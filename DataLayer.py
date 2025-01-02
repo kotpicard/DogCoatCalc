@@ -16,6 +16,7 @@ class DataLayer(wx.EvtHandler):
         self.Bind(EVT_LOAD, self.LoadData)
         self.Bind(EVT_PASS_DOG, self.AddDogFromTopLayer)
         self.Bind(EVT_DISPLAY_ALL_DOGS, self.PassDogsForDisplay)
+        self.Bind(EVT_REQUEST_DOG_BY_ID, self.PassDogByID)
 
     def AddDogFromTopLayer(self, evt):
         if evt.dog.id is not None:
@@ -25,6 +26,10 @@ class DataLayer(wx.EvtHandler):
             self.currentDogID += 1
             self.dogs.append(evt.dog)
         wx.PostEvent(self, SaveEvent())
+
+    def PassDogByID(self, evt):
+        if int(evt.dogid) in range(len(self.dogs)):
+            wx.PostEvent(self.parent, PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type="byid"))
 
     def PassDogsForDisplay(self, evt):
         dog_descs = []

@@ -20,6 +20,10 @@ class DogApp(wx.App):
         self.Bind(EVT_PASS_DOG_DATA, self.PassDogData)
         self.Bind(EVT_NAVIGATION, self.NavEventHandler)
         self.Bind(EVT_DISPLAY_ALL_DOGS, self.DisplayDogs)
+        self.Bind(EVT_REQUEST_DOG_BY_ID, self.RequestDog)
+
+    def RequestDog(self, evt):
+        wx.PostEvent(self.DataLayer, evt)
 
     def LoadDogFromDataHandler(self, evt):
         wx.PostEvent(self.LogicLayer, evt)
@@ -28,8 +32,10 @@ class DogApp(wx.App):
         wx.PostEvent(self.DataLayer, evt)
 
     def PassDogData(self, evt):
-        wx.PostEvent(self.LogicLayer, evt)
-        if evt.type=="add":
+        if evt.type=="byid":
+            wx.PostEvent(self.MainWindow, PassDataForDogPageEvent(dog=evt.dog))
+        if evt.type == "add":
+            wx.PostEvent(self.LogicLayer, evt)
             wx.PostEvent(self, NavigationEvent(destination="MyDogs"))
 
     def NavEventHandler(self, evt):

@@ -727,7 +727,7 @@ class Dog:
                 ("relatives", "|".join([str(x.id) for x in self.relatives]))]
 
     def ToDesc(self):
-        return [self.name, "Male" if self.sex == "m" else "Female", str(self.age),
+        return [str(self.id)+". "+self.name, "Male" if self.sex == "m" else "Female", str(self.age),
                 "\n".join([str(x.desc) for x in self.coat])]
 
     def CreateParents(self):

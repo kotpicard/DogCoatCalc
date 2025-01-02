@@ -25,6 +25,8 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_ADD_DOG, self.AddDogHandler)
         self.Bind(EVT_PASS_DOG_DATA, self.PassDogData)
         self.Bind(EVT_NAV_DATA_PASS, self.NavigationDataHandler)
+        self.Bind(EVT_OPEN_DOG_PAGE, self.GoToDogPage)
+        self.Bind(EVT_PASS_DATA_DOG_PAGE, self.CreateDogPage)
 
     def CreateMenu(self):
         filemenu = wx.Menu()
@@ -40,7 +42,9 @@ class MainWindow(wx.Frame):
 
     def NavigationDataHandler(self, e):
         self.MainSizer.Clear(delete_windows=True)
+        print(e.destination)
         self.NAVDICT[e.destination](e.data)
+        print("layout")
         self.Layout()
         self.Center()
 
@@ -58,14 +62,24 @@ class MainWindow(wx.Frame):
     def PassDogData(self, e):
         wx.PostEvent(self.app, e)
 
-    def CreateGoalsPage(self):
+    def CreateGoalsPage(self, data):
         ...
 
-    def CreateDogPage(self, data):
-        dogpanel = DogPanel(self)
+    def GoToDogPage(self, evt):
+        print("GO TO DOG PAGE", evt.num)
+        dogid = evt.num
+        wx.PostEvent(self.app, RequestDogByID(dogid=dogid))
+
+    def CreateDogPage(self, evt):
+        self.MainSizer.Clear(delete_windows=True)
+        data = evt.dog.ToDesc()
+        dogpanel = DogPanel(self, data)
         self.MainSizer.Add(dogpanel)
+        self.Layout()
+        self.Center()
 
     def CreateMyDogsPanel(self, data):
+        print("HERE")
         mydogspanel = MyDogsPanel(self)
         mydogspanel.Fill(data)
         self.MainSizer.Add(mydogspanel)

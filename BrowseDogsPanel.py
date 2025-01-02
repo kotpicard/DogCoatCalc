@@ -1,7 +1,7 @@
 import wx
 from LinkButton import LinkButton
 from text_en import *
-
+from CustomEvents import *
 from GuiConstants import Hex_BACKGROUNDBOX, Color
 
 
@@ -23,9 +23,11 @@ class BrowseDogsPanel(wx.ScrolledWindow):
         button = LinkButton(self, label=value)
         self.sizer.Add(button)
 
-    def AddElement(self, values):
+    def AddElement(self, values, i=None):
         elementsizer = wx.BoxSizer(wx.VERTICAL)
         button = LinkButton(self, label=values[0])
+        button.num = i
+        button.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
         sexlabel = wx.StaticText(self, label=TEXT_SEX + values[1])
         agelabel = wx.StaticText(self, label=TEXT_AGE + values[2])
         # breedlabel = wx.StaticText(self, label=TEXT_BREED + values[3])
@@ -58,6 +60,10 @@ class BrowseDogsPanel(wx.ScrolledWindow):
         elementsizer.Add(coatlabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
 
         self.sizer.Add(elementsizer)
+
+    def OpenDogPage(self, e):
+        num = e.GetEventObject().num
+        wx.PostEvent(self.GetParent().GetParent(), OpenDogPageEvent(num=num))
 
 
 class MyFrame(wx.Frame):

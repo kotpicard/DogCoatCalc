@@ -12,7 +12,6 @@ class LinkButton(wx.Panel):
 
         # Bind events
         self.Bind(wx.EVT_PAINT, self.on_paint)
-        self.Bind(wx.EVT_LEFT_DOWN, self.on_click)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_hover_enter)
         self.Bind(wx.EVT_LEAVE_WINDOW, self.on_hover_leave)
 
@@ -29,9 +28,9 @@ class LinkButton(wx.Panel):
     def on_hover_leave(self, event):
         self.text_color = self.normal_text_color
         self.Refresh()
-
-    def on_click(self, event):
-        wx.MessageBox(f"You clicked '{self.label}'!", "Info", wx.OK | wx.ICON_INFORMATION)
+    #
+    # def on_click(self, event):
+    #     wx.MessageBox(f"You clicked '{self.label}'!", "Info", wx.OK | wx.ICON_INFORMATION)
 
     def on_paint(self, event):
         # Create a graphics context for smooth drawing

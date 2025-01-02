@@ -74,49 +74,55 @@ class MyDogsPanel(wx.Panel):
         button = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_ADD,
                                colors=BUTTONCOLORS)
         button2 = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_REFRESH,
-                               colors=BUTTONCOLORS)
+                                colors=BUTTONCOLORS)
         button2.Bind(wx.EVT_LEFT_DOWN, self.Reload)
         buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.dogspanel, 5, wx.EXPAND | wx.ALL, 10)
         buttonsizer.Add(button, 0, wx.ALL, 10)
-        buttonsizer.Add(button2, 0,wx.ALL, 10)
+        buttonsizer.Add(button2, 0, wx.ALL, 10)
         buttonsizer.AddStretchSpacer(3)
         sizer.Add(buttonsizer, 0, wx.ALL, 0)
         self.SetSizer(sizer)
         button.Bind(wx.EVT_LEFT_DOWN, self.AddDog)
 
     def Fill(self, elems):
-        for elem in elems:
-            self.dogspanel.AddElement(elem)
+        print("FILLING")
+        for i in range(len(elems)):
+            self.dogspanel.AddElement(elems[i], i)
 
-    def AddDog(self,e):
+    def AddDog(self, e):
         evt = AddDogEvent()
         wx.PostEvent(self.GetParent(), evt)
 
-    def Reload(self,e):
+    def Reload(self, e):
         wx.PostEvent(self.GetParent(), NavigationEvent(destination="MyDogs"))
 
 
 class DogPanel(wx.Panel):
-    def __init__(self, parent):
+    def __init__(self, parent, values):
         super().__init__(parent)
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
         dogdatasizer = wx.BoxSizer(wx.VERTICAL)
-        namelabel = wx.StaticText(self, label=TEXT_NAMEBARE)
+        namelabel = wx.StaticText(self, label=values[0])
+        dogid = int(values[0].split(".")[0])
+        previd = dogid - 1
+        nextid = dogid + 1
         namelabel.SetFont(FONT_BIG)
         namelabel.SetForegroundColour(Color(Hex_FONTCOLORBG).rgb)
         dogdatasizer.Add(namelabel, 0, wx.ALL)
-        sexlabel = wx.StaticText(self, label=TEXT_SEX)
-        agelabel = wx.StaticText(self, label=TEXT_AGE)
-        breedlabel = wx.StaticText(self, label=TEXT_BREED)
-        coatlabel = wx.StaticText(self, label=TEXT_COAT)
+        agelabel = wx.StaticText(self, label=TEXT_AGE + values[2])
+        sexlabel = wx.StaticText(self, label=TEXT_SEX + values[1])
+
+        # breedlabel = wx.StaticText(self, label=TEXT_BREED)
+        coatlabel = wx.StaticText(self, label=TEXT_COAT + values[3])
         viewgenotypebutton = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_VIEWGENOTYPE,
                                            colors=BUTTONCOLORS)
         breedingtestsbutton = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_BREEDINGTESTS,
                                             colors=BUTTONCOLORS)
-        dogdatasizer.Add(sexlabel, 0, wx.ALL)
+
         dogdatasizer.Add(agelabel, 0, wx.ALL)
-        dogdatasizer.Add(breedlabel, 0, wx.ALL)
+        dogdatasizer.Add(sexlabel, 0, wx.ALL)
+        # dogdatasizer.Add(breedlabel, 0, wx.ALL)
         dogdatasizer.Add(coatlabel, 0, wx.ALL)
         dogdatasizer.Add(viewgenotypebutton, 0, wx.ALL, 5)
         dogdatasizer.Add(breedingtestsbutton, 0, wx.ALL, 5)
@@ -144,8 +150,14 @@ class DogPanel(wx.Panel):
         bottomsizer = wx.BoxSizer(wx.HORIZONTAL)
         buttonprev = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_PREVDOG,
                                    colors=BUTTONCOLORS)
+        buttonprev.num = previd
+        buttonprev.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
+
         buttonnext = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_NEXTDOG,
                                    colors=BUTTONCOLORS)
+        buttonnext.num = nextid
+        buttonnext.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
+
         bottomsizer.Add(buttonprev, 0, wx.ALL, 10)
         bottomsizer.AddStretchSpacer()
         bottomsizer.Add(buttonnext, 0, wx.ALL, 10)
@@ -155,6 +167,10 @@ class DogPanel(wx.Panel):
         dogsizer.AddSpacer(50)
         dogsizer.Add(bottomsizer, 1, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(dogsizer)
+
+    def OpenDogPage(self, e):
+        num = e.GetEventObject().num
+        wx.PostEvent(self.GetParent(), OpenDogPageEvent(num=num))
 
 
 class BreedingPanel(wx.Panel):

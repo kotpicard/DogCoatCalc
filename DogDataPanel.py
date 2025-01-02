@@ -1,46 +1,39 @@
 from RoundedButton import RoundedButton
 from GuiConstants import *
+from text_en import *
 
 
 class DogDataPanel(wx.Panel):
-    def __init__(self, parent_panel, font_color, button_colors):
+    def __init__(self, parent_panel, values):
         super().__init__(parent_panel)
         self.parent_panel = parent_panel
         self.SetBackgroundColour(self.parent_panel.GetBackgroundColour())
-        self.font_color = font_color
-        self.button_colors = button_colors
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
         # Main vertical sizer for layout
 
         # Add UI components to the sizer
-        self.create_components()
+        self.create_components(values)
         self.SetSizer(self.sizer)
 
-    def create_components(self):
-        """
-        Create all UI components and add them to the sizer.
-        """
+    def create_components(self, values):
         # Name Label
-        namelabel = wx.StaticText(self.parent_panel, label="Name")
-        font = namelabel.GetFont()
-        font.SetPointSize(20)  # Set font size to 20
-        namelabel.SetFont(font)
-        namelabel.SetForegroundColour(self.font_color)
+        namelabel = wx.StaticText(self.parent_panel, label=values[0])
+        namelabel.SetFont(FONT_BIG)
         self.sizer.Add(namelabel, 0, wx.ALL, 5)
 
         # Other Labels
-        self.sizer.Add(wx.StaticText(self.parent_panel, label="Sex:"), 0, wx.ALL, 5)
-        self.sizer.Add(wx.StaticText(self.parent_panel, label="Age:"), 0, wx.ALL, 5)
-        self.sizer.Add(wx.StaticText(self.parent_panel, label="Breed:"), 0, wx.ALL, 5)
-        self.sizer.Add(wx.StaticText(self.parent_panel, label="Coat:"), 0, wx.ALL, 5)
+        self.sizer.Add(wx.StaticText(self.parent_panel, label=TEXT_SEX+values[1]), 0, wx.ALL, 5)
+        self.sizer.Add(wx.StaticText(self.parent_panel, label=TEXT_AGE+values[2]), 0, wx.ALL, 5)
+        # self.sizer.Add(wx.StaticText(self.parent_panel, label="Breed:"), 0, wx.ALL, 5)
+        self.sizer.Add(wx.StaticText(self.parent_panel, label=TEXT_COAT+values[3]), 0, wx.ALL, 5)
 
         # Buttons
         view_genotype_button = RoundedButton(
-            self.parent_panel, size=(200, 50), corner_radius=10, label="View Genotype", colors=self.button_colors
+            self.parent_panel, size=(200, 50), corner_radius=10, label=TEXT_VIEWGENOTYPE, colors=BUTTONCOLORS
         )
         breeding_tests_button = RoundedButton(
-            self.parent_panel, size=(200, 50), corner_radius=10, label="Breeding Tests", colors=self.button_colors
+            self.parent_panel, size=(200, 50), corner_radius=10, label=TEXT_BREEDINGTESTS, colors=BUTTONCOLORS
         )
 
         self.sizer.Add(view_genotype_button, 0, wx.ALL, 5)
