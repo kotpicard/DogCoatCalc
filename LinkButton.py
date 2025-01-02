@@ -2,7 +2,7 @@ from GuiConstants import *
 
 
 class LinkButton(wx.Panel):
-    def __init__(self, parent, label, size=(50, 50), textcolors=(Color(Hex_FONTLINKCOLOR).rgb, Color(Hex_FONTLINKCOLORHOVER).rgb)):
+    def __init__(self, parent, label, size=(200, 50), textcolors=(Color(Hex_FONTLINKCOLOR).rgb, Color(Hex_FONTLINKCOLORHOVER).rgb)):
         super().__init__(parent, size=size)
         self.label = label
 
