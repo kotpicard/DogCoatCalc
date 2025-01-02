@@ -1,0 +1,25 @@
+CURRENT_DOG_ID:2
+CURRENT_BREEDING_ID:0
+##DOGS
+#ID:0
+NAME:qqqq
+AGE:1
+SEX:m
+COAT:Isabella|Red|Irish white pattern|Double merle|Ticking|Sable|Tan points
+GENOTYPE:Ay/Any Allele | b/b | d/d | Any allele except 'e'/Any Allele | Any Allele/Any Allele | Any allele except 'i'/Any Allele | Any allele except 'K'/Any allele except 'K' | M/M | si/si | T/Any Allele
+MOTHER:None
+FATHER:None
+CHILDREN:
+RELATIVES:
+#ID:1
+NAME:qqqq
+AGE:1
+SEX:m
+COAT:Isabella|Red|Irish white pattern|Double merle|Ticking|Sable|Tan points
+GENOTYPE:Ay/Any Allele | b/b | d/d | Any allele except 'e'/Any Allele | Any Allele/Any Allele | Any allele except 'i'/Any Allele | Any allele except 'K'/Any allele except 'K' | M/M | si/si | T/Any Allele
+MOTHER:None
+FATHER:None
+CHILDREN:
+RELATIVES:
+##BREEDINGS
+##GOALS
