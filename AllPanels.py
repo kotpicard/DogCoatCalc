@@ -73,8 +73,15 @@ class MyDogsPanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         button = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_ADD,
                                colors=BUTTONCOLORS)
+        button2 = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_REFRESH,
+                               colors=BUTTONCOLORS)
+        button2.Bind(wx.EVT_LEFT_DOWN, self.Reload)
+        buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.dogspanel, 5, wx.EXPAND | wx.ALL, 10)
-        sizer.Add(button, 0,wx.ALL, 10)
+        buttonsizer.Add(button, 0, wx.ALL, 10)
+        buttonsizer.Add(button2, 0,wx.ALL, 10)
+        buttonsizer.AddStretchSpacer(3)
+        sizer.Add(buttonsizer, 0, wx.ALL, 0)
         self.SetSizer(sizer)
         button.Bind(wx.EVT_LEFT_DOWN, self.AddDog)
 
@@ -85,6 +92,9 @@ class MyDogsPanel(wx.Panel):
     def AddDog(self,e):
         evt = AddDogEvent()
         wx.PostEvent(self.GetParent(), evt)
+
+    def Reload(self,e):
+        wx.PostEvent(self.GetParent(), NavigationEvent(destination="MyDogs"))
 
 
 class DogPanel(wx.Panel):

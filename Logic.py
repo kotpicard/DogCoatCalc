@@ -630,7 +630,7 @@ NO_WHITE.desc = "No white spotting"
 MINOR_WHITE.desc = "Little white spotting"
 PIEBALD.desc = "Piebald white pattern"
 IRISH_WHITE.desc = "Irish white pattern"
-NO_TICKING.desc = "No ticking"
+NO_TICKING.desc = "No ticking/roaning"
 MINOR_TICKING.desc = "Minor ticking"
 TICKING.desc = "Ticking"
 ROANING.desc = "Roaning"
@@ -693,7 +693,8 @@ GREYING.AddCondition(4, "HasAtLeastOne", "G")
 GREYING.AddCondition(3, "IsNotHomozygousFor", "e")
 
 OTHER_PHENOTYPES = [SABLE, AGOUTI, TANPOINT, BRINDLE, SOLID_EUMELANIN, SOLID_PHEOMELANIN, MASK, MERLE, DOUBLE_MERLE,
-                    NO_WHITE, MINOR_WHITE, PIEBALD, IRISH_WHITE, MINOR_TICKING, TICKING, ROANING, GREYING]
+                    NO_WHITE, MINOR_WHITE, PIEBALD, IRISH_WHITE, MINOR_TICKING, TICKING, ROANING, GREYING, NO_GREYING,
+                    NO_MERLE, NO_TICKING]
 
 PHEN_DICT = dict()
 for elem in OTHER_PHENOTYPES + COLOR_PHENOTYPES:
@@ -726,7 +727,8 @@ class Dog:
                 ("relatives", "|".join([str(x.id) for x in self.relatives]))]
 
     def ToDesc(self):
-        return [self.name, str(self.age), self.sex, "|".join([str(x.desc) for x in self.coat])]
+        return [self.name, "Male" if self.sex == "m" else "Female", str(self.age),
+                "\n".join([str(x.desc) for x in self.coat])]
 
     def CreateParents(self):
         if type(self.dam) != Dog:

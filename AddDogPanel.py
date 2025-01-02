@@ -90,6 +90,7 @@ class AddDogPanel(wx.Panel):
         addbutton.Bind(wx.EVT_LEFT_DOWN, self.AddDog)
         cancelbutton = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_CANCEL,
                                      colors=BUTTONCOLORS)
+        cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.Cancel)
         bottomsizer.Add(addbutton, 1, wx.ALL, 10)
         bottomsizer.Add(cancelbutton, 1, wx.ALL, 10)
 
@@ -105,8 +106,11 @@ class AddDogPanel(wx.Panel):
         age = children[1].GetValue()
         other = [x.GetLabel() for x in children[2:] if x.GetValue()]
         sex = other.pop(0)
-        evt = PassDogDataEvent(name=name, age=age, sex=sex, coat=other)
+        evt = PassDogDataEvent(name=name, age=age, sex=sex, coat=other, type="add")
         wx.PostEvent(self.GetParent(), evt)
+
+    def Cancel(self, e):
+        wx.PostEvent(self.GetParent(), NavigationEvent(destination="MyDogs"))
 
 
 

@@ -29,6 +29,8 @@ class DogApp(wx.App):
 
     def PassDogData(self, evt):
         wx.PostEvent(self.LogicLayer, evt)
+        if evt.type=="add":
+            wx.PostEvent(self, NavigationEvent(destination="MyDogs"))
 
     def NavEventHandler(self, evt):
         if evt.destination == "MyDogs":

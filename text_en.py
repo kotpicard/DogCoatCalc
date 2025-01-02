@@ -38,6 +38,7 @@ TEXT_SAVE = "Save"
 TEXT_LOAD = "Load"
 TEXT_CLEAR = "Clear"
 TEXT_CALCULATE = "Calculate"
+TEXT_REFRESH = "Refresh"
 
 # Breeding result
 TEXT_CLOSE = "Close"

@@ -34,7 +34,7 @@ class LogicLayer(wx.EvtHandler):
         age = e.age
         sex = "f" if e.sex == "Female" else "m"
         coat = e.coat
-        coat_phens = [PHEN_DICT[x] for x in coat]
+        coat_phens = [PHEN_DICT[x] for x in coat if x != "I don't know"]
         dog = Dog(Genotype(), coat=coat_phens, name=name, age=age, sex=sex)
         for p in coat_phens:
             p.ImposeConditions(dog.genotype)
