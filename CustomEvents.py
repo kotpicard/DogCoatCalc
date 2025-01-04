@@ -17,3 +17,5 @@ PassDogDataEvent, EVT_PASS_DOG_DATA = NewEvt()
 DisplayAllDogsEvent, EVT_DISPLAY_ALL_DOGS = NewEvt()
 RequestDogByID, EVT_REQUEST_DOG_BY_ID = NewEvt()
 
+#DOG EVENTS
+DogIncorrectGenotypeEvent, EVT_INCORRECT_GENOTYPE = NewEvt()

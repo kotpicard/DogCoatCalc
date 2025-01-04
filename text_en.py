@@ -91,3 +91,6 @@ TEXT_ISABELLA = "Isabella"
 TEXT_RED = "Red"
 TEXT_DILUTE_RED = "Fawn/cream/silver/white"
 TEXT_WHITE = "White"
+
+TEXT_INCORRECT_GENOTYPE = """The genotype of this dog is contradictory. Check if the traits selected are correct and try again."""
+TEXT_WARNING = "Warning!"

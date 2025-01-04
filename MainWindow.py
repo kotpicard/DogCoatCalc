@@ -27,6 +27,7 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_NAV_DATA_PASS, self.NavigationDataHandler)
         self.Bind(EVT_OPEN_DOG_PAGE, self.GoToDogPage)
         self.Bind(EVT_PASS_DATA_DOG_PAGE, self.CreateDogPage)
+        self.Bind(EVT_INCORRECT_GENOTYPE, self.IncorrectGenotypeAlert)
 
     def CreateMenu(self):
         filemenu = wx.Menu()
@@ -58,6 +59,11 @@ class MainWindow(wx.Frame):
         self.MainSizer.Add(test)
         self.Layout()
         self.Center()
+
+    def IncorrectGenotypeAlert(self, e):
+        dialog = wx.MessageDialog(self, TEXT_INCORRECT_GENOTYPE, TEXT_WARNING, wx.OK | wx.ICON_WARNING)
+        dialog.ShowModal()  # Show the dialog modally
+        dialog.Destroy()
 
     def PassDogData(self, e):
         wx.PostEvent(self.app, e)

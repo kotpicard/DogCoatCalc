@@ -429,6 +429,7 @@ class MultipleCondition:
 
 class Genotype:
     def __init__(self, loci=None):
+        self.status = True
         if not loci:
             self.loci = [Locus(i) for i in range(10)]
         else:
@@ -500,11 +501,11 @@ class Phenotype:
 
     def ImposeConditions(self, genotype):
         self.CreateReverseConditions()
-        print("################################################################")
         for cond in self.reverseConditions:
             # print(cond.locus, cond.name)
-            print("LOOK HERE LOOK HERE LOOK HERE")
-            print(cond.Execute(genotype), end="THIS LINE!!!!!!!!!!!!!!!!!!!")
+            result = cond.Execute(genotype)
+            if not result:
+                genotype.status = False
 
 
 class Possibility:

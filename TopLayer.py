@@ -1,6 +1,6 @@
 import wx
 
-from gui import MainWindow
+from MainWindow import MainWindow
 from DataLayer import DataLayer
 from LogicLayer import LogicLayer
 
@@ -21,6 +21,10 @@ class DogApp(wx.App):
         self.Bind(EVT_NAVIGATION, self.NavEventHandler)
         self.Bind(EVT_DISPLAY_ALL_DOGS, self.DisplayDogs)
         self.Bind(EVT_REQUEST_DOG_BY_ID, self.RequestDog)
+        self.Bind(EVT_INCORRECT_GENOTYPE, self.IncorrectGenotypeAlert)
+
+    def IncorrectGenotypeAlert(self, evt):
+        wx.PostEvent(self.MainWindow, evt)
 
     def RequestDog(self, evt):
         wx.PostEvent(self.DataLayer, evt)

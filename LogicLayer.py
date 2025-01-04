@@ -38,5 +38,8 @@ class LogicLayer(wx.EvtHandler):
         dog = Dog(Genotype(), coat=coat_phens, name=name, age=age, sex=sex)
         for p in coat_phens:
             p.ImposeConditions(dog.genotype)
-        evt = PassDogToDataLayerEvent(dog=dog)
-        wx.PostEvent(self.parent, evt)
+        if dog.genotype.status:
+            evt = PassDogToDataLayerEvent(dog=dog)
+            wx.PostEvent(self.parent, evt)
+        else:
+            wx.PostEvent(self.parent, DogIncorrectGenotypeEvent())
