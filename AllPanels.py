@@ -105,6 +105,7 @@ class DogPanel(wx.Panel):
         dogdatasizer = wx.BoxSizer(wx.VERTICAL)
         namelabel = wx.StaticText(self, label=values[0])
         dogid = int(values[0].split(".")[0])
+        self.dogid = dogid
         previd = dogid - 1
         nextid = dogid + 1
         namelabel.SetFont(FONT_BIG)
@@ -117,6 +118,8 @@ class DogPanel(wx.Panel):
         coatlabel = wx.StaticText(self, label=TEXT_COAT + values[3])
         viewgenotypebutton = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_VIEWGENOTYPE,
                                            colors=BUTTONCOLORS)
+        viewgenotypebutton.Bind(wx.EVT_LEFT_DOWN, self.OpenGenotypeView)
+
         breedingtestsbutton = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_BREEDINGTESTS,
                                             colors=BUTTONCOLORS)
 
@@ -171,6 +174,51 @@ class DogPanel(wx.Panel):
     def OpenDogPage(self, e):
         num = e.GetEventObject().num
         wx.PostEvent(self.GetParent(), OpenDogPageEvent(num=num))
+
+    def OpenGenotypeView(self, e):
+        wx.PostEvent(self.GetParent(), OpenGenotypeViewEvent(dogid=self.dogid))
+
+
+class GenotypePanel(wx.Panel):
+    def __init__(self, parent, data):
+        # data is tuple (name, genotype object prepared for display)
+        # genotype format: (((value, type),(value,type)), etc)
+        # values: anyallele, notallele, allele
+        super().__init__(parent)
+        name = data[0]
+        genotype = data[1]
+        self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
+        titlelabel = wx.StaticText(self, label="Genotype of " + name)
+        titlelabel.SetFont(FONT_BIG)
+        genotypesizer = wx.GridSizer(2, 5, 30, 5)
+        for locusnumber, locus in enumerate(genotype):
+            value1 = locus[0][0]
+            value2 = locus[1][0]
+            locussizer = wx.BoxSizer(wx.VERTICAL)
+            if locus[0][1] == "allele":
+                color1 = Color(Hex_ALLELE).rgb
+            elif locus[0][1] == "notallele":
+                color1 = Color(Hex_NOTALLELE).rgb
+            else:
+                color1 = Color(Hex_ANYALLELE).rgb
+            if locus[1][1] == "allele":
+                color2 = Color(Hex_ALLELE).rgb
+            elif locus[1][1] == "notallele":
+                color2 = Color(Hex_NOTALLELE).rgb
+            else:
+                color2 = Color(Hex_ANYALLELE).rgb
+            button1 = RoundedButton(self, label=value1, colors=(color1, color1))
+            button2 = RoundedButton(self, label=value2, colors=(color2, color2))
+            editbutton = RoundedButton(self, label=TEXT_EDIT, colors=BUTTONCOLORS)
+            editbutton.locusnumber = locusnumber
+            locussizer.Add(button1, 2, wx.EXPAND|wx.ALL, 5)
+            locussizer.Add(button2, 2, wx.EXPAND|wx.ALL, 5)
+            locussizer.Add(editbutton, 1, wx.EXPAND|wx.ALL, 5)
+            genotypesizer.Add(locussizer, 1, wx.EXPAND|wx.ALL, 0)
+        mainsizer = wx.BoxSizer(wx.VERTICAL)
+        mainsizer.Add(titlelabel, 1, wx.EXPAND | wx.ALL, 10)
+        mainsizer.Add(genotypesizer, 5, wx.EXPAND | wx.ALL, 10)
+        self.SetSizer(mainsizer)
 
 
 class BreedingPanel(wx.Panel):

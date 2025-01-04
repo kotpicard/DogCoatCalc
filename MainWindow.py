@@ -28,6 +28,8 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_OPEN_DOG_PAGE, self.GoToDogPage)
         self.Bind(EVT_PASS_DATA_DOG_PAGE, self.CreateDogPage)
         self.Bind(EVT_INCORRECT_GENOTYPE, self.IncorrectGenotypeAlert)
+        self.Bind(EVT_VIEW_GENOTYPE, self.InitViewGenotype)
+        self.Bind(EVT_FORMATTEDGEN_DATAPASS, self.OpenGenotypeView)
 
     def CreateMenu(self):
         filemenu = wx.Menu()
@@ -52,6 +54,16 @@ class MainWindow(wx.Frame):
     def CreateDefaultPanel(self):
         defaultpanel = DefaultPanel(self)
         self.MainSizer.Add(defaultpanel)
+
+    def InitViewGenotype(self, e):
+        wx.PostEvent(self.app, e)
+
+    def OpenGenotypeView(self, e):
+        self.MainSizer.Clear(delete_windows=True)
+        genotypepanel = GenotypePanel(self, e.data)
+        self.MainSizer.Add(genotypepanel)
+        self.Layout()
+        self.Center()
 
     def AddDogHandler(self, e):
         self.MainSizer.Clear(delete_windows=True)

@@ -23,6 +23,11 @@ Hex_FONTCOLORBG = "150F0F"
 Hex_FONTLINKCOLORHOVER = "4548EF"
 Hex_FONTLINKCOLOR = "48499D"
 
+#allele hex codes
+Hex_ALLELE = "13557E"
+Hex_NOTALLELE = "7E1313"
+Hex_ANYALLELE = "968C1F"
+
 
 class Color:
     def __init__(self, hex):

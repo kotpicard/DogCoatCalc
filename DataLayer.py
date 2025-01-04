@@ -17,6 +17,14 @@ class DataLayer(wx.EvtHandler):
         self.Bind(EVT_PASS_DOG, self.AddDogFromTopLayer)
         self.Bind(EVT_DISPLAY_ALL_DOGS, self.PassDogsForDisplay)
         self.Bind(EVT_REQUEST_DOG_BY_ID, self.PassDogByID)
+        self.Bind(EVT_REQUEST_GENOTYPE_BY_ID, self.PassGenotypeByID)
+
+    def PassGenotypeByID(self, evt):
+        if evt.type == "viewgenotype":
+            # if passing for view genotype window, pass the data to logic layer for formatting
+            data = (self.dogs[evt.dogid].name, self.dogs[evt.dogid].genotype)
+            newevt = PassDataForViewGenotype(data=data)
+            wx.PostEvent(self.parent, newevt)
 
     def AddDogFromTopLayer(self, evt):
         if evt.dog.id is not None:

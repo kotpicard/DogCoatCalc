@@ -94,3 +94,4 @@ TEXT_WHITE = "White"
 
 TEXT_INCORRECT_GENOTYPE = """The genotype of this dog is contradictory. Check if the traits selected are correct and try again."""
 TEXT_WARNING = "Warning!"
+TEXT_EDIT = "Edit"

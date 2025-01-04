@@ -9,6 +9,30 @@ class LogicLayer(wx.EvtHandler):
         self.parent = parent
         self.Bind(EVT_LOAD_DOG_FROM_DATA, self.LoadDog)
         self.Bind(EVT_PASS_DOG_DATA, self.CreateDog)
+        self.Bind(EVT_VIEWGEN_DATAPASS, self.FormatForViewGen)
+
+    def FormatForViewGen(self, evt):
+        data = evt.data
+        name = data[0]
+        genotype = data[1]
+        res = []
+        for locus in genotype:
+            value1 = locus.alleles[0].value
+            value2 = locus.alleles[1].value
+            if type(locus.alleles[0]) == Allele:
+                type1 = "allele"
+            elif type(locus.alleles[0]) == NotAllele:
+                type1 = "notallele"
+            else:
+                type1 = "anyallele"
+            if type(locus.alleles[1]) == Allele:
+                type2 = "allele"
+            elif type(locus.alleles[1]) == NotAllele:
+                type2 = "notallele"
+            else:
+                type2 = "anyallele"
+            res.append([(value1, type1), (value2, type2)])
+        wx.PostEvent(self.parent, PassFormattedGenotype(data=(name, res)))
 
     def LoadDog(self, evt):
         data = [x[1].strip() for x in evt.data]
