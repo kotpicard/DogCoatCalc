@@ -15,27 +15,51 @@ class LogicLayer(wx.EvtHandler):
         self.Bind(EVT_OPEN_EDIT_LOCUS, self.GetOptionsForEditLocus)
 
     def StartLocusEdit(self, evt):
-        dogid = evt.data[0]
-        name = evt.data[1]
-        genotype = evt.data[2]
+        dogid = evt.dogid
+        values = evt.values
+        replacementtype = evt.replacementtype
         number = evt.number
-        wx.PostEvent(self.parent, RequestGenotypeByID(dogid=dogid, type="passgenotype", subtype="editlocus"))
+        print(dogid,values,replacementtype,number)
+        wx.PostEvent(self.parent, RequestGenotypeByID(dogid=dogid, type="passgenotype", subtype="editlocus",
+                                                      data=(values, number, replacementtype, dogid)))
 
     def ProcessGenotype(self, evt):
         if evt.type == "editlocus":
-            self.ProcessLocusEdit()
+            self.ProcessLocusEdit(genotype=evt.genotype, data=evt.data)
 
-    def ProcssLocusEdit(self, data):
-        ...
+    def ProcessLocusEdit(self, genotype, data):
+        # data is values, number, replacementtype, dogid
+        values = data[0]
+        number = data[1]
+        replacementtype = data[2]
+        print(replacementtype)
+        dogid=data[3]
+        if replacementtype == "anyallele":
+            print("any")
+            replacementallele = AnyAllele()
+        elif replacementtype == "notallele":
+            print("not")
+            replacementallele = NotAllele(values)
+        else:
+            print("allele")
+            replacementallele = Allele(values[0])
+            print(type(replacementallele))
+        replacementlocus = Locus(number, allele1=replacementallele, allele2=AnyAllele())
+        print("REPLACEMENT", replacementlocus)
+        canreplace = genotype[number].CanReplace(replacementlocus)
+        print(canreplace, "CANREPLACE")
+        if canreplace:
+            genotype[number].replace(replacementlocus)
+            wx.PostEvent(self.parent, DogGenotypeChangedEvent(dogid=dogid))
+            print("changed")
+        else:
+            wx.PostEvent(self.parent, DogIncorrectGenotypeEvent())
 
     def GetOptionsForEditLocus(self, evt):
         locusnumber = evt.number
         options = ALLELES[locusnumber]
         newevt = PassEditLocusDataEvent(number=locusnumber, dogid=evt.dogid, options=options)
         wx.PostEvent(self.parent, newevt)
-
-
-
 
     def FormatForViewGen(self, evt):
         data = evt.data

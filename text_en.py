@@ -92,7 +92,7 @@ TEXT_RED = "Red"
 TEXT_DILUTE_RED = "Fawn/cream/silver/white"
 TEXT_WHITE = "White"
 
-TEXT_INCORRECT_GENOTYPE = """The genotype of this dog is contradictory. Check if the traits selected are correct and try again."""
+TEXT_INCORRECT_GENOTYPE = """The genotype of this dog is contradictory. Check if the options selected are correct and try again."""
 TEXT_WARNING = "Warning!"
 TEXT_EDIT = "Edit"
 TEXT_CHANGE_ALLELE = "Change Allele at Locus "

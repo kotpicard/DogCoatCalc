@@ -211,13 +211,13 @@ class GenotypePanel(wx.Panel):
                 color2 = Color(Hex_ANYALLELE).rgb
             button1 = RoundedButton(self, label=value1, colors=(color1, color1))
             button2 = RoundedButton(self, label=value2, colors=(color2, color2))
-            editbutton = RoundedButton(self, label=TEXT_EDIT, colors=BUTTONCOLORS)
-            editbutton.locusnumber = locusnumber
-            editbutton.Bind(wx.EVT_LEFT_DOWN, self.OpenEditLocus)
-            locussizer.Add(button1, 2, wx.EXPAND|wx.ALL, 5)
-            locussizer.Add(button2, 2, wx.EXPAND|wx.ALL, 5)
-            locussizer.Add(editbutton, 1, wx.EXPAND|wx.ALL, 5)
-            genotypesizer.Add(locussizer, 1, wx.EXPAND|wx.ALL, 0)
+            button1.Bind(wx.EVT_LEFT_DOWN, self.OpenEditLocus)
+            button1.locusnumber = locusnumber
+            button2.Bind(wx.EVT_LEFT_DOWN, self.OpenEditLocus)
+            button2.locusnumber = locusnumber
+            locussizer.Add(button1, 2, wx.EXPAND | wx.ALL, 5)
+            locussizer.Add(button2, 2, wx.EXPAND | wx.ALL, 5)
+            genotypesizer.Add(locussizer, 1, wx.EXPAND | wx.ALL, 0)
         mainsizer = wx.BoxSizer(wx.VERTICAL)
         mainsizer.Add(titlelabel, 1, wx.EXPAND | wx.ALL, 10)
         mainsizer.Add(genotypesizer, 5, wx.EXPAND | wx.ALL, 10)
@@ -229,19 +229,20 @@ class GenotypePanel(wx.Panel):
         wx.PostEvent(self.GetParent(), evt)
 
 
-
 class AllelePanel(wx.Panel):
     def __init__(self, parent, number, options, dogid):
         super().__init__(parent)
-        self.dogid=dogid
+        self.dogid = dogid
+        self.number = number
         self.options = options
+        self.type = "allele"
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
-        titlelabel = wx.StaticText(self, label=TEXT_CHANGE_ALLELE+str(number))
+        titlelabel = wx.StaticText(self, label=TEXT_CHANGE_ALLELE + str(number))
         titlelabel.SetFont(FONT_BIG)
         typelabel = wx.StaticText(self, label=TEXT_TYPE)
         typelabel.SetFont(FONT_BIG)
-        typebutton1 = wx.RadioButton(self, label=TEXT_ALLELE)
-        typebutton1.Bind(wx.EVT_RADIOBUTTON,self.LayoutAllele)
+        typebutton1 = wx.RadioButton(self, label=TEXT_ALLELE,style=wx.RB_GROUP)
+        typebutton1.Bind(wx.EVT_RADIOBUTTON, self.LayoutAllele)
         typebutton2 = wx.RadioButton(self, label=TEXT_NOTALLELE)
         typebutton2.Bind(wx.EVT_RADIOBUTTON, self.LayoutNotAllele)
         typebutton3 = wx.RadioButton(self, label=TEXT_ANYALLELE)
@@ -255,6 +256,7 @@ class AllelePanel(wx.Panel):
         self.CreateBottomSizer("allele")
         buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
         buttonsave = RoundedButton(self, label=TEXT_SAVE, colors=BUTTONCOLORS)
+        buttonsave.Bind(wx.EVT_LEFT_DOWN, self.ProcessEdit)
         buttoncancel = RoundedButton(self, label=TEXT_CANCEL, colors=BUTTONCOLORS)
         buttonsizer.AddStretchSpacer(4)
         buttonsizer.Add(buttonsave, 0, wx.ALL, 5)
@@ -267,31 +269,46 @@ class AllelePanel(wx.Panel):
         self.SetSizer(mainsizer)
         self.Layout()
 
+    def ProcessEdit(self, e):
+        print("processing edit")
+        if self.type != "anyallele":
+            children = [x.GetWindow() for x in self.bottomsizer.GetChildren()]
+            values = [x.GetLabel() for x in children if type(x) in [wx.RadioButton, wx.CheckBox] and x.GetValue()]
+            for x in self.bottomsizer.GetChildren():
+                print(type(x))
+        else:
+            values = []
+        print(self.type, self.dogid, values)
+        wx.PostEvent(self.GetParent(), EditLocusEvent(replacementtype=self.type, dogid=self.dogid, number=self.number, values=values))
 
-    def LayoutAllele(self,e):
+    def LayoutAllele(self, e):
         self.CreateBottomSizer("allele")
-    def LayoutNotAllele(self,e):
+        self.type = "allele"
+
+    def LayoutNotAllele(self, e):
         self.CreateBottomSizer("notallele")
-    def LayoutAnyAllele(self,e):
+        self.type = "notallele"
+
+    def LayoutAnyAllele(self, e):
         self.CreateBottomSizer("anyallele")
+        self.type = "anyallele"
 
     def CreateBottomSizer(self, selection):
         self.bottomsizer.Clear(delete_windows=True)
-        if selection=="allele":
+        if selection == "allele":
             valuelabel = wx.StaticText(self, label=TEXT_VALUE)
             valuelabel.SetFont(FONT_BIG)
             self.bottomsizer.Add(valuelabel, 0, wx.ALL, 5)
-            for option in self.options:
+            self.bottomsizer.Add(wx.RadioButton(self, label=self.options[0], style=wx.RB_GROUP), 0)
+            for option in self.options[1:]:
                 self.bottomsizer.Add(wx.RadioButton(self, label=option), 0, wx.ALL, 5)
-        if selection=="notallele":
+        if selection == "notallele":
             valuelabel = wx.StaticText(self, label=TEXT_NOT_VALUE)
             valuelabel.SetFont(FONT_BIG)
             self.bottomsizer.Add(valuelabel, 0, wx.ALL, 5)
             for option in self.options:
                 self.bottomsizer.Add(wx.CheckBox(self, label=option), 0, wx.ALL, 5)
         self.Layout()
-
-
 
 
 class BreedingPanel(wx.Panel):

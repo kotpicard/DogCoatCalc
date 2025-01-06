@@ -33,6 +33,7 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_EDIT_LOCUS, self.PassToTopLayer)
         self.Bind(EVT_OPEN_EDIT_LOCUS, self.PassToTopLayer)
         self.Bind(EVT_PASS_EDIT_LOCUS_DATA, self.OpenEditLocus)
+        self.Bind(EVT_GENOTYPE_CHANGED, self.InitViewGenotype)
 
     def PassToTopLayer(self, e):
         wx.PostEvent(self.app, e)
@@ -62,7 +63,7 @@ class MainWindow(wx.Frame):
         self.MainSizer.Add(defaultpanel)
 
     def InitViewGenotype(self, e):
-        wx.PostEvent(self.app, e)
+        wx.PostEvent(self.app, OpenGenotypeViewEvent(dogid=e.dogid))
 
     def OpenEditLocus(self, e):
         self.MainSizer.Clear(delete_windows=True)

@@ -27,3 +27,4 @@ RequestGenotypeByID, EVT_REQUEST_GENOTYPE_BY_ID = NewEvt()
 
 #DOG EVENTS
 DogIncorrectGenotypeEvent, EVT_INCORRECT_GENOTYPE = NewEvt()
+DogGenotypeChangedEvent, EVT_GENOTYPE_CHANGED = NewEvt()

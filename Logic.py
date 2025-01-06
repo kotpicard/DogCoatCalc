@@ -22,6 +22,14 @@ LOCUS9 = ["T", "Tr", "t"]
 ALLELES = [LOCUS0, LOCUS1, LOCUS2, LOCUS3, LOCUS4, LOCUS5, LOCUS6, LOCUS7, LOCUS8, LOCUS9]
 
 
+def unique(arr):
+    present = []
+    for elem in arr:
+        if elem not in present:
+            present.append(elem)
+    return present
+
+
 class Allele:
     def __init__(self, value):
         self.value = value
@@ -67,8 +75,11 @@ class NotAllele(Allele):
 
     def __add__(self, other):
         if type(other) == NotAllele:
+            print("BEFORENOTVALUE", self.notValue)
             self.notValue += other.notValue
-            self.notValue = list(set(self.notValue))
+            self.notValue = unique(self.notValue)
+            self.value = "Any allele except {}".format(str(self.notValue)[1:-1])
+            print("AFTER NOTVALUE", self.notValue,self.value)
         return self
 
     def ReturnCondition(self, number):
@@ -140,6 +151,8 @@ class Locus:
 
     def CanReplace(self, replacement):
         # replacement is locus
+        if type(replacement) == Locus:
+            replacement = replacement.alleles
         print("replacing", self.alleles, replacement)
         if self.CanBeReplacedBy(self.alleles[0], replacement[0]) and self.CanBeReplacedBy(self.alleles[1],
                                                                                           replacement[1]):
@@ -158,6 +171,8 @@ class Locus:
     def replace(self, replacement):
         # replacement is locus
         # print("EQUALITY TEST", self == replacement)
+        if type(replacement) == Locus:
+            replacement = replacement.alleles
         order = self.CanReplace(replacement)
         if type(order) == int:
             self.alleles = self.alleles[::order]
@@ -167,6 +182,8 @@ class Locus:
                 if type(replacement[i]) != AnyAllele and self != replacement:
                     if type(self.alleles[i]) == type(replacement[i]) == NotAllele:
                         temp.append(self.alleles[i] + replacement[i])
+                        print("ADDED TO NOTVALUE")
+                        print(temp)
                     else:
                         # print(replacement[i])
                         temp.append(replacement[i])
@@ -728,7 +745,7 @@ class Dog:
                 ("relatives", "|".join([str(x.id) for x in self.relatives]))]
 
     def ToDesc(self):
-        return [str(self.id)+". "+self.name, "Male" if self.sex == "m" else "Female", str(self.age),
+        return [str(self.id) + ". " + self.name, "Male" if self.sex == "m" else "Female", str(self.age),
                 "\n".join([str(x.desc) for x in self.coat])]
 
     def CreateParents(self):

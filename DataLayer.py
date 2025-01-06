@@ -27,8 +27,9 @@ class DataLayer(wx.EvtHandler):
             newevt = PassDataForViewGenotype(data=data)
             wx.PostEvent(self.parent, newevt)
         if evt.type == "passgenotype":
-            data = self.dogs[evt.dogid].genotype
-            newevt = PassGenotypeDataEvent(data=data, type=evt.subtype)
+            genotype = self.dogs[evt.dogid].genotype
+            newevt = PassGenotypeDataEvent(genotype=genotype, type=evt.subtype, data=evt.data)
+            print("passing")
             wx.PostEvent(self.parent, newevt)
 
 
