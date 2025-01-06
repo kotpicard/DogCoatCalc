@@ -735,14 +735,15 @@ class Dog:
         self.childConditions = []
 
     def ToList(self):
+        print(self.children)
         return [("id", int(self.id)),
                 ("name", self.name), ("age", str(self.age)), ("sex", self.sex),
                 ("coat", "|".join([str(x.desc) for x in self.coat])),
                 ("genotype", str(self.genotype)),
                 ("mother", str(self.dam.id) if self.dam else None),
                 ("father", str(self.sire.id) if self.sire else None),
-                ("children", "|".join([str(x.id) for x in self.children])),
-                ("relatives", "|".join([str(x.id) for x in self.relatives]))]
+                ("children", "|".join([str(x.id) for x in self.children]) if self.children else None),
+                ("relatives", "|".join([str(x.id) for x in self.relatives]) if self.relatives else None)]
 
     def ToDesc(self):
         return [str(self.id) + ". " + self.name, "Male" if self.sex == "m" else "Female", str(self.age),

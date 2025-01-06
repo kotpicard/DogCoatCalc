@@ -89,15 +89,16 @@ class DataLayer(wx.EvtHandler):
         datafile = open(self.dataLocation)
         data = datafile.readlines()
         datafile.close()
-        self.currentDogID = int(data[0].split(":")[1])
-        self.currentBreedingID = int(data[0].split(":")[1])
-        breedingsstart = data.index("##BREEDINGS\n")
-        goalsstart = data.index("##GOALS\n")
-        data_dogs = data[3:breedingsstart]
-        data_breedings = data[breedingsstart + 1:goalsstart]
-        data_goals = data[goalsstart + 1:]
-        print(data_dogs, data_goals, data_breedings)
-        for i in range(0, len(data_dogs), 10):
-            dogslice = data_dogs[i:i + 10]
-            evt = LoadDogFromDataEvent(data=dogslice)
-            wx.PostEvent(self.parent, evt)
+        if data:
+            self.currentDogID = int(data[0].split(":")[1])
+            self.currentBreedingID = int(data[0].split(":")[1])
+            breedingsstart = data.index("##BREEDINGS\n")
+            goalsstart = data.index("##GOALS\n")
+            data_dogs = data[3:breedingsstart]
+            data_breedings = data[breedingsstart + 1:goalsstart]
+            data_goals = data[goalsstart + 1:]
+            print(data_dogs, data_goals, data_breedings)
+            for i in range(0, len(data_dogs), 10):
+                dogslice = data_dogs[i:i + 10]
+                evt = LoadDogFromDataEvent(data=dogslice)
+                wx.PostEvent(self.parent, evt)

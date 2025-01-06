@@ -19,7 +19,7 @@ class LogicLayer(wx.EvtHandler):
         values = evt.values
         replacementtype = evt.replacementtype
         number = evt.number
-        print(dogid,values,replacementtype,number)
+        print(dogid, values, replacementtype, number)
         wx.PostEvent(self.parent, RequestGenotypeByID(dogid=dogid, type="passgenotype", subtype="editlocus",
                                                       data=(values, number, replacementtype, dogid)))
 
@@ -33,7 +33,7 @@ class LogicLayer(wx.EvtHandler):
         number = data[1]
         replacementtype = data[2]
         print(replacementtype)
-        dogid=data[3]
+        dogid = data[3]
         if replacementtype == "anyallele":
             print("any")
             replacementallele = AnyAllele()
@@ -86,7 +86,8 @@ class LogicLayer(wx.EvtHandler):
         wx.PostEvent(self.parent, PassFormattedGenotype(data=(dogid, name, res)))
 
     def LoadDog(self, evt):
-        data = [x[1].strip() for x in evt.data]
+        data = [x.split(":")[1].strip() for x in evt.data]
+        print(data)
         genotype = Genotype()
         genotype.CreateFromString(data[5])
         dogid = int(data[0])
@@ -94,13 +95,14 @@ class LogicLayer(wx.EvtHandler):
         age = int(data[2])
         sex = data[3]
         coat = data[4].split("|")
-        mother = int(data[6])
-        father = int(data[7])
+        coat = [PHEN_DICT[x] for x in coat if x != "I don't know"]
+        mother = None if data[6] == "None" else int(data[6])
+        father = None if data[7] == "None" else int(data[7])
         children = data[8].split("|")
         relatives = data[9].split("|")
         dog = Dog(genotype, coat, dogid, name, age, mother, father, sex)
-        dog.children = children
-        dog.relatives = relatives
+        dog.children = None if children == ["None"] else children
+        dog.relatives = None if relatives == ["None"] else relatives
         evt = PassDogToDataLayerEvent(dog=dog)
         wx.PostEvent(self.parent, evt)
 
