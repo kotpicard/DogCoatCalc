@@ -25,6 +25,10 @@ class DogApp(wx.App):
         self.Bind(EVT_VIEW_GENOTYPE, self.RequestGenotypeData)
         self.Bind(EVT_VIEWGEN_DATAPASS, self.PassToLogicLayer)
         self.Bind(EVT_FORMATTEDGEN_DATAPASS, self.PassToMainWindow)
+        self.Bind(EVT_EDIT_LOCUS, self.PassToLogicLayer)
+        self.Bind(EVT_PASS_GENOTYPE, self.PassToLogicLayer)
+        self.Bind(EVT_OPEN_EDIT_LOCUS, self.PassToLogicLayer)
+        self.Bind(EVT_PASS_EDIT_LOCUS_DATA, self.PassToMainWindow)
 
     def RequestGenotypeData(self, evt):
         dogid = evt.dogid

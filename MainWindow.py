@@ -30,6 +30,12 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_INCORRECT_GENOTYPE, self.IncorrectGenotypeAlert)
         self.Bind(EVT_VIEW_GENOTYPE, self.InitViewGenotype)
         self.Bind(EVT_FORMATTEDGEN_DATAPASS, self.OpenGenotypeView)
+        self.Bind(EVT_EDIT_LOCUS, self.PassToTopLayer)
+        self.Bind(EVT_OPEN_EDIT_LOCUS, self.PassToTopLayer)
+        self.Bind(EVT_PASS_EDIT_LOCUS_DATA, self.OpenEditLocus)
+
+    def PassToTopLayer(self, e):
+        wx.PostEvent(self.app, e)
 
     def CreateMenu(self):
         filemenu = wx.Menu()
@@ -57,6 +63,13 @@ class MainWindow(wx.Frame):
 
     def InitViewGenotype(self, e):
         wx.PostEvent(self.app, e)
+
+    def OpenEditLocus(self, e):
+        self.MainSizer.Clear(delete_windows=True)
+        editlocuspanel = AllelePanel(self, number=e.number, dogid=e.dogid, options=e.options)
+        self.MainSizer.Add(editlocuspanel)
+        self.Layout()
+        self.Center()
 
     def OpenGenotypeView(self, e):
         self.MainSizer.Clear(delete_windows=True)

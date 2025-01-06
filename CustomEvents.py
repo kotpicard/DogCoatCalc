@@ -10,6 +10,10 @@ PassDataForDogPageEvent, EVT_PASS_DATA_DOG_PAGE = NewEvt()
 OpenGenotypeViewEvent, EVT_VIEW_GENOTYPE = NewEvt()
 PassDataForViewGenotype, EVT_VIEWGEN_DATAPASS = NewEvt()
 PassFormattedGenotype, EVT_FORMATTEDGEN_DATAPASS = NewEvt()
+EditLocusEvent, EVT_EDIT_LOCUS = NewEvt()
+OpenEditLocusEvent, EVT_OPEN_EDIT_LOCUS = NewEvt()
+PassGenotypeDataEvent, EVT_PASS_GENOTYPE = NewEvt()
+PassEditLocusDataEvent, EVT_PASS_EDIT_LOCUS_DATA = NewEvt()
 
 #SAVE/LOAD
 SaveEvent, EVT_SAVE = NewEvt()

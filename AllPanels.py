@@ -181,12 +181,14 @@ class DogPanel(wx.Panel):
 
 class GenotypePanel(wx.Panel):
     def __init__(self, parent, data):
-        # data is tuple (name, genotype object prepared for display)
+        # data is tuple (id, name, genotype object prepared for display)
         # genotype format: (((value, type),(value,type)), etc)
         # values: anyallele, notallele, allele
         super().__init__(parent)
-        name = data[0]
-        genotype = data[1]
+        self.data = data
+        self.dogid = data[0]
+        name = data[1]
+        genotype = data[2]
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
         titlelabel = wx.StaticText(self, label="Genotype of " + name)
         titlelabel.SetFont(FONT_BIG)
@@ -211,6 +213,7 @@ class GenotypePanel(wx.Panel):
             button2 = RoundedButton(self, label=value2, colors=(color2, color2))
             editbutton = RoundedButton(self, label=TEXT_EDIT, colors=BUTTONCOLORS)
             editbutton.locusnumber = locusnumber
+            editbutton.Bind(wx.EVT_LEFT_DOWN, self.OpenEditLocus)
             locussizer.Add(button1, 2, wx.EXPAND|wx.ALL, 5)
             locussizer.Add(button2, 2, wx.EXPAND|wx.ALL, 5)
             locussizer.Add(editbutton, 1, wx.EXPAND|wx.ALL, 5)
@@ -219,6 +222,76 @@ class GenotypePanel(wx.Panel):
         mainsizer.Add(titlelabel, 1, wx.EXPAND | wx.ALL, 10)
         mainsizer.Add(genotypesizer, 5, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(mainsizer)
+
+    def OpenEditLocus(self, e):
+        number = e.GetEventObject().locusnumber
+        evt = OpenEditLocusEvent(number=number, dogid=self.dogid)
+        wx.PostEvent(self.GetParent(), evt)
+
+
+
+class AllelePanel(wx.Panel):
+    def __init__(self, parent, number, options, dogid):
+        super().__init__(parent)
+        self.dogid=dogid
+        self.options = options
+        self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
+        titlelabel = wx.StaticText(self, label=TEXT_CHANGE_ALLELE+str(number))
+        titlelabel.SetFont(FONT_BIG)
+        typelabel = wx.StaticText(self, label=TEXT_TYPE)
+        typelabel.SetFont(FONT_BIG)
+        typebutton1 = wx.RadioButton(self, label=TEXT_ALLELE)
+        typebutton1.Bind(wx.EVT_RADIOBUTTON,self.LayoutAllele)
+        typebutton2 = wx.RadioButton(self, label=TEXT_NOTALLELE)
+        typebutton2.Bind(wx.EVT_RADIOBUTTON, self.LayoutNotAllele)
+        typebutton3 = wx.RadioButton(self, label=TEXT_ANYALLELE)
+        typebutton3.Bind(wx.EVT_RADIOBUTTON, self.LayoutAnyAllele)
+        typesizer = wx.BoxSizer(wx.VERTICAL)
+        typesizer.Add(typelabel, 0, wx.ALL, 5)
+        typesizer.Add(typebutton1, 0, wx.ALL, 5)
+        typesizer.Add(typebutton2, 0, wx.ALL, 5)
+        typesizer.Add(typebutton3, 0, wx.ALL, 5)
+        self.bottomsizer = wx.BoxSizer(wx.VERTICAL)
+        self.CreateBottomSizer("allele")
+        buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
+        buttonsave = RoundedButton(self, label=TEXT_SAVE, colors=BUTTONCOLORS)
+        buttoncancel = RoundedButton(self, label=TEXT_CANCEL, colors=BUTTONCOLORS)
+        buttonsizer.AddStretchSpacer(4)
+        buttonsizer.Add(buttonsave, 0, wx.ALL, 5)
+        buttonsizer.Add(buttoncancel, 0, wx.ALL, 5)
+        mainsizer = wx.BoxSizer(wx.VERTICAL)
+        mainsizer.Add(titlelabel, 0, wx.ALL, 5)
+        mainsizer.Add(typesizer, 4, wx.EXPAND | wx.ALL, 5)
+        mainsizer.Add(self.bottomsizer, 4, wx.EXPAND | wx.ALL, 5)
+        mainsizer.Add(buttonsizer, 1, wx.EXPAND | wx.ALL, 5)
+        self.SetSizer(mainsizer)
+        self.Layout()
+
+
+    def LayoutAllele(self,e):
+        self.CreateBottomSizer("allele")
+    def LayoutNotAllele(self,e):
+        self.CreateBottomSizer("notallele")
+    def LayoutAnyAllele(self,e):
+        self.CreateBottomSizer("anyallele")
+
+    def CreateBottomSizer(self, selection):
+        self.bottomsizer.Clear(delete_windows=True)
+        if selection=="allele":
+            valuelabel = wx.StaticText(self, label=TEXT_VALUE)
+            valuelabel.SetFont(FONT_BIG)
+            self.bottomsizer.Add(valuelabel, 0, wx.ALL, 5)
+            for option in self.options:
+                self.bottomsizer.Add(wx.RadioButton(self, label=option), 0, wx.ALL, 5)
+        if selection=="notallele":
+            valuelabel = wx.StaticText(self, label=TEXT_NOT_VALUE)
+            valuelabel.SetFont(FONT_BIG)
+            self.bottomsizer.Add(valuelabel, 0, wx.ALL, 5)
+            for option in self.options:
+                self.bottomsizer.Add(wx.CheckBox(self, label=option), 0, wx.ALL, 5)
+        self.Layout()
+
+
 
 
 class BreedingPanel(wx.Panel):

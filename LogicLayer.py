@@ -10,11 +10,38 @@ class LogicLayer(wx.EvtHandler):
         self.Bind(EVT_LOAD_DOG_FROM_DATA, self.LoadDog)
         self.Bind(EVT_PASS_DOG_DATA, self.CreateDog)
         self.Bind(EVT_VIEWGEN_DATAPASS, self.FormatForViewGen)
+        self.Bind(EVT_EDIT_LOCUS, self.StartLocusEdit)
+        self.Bind(EVT_PASS_GENOTYPE, self.ProcessGenotype)
+        self.Bind(EVT_OPEN_EDIT_LOCUS, self.GetOptionsForEditLocus)
+
+    def StartLocusEdit(self, evt):
+        dogid = evt.data[0]
+        name = evt.data[1]
+        genotype = evt.data[2]
+        number = evt.number
+        wx.PostEvent(self.parent, RequestGenotypeByID(dogid=dogid, type="passgenotype", subtype="editlocus"))
+
+    def ProcessGenotype(self, evt):
+        if evt.type == "editlocus":
+            self.ProcessLocusEdit()
+
+    def ProcssLocusEdit(self, data):
+        ...
+
+    def GetOptionsForEditLocus(self, evt):
+        locusnumber = evt.number
+        options = ALLELES[locusnumber]
+        newevt = PassEditLocusDataEvent(number=locusnumber, dogid=evt.dogid, options=options)
+        wx.PostEvent(self.parent, newevt)
+
+
+
 
     def FormatForViewGen(self, evt):
         data = evt.data
-        name = data[0]
-        genotype = data[1]
+        dogid = data[0]
+        name = data[1]
+        genotype = data[2]
         res = []
         for locus in genotype:
             value1 = locus.alleles[0].value
@@ -32,7 +59,7 @@ class LogicLayer(wx.EvtHandler):
             else:
                 type2 = "anyallele"
             res.append([(value1, type1), (value2, type2)])
-        wx.PostEvent(self.parent, PassFormattedGenotype(data=(name, res)))
+        wx.PostEvent(self.parent, PassFormattedGenotype(data=(dogid, name, res)))
 
     def LoadDog(self, evt):
         data = [x[1].strip() for x in evt.data]
