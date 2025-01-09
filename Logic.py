@@ -32,16 +32,16 @@ def unique(arr):
 
 class Allele:
     def __init__(self, value):
-        self.value = value
+        self.value = value.strip()
 
     def __eq__(self, other):
         return other == self.value
 
     def __repr__(self):
-        return self.value
+        return self.value.strip()
 
     def __str__(self):
-        return self.value
+        return self.value.strip()
 
     def ReturnCondition(self, number):
         return ReverseCondition(Condition(number, "HasAtLeastOne", self.value))
@@ -68,7 +68,9 @@ class NotAllele(Allele):
             self.notValue = [notValue]
         else:
             self.notValue = notValue
-        self.value = "Any allele except {}".format(str(self.notValue)[1:-1]).replace('"',"").replace("'","")
+        self.value = "Any allele except {}".format(str(self.notValue)).replace('"', "").replace("'", "").replace("[",
+                                                                                                                 "").replace(
+            "]", "")
 
     def __eq__(self, other):
         return all([x != other for x in self.notValue])
@@ -78,8 +80,9 @@ class NotAllele(Allele):
             print("BEFORENOTVALUE", self.notValue)
             self.notValue += other.notValue
             self.notValue = unique(self.notValue)
-            self.value = "Any allele except {}".format(str(self.notValue)[1:-1]).replace('"',"").replace("'","")
-            print("AFTER NOTVALUE", self.notValue,self.value)
+            self.value = "Any allele except {}".format(str(self.notValue)).replace('"', "").replace("'", "").replace(
+                "[", "").replace("]", "")
+            print("AFTER NOTVALUE", self.notValue, self.value)
         return self
 
     def ReturnCondition(self, number):
@@ -146,28 +149,55 @@ class Locus:
                 return False
         elif type(replacement) == Allele and type(original) == NotAllele and replacement.value in original.notValue:
             return False
+        elif type(original) == NotAllele and type(replacement) == NotAllele and all(
+                [x in original.notValue for x in replacement.notValue]):
+            return "test other"
         else:
             print("CAN REPLACE")
             return True
 
     def CanReplace(self, replacement):
         # replacement is locus
+        result = []
         if type(replacement) == Locus:
             replacement = replacement.alleles
         print("replacing", self.alleles, replacement)
+
         if self.CanBeReplacedBy(self.alleles[0], replacement[0]) and self.CanBeReplacedBy(self.alleles[1],
                                                                                           replacement[1]):
-            print("order1")
-            return 1
+            if self.CanBeReplacedBy(self.alleles[0], replacement[0]) == "test other" or self.CanBeReplacedBy(
+                    self.alleles[1],
+                    replacement[1]) == "test other":
+                result.append("test other 1")
+            else:
+                result.append(1)
 
-        elif self.CanBeReplacedBy(self.alleles[0], replacement[1]) and self.CanBeReplacedBy(self.alleles[1],
-                                                                                            replacement[0]):
-            print("order2")
-            return -1
+        if self.CanBeReplacedBy(self.alleles[0], replacement[1]) and self.CanBeReplacedBy(self.alleles[1],
+                                                                                          replacement[0]):
+            if self.CanBeReplacedBy(self.alleles[0], replacement[1]) == "test other" or self.CanBeReplacedBy(
+                    self.alleles[0],
+                    replacement[1]) == "test other":
+                result.append("test other -1")
+            result.append(-1)
         elif all([type(x) == AnyAllele for x in replacement]):
-            return True
+            result.append(True)
         else:
+            result.append(False)
+
+        if "test other 1" in result:
+            if -1 in result:
+                return -1
+            else:
+                return 1
+        elif "test other -1" in result:
+            if 1 in result:
+                return 1
+            else:
+                return -1
+        elif False in result:
             return False
+        else:
+            return result[0]
 
     def replace(self, replacement):
         # replacement is locus
