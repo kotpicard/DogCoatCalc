@@ -119,13 +119,17 @@ class DogPanel(wx.Panel):
         namelabel = wx.StaticText(self, label=values[0])
         dogid = int(values[0].split(".")[0])
         self.dogid = dogid
+        self.name = values[0].split(".")[1]
+        self.age = values[2]
+        self.sex = values[1]
+        self.coat = values[3]
         previd = dogid - 1
         nextid = dogid + 1
         namelabel.SetFont(FONT_BIG)
         namelabel.SetForegroundColour(Color(Hex_FONTCOLORBG).rgb)
         dogdatasizer.Add(namelabel, 0, wx.ALL)
-        agelabel = wx.StaticText(self, label=TEXT_AGE + values[2])
-        sexlabel = wx.StaticText(self, label=TEXT_SEX + values[1])
+        agelabel = wx.StaticText(self, label=TEXT_AGE + self.age)
+        sexlabel = wx.StaticText(self, label=TEXT_SEX + self.sex)
 
         # breedlabel = wx.StaticText(self, label=TEXT_BREED)
         coatlabel = wx.StaticText(self, label=TEXT_COAT + values[3])
@@ -133,8 +137,10 @@ class DogPanel(wx.Panel):
                                            colors=BUTTONCOLORS)
         viewgenotypebutton.Bind(wx.EVT_LEFT_DOWN, self.OpenGenotypeView)
 
-        breedingtestsbutton = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_BREEDINGTESTS,
+        breedingtestsbutton = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_BREEDINGCALC,
                                             colors=BUTTONCOLORS)
+
+        breedingtestsbutton.Bind(wx.EVT_LEFT_DOWN, self.OpenCalcWithData)
 
         dogdatasizer.Add(agelabel, 0, wx.ALL)
         dogdatasizer.Add(sexlabel, 0, wx.ALL)
@@ -186,6 +192,10 @@ class DogPanel(wx.Panel):
         dogsizer.AddSpacer(50)
         dogsizer.Add(bottomsizer, 1, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(dogsizer)
+
+    def OpenCalcWithData(self, e):
+        wx.PostEvent(self.GetParent(), NavigationEvent(destination="BreedingCalc"))
+        wx.PostEvent(self.GetParent(), ParentSelectedEvent(dogid=self.dogid, type="parentselected"))
 
     def GoBack(self, e):
         wx.PostEvent(self.GetParent(), NavigationEvent(destination="MyDogs"))
@@ -392,11 +402,14 @@ class BreedingPanel(wx.Panel):
         buttonsizer.Add(loadgoalbutton, 1, wx.EXPAND)
         buttonsizer.Add(savegoalbutton, 1, wx.EXPAND)
         calculatebutton = RoundedButton(self, TEXT_CALCULATE, colors=BUTTONCOLORS)
+        backbutton = RoundedButton(self, TEXT_BACK, colors=BUTTONCOLORS)
+        backbutton.Bind(wx.EVT_LEFT_DOWN, self.GoBack)
         rightsizer.Add(breedinggoalslabel, 0, wx.RIGHT, 5)
         rightsizer.Add(goalctrl, 2, wx.EXPAND | wx.RIGHT | wx.TOP, 15)
         rightsizer.Add(buttonsizer, 1, wx.EXPAND | wx.RIGHT | wx.TOP, 15)
         rightsizer.AddSpacer(200)
         rightsizer.Add(calculatebutton, 0, wx.EXPAND | wx.RIGHT | wx.BOTTOM, 15)
+        rightsizer.Add(backbutton, 0, wx.EXPAND | wx.RIGHT | wx.BOTTOM, 15)
 
         breedingtestsizer = wx.BoxSizer(wx.HORIZONTAL)
         breedingtestsizer.Add(leftsizer, 1, wx.EXPAND)
@@ -409,6 +422,10 @@ class BreedingPanel(wx.Panel):
         self.Bind(EVT_PASS_DOGS, self.ReceiveData)
         self.Bind(EVT_PARENT_SELECTED, self.passToMainWindow)
         self.Bind(EVT_PASS_SELECTED_PARENT_DATA, self.SetParentData)
+
+
+    def GoBack(self, e):
+        wx.PostEvent(self.GetParent(), OpenMainMenu())
 
     def SetParentData(self, e):
         data = e.dog.name, str(e.dog.age), e.dog.coatdesc, e.dog.id
