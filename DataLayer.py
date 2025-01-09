@@ -18,9 +18,21 @@ class DataLayer(wx.EvtHandler):
         self.Bind(EVT_DISPLAY_ALL_DOGS, self.PassDogsForDisplay)
         self.Bind(EVT_REQUEST_DOG_BY_ID, self.PassDogByID)
         self.Bind(EVT_REQUEST_GENOTYPE_BY_ID, self.PassGenotypeByID)
+        self.Bind(EVT_REQUEST_DOGS, self.PassDogsByCondition)
+        self.Bind(EVT_PARENT_SELECTED, self.PassDogByID)
+
+    def PassDogsByCondition(self, evt):
+        result = [dog for dog in self.dogs if evt.filter(dog)]
+        if evt.destination == "selectdog":
+            result = [self.FormatForSelection(dog) for dog in result]
+        e = PassDogs(data=result, destination=evt.destination)
+        wx.PostEvent(self.parent, e)
+
+    def FormatForSelection(self, dog):
+        return [[dog.name, "Female" if dog.sex == "f" else "Male", str(dog.age), dog.coatdesc], dog.id]
 
     def PassGenotypeByID(self, evt):
-        #evt.type, evt.dogid
+        # evt.type, evt.dogid
         if evt.type == "viewgenotype":
             # if passing for view genotype window, pass the data to logic layer for formatting
             data = (evt.dogid, self.dogs[evt.dogid].name, self.dogs[evt.dogid].genotype)
@@ -31,7 +43,6 @@ class DataLayer(wx.EvtHandler):
             newevt = PassGenotypeDataEvent(genotype=genotype, type=evt.subtype, data=evt.data)
             print("passing")
             wx.PostEvent(self.parent, newevt)
-
 
     def AddDogFromTopLayer(self, evt):
         if evt.dog.id is not None:
@@ -44,7 +55,7 @@ class DataLayer(wx.EvtHandler):
 
     def PassDogByID(self, evt):
         if int(evt.dogid) in range(len(self.dogs)):
-            wx.PostEvent(self.parent, PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type="byid"))
+            wx.PostEvent(self.parent, PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type=evt.type))
 
     def PassDogsForDisplay(self, evt):
         dog_descs = []

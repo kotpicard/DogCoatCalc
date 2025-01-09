@@ -35,6 +35,19 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_PASS_EDIT_LOCUS_DATA, self.OpenEditLocus)
         self.Bind(EVT_GENOTYPE_CHANGED, self.GenotypeChangedHandler)
         self.Bind(EVT_MAIN_MENU, self.OpenDefaultPanel)
+        self.Bind(EVT_REQUEST_DOGS, self.PassToTopLayer)
+        self.Bind(EVT_PASS_DOGS, self.ProcessPassDogs)
+        self.Bind(EVT_PARENT_SELECTED, self.PassToTopLayer)
+        self.Bind(EVT_PASS_SELECTED_PARENT_DATA, self.SetSelectedParent)
+
+    def SetSelectedParent(self, e):
+        target = [x for x in self.GetChildren() if type(x)==BreedingPanel][0]
+        wx.PostEvent(target, e)
+
+    def ProcessPassDogs(self, e):
+        if e.destination == "selectdog":
+            for child in [x for x in self.GetChildren() if type(x) == BreedingPanel]:
+                wx.PostEvent(child, e)
 
     def GenotypeChangedHandler(self, e):
         wx.PostEvent(self.app, SaveEvent())
@@ -53,6 +66,7 @@ class MainWindow(wx.Frame):
         self.SetMenuBar(menuBar)
 
     def NavigationHandler(self, e):
+        print(e, e.destination)
         wx.PostEvent(self.app, e)
 
     def NavigationDataHandler(self, e):
@@ -112,7 +126,7 @@ class MainWindow(wx.Frame):
     def GoToDogPage(self, evt):
         print("GO TO DOG PAGE", evt.num)
         dogid = evt.num
-        wx.PostEvent(self.app, RequestDogByID(dogid=dogid))
+        wx.PostEvent(self.app, RequestDogByID(dogid=dogid, type="byid"))
 
     def CreateDogPage(self, evt):
         self.MainSizer.Clear(delete_windows=True)
@@ -123,7 +137,6 @@ class MainWindow(wx.Frame):
         self.Center()
 
     def CreateMyDogsPanel(self, data):
-        print("HERE")
         mydogspanel = MyDogsPanel(self)
         mydogspanel.Fill(data)
         self.MainSizer.Add(mydogspanel)

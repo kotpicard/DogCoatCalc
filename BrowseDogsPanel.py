@@ -8,6 +8,7 @@ from GuiConstants import Hex_BACKGROUNDBOX, Color
 class BrowseDogsPanel(wx.ScrolledWindow):
     def __init__(self, parent, background, cols):
         super().__init__(parent)
+        self.selected = []
 
         self.sizer = wx.FlexGridSizer(0, cols, 10, 10)
         self.SetBackgroundColour(background)
@@ -30,7 +31,6 @@ class BrowseDogsPanel(wx.ScrolledWindow):
         button.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
         sexlabel = wx.StaticText(self, label=TEXT_SEX + values[1])
         agelabel = wx.StaticText(self, label=TEXT_AGE + values[2])
-        # breedlabel = wx.StaticText(self, label=TEXT_BREED + values[3])
         coatlabel = wx.StaticText(self, label=TEXT_COAT + values[3])
 
         elementsizer.Add(button, 0, wx.ALIGN_CENTER)
@@ -38,32 +38,44 @@ class BrowseDogsPanel(wx.ScrolledWindow):
         elementsizer.Add(agelabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
         # elementsizer.Add(breedlabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
         elementsizer.Add(coatlabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
-
         self.sizer.Add(elementsizer)
+        self.sizer.Layout()
 
-    def AddSelectableElement(self, values):
+    def AddSelectableElement(self, values, i=None):
         elementsizer = wx.BoxSizer(wx.VERTICAL)
         topsizer = wx.BoxSizer(wx.HORIZONTAL)
         radio = wx.RadioButton(self)
+        radio.num=i
+        radio.Bind(wx.EVT_RADIOBUTTON, self.selectedstatusupdate)
         topsizer.Add(radio, wx.ALL, 5)
         button = LinkButton(self, label=values[0])
+        button.num = i
+        button.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
         topsizer.Add(button)
         sexlabel = wx.StaticText(self, label=TEXT_SEX + values[1])
         agelabel = wx.StaticText(self, label=TEXT_AGE + values[2])
-        breedlabel = wx.StaticText(self, label=TEXT_BREED + values[3])
-        coatlabel = wx.StaticText(self, label=TEXT_COAT + values[4])
+        coatlabel = wx.StaticText(self, label=TEXT_COAT + values[3])
 
         elementsizer.Add(topsizer, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
         elementsizer.Add(sexlabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
         elementsizer.Add(agelabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
-        elementsizer.Add(breedlabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
         elementsizer.Add(coatlabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
 
         self.sizer.Add(elementsizer)
+        self.sizer.Layout()
+
+    def selectedstatusupdate(self, e):
+        num = e.GetEventObject().num
+        if num in self.selected:
+            self.selected.remove(num)
+        else:
+            self.selected.append(num)
 
     def OpenDogPage(self, e):
+        print("open dog page", e.GetEventObject().num)
         num = e.GetEventObject().num
-        wx.PostEvent(self.GetParent().GetParent(), OpenDogPageEvent(num=num))
+        if num is not None:
+            wx.PostEvent(self.GetParent(), OpenDogPageEvent(num=num))
 
 
 class MyFrame(wx.Frame):

@@ -32,7 +32,10 @@ class DogApp(wx.App):
         self.Bind(EVT_PASS_EDIT_LOCUS_DATA, self.PassToMainWindow)
         self.Bind(EVT_GENOTYPE_CHANGED, self.PassToMainWindow)
         self.Bind(EVT_SAVE, self.PassToDataLayer)
-        wx.PostEvent(self.DataLayer,LoadEvent())
+        self.Bind(EVT_REQUEST_DOGS, self.PassToDataLayer)
+        self.Bind(EVT_PASS_DOGS, self.PassToMainWindow)
+        self.Bind(EVT_PARENT_SELECTED, self.PassToDataLayer)
+        wx.PostEvent(self.DataLayer, LoadEvent())
 
     def RequestGenotypeData(self, evt):
         dogid = evt.dogid
@@ -53,10 +56,14 @@ class DogApp(wx.App):
         if evt.type == "add":
             wx.PostEvent(self.LogicLayer, evt)
             wx.PostEvent(self, NavigationEvent(destination="MyDogs"))
+        if evt.type == "parentselected":
+            wx.PostEvent(self.MainWindow, PassSelectedParentDataEvent(dog=evt.dog))
 
     def NavEventHandler(self, evt):
         if evt.destination == "MyDogs":
             wx.PostEvent(self.DataLayer, DisplayAllDogsEvent())
+        if evt.destination == "BreedingCalc":
+            wx.PostEvent(self.MainWindow, NavDataPass(destination="BreedingCalc", data=None))
 
     def DisplayDogs(self, evt):
         event = NavDataPass(destination="MyDogs", data=evt.descs)

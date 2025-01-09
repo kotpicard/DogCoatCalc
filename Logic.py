@@ -766,6 +766,7 @@ class Dog:
         self.relatives = []
         self.childPossibilities = []
         self.childConditions = []
+        self.coatdesc = "| ".join([str(x.desc) for x in self.coat])
 
     def ToList(self):
         print(self.children)

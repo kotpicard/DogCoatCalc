@@ -25,7 +25,11 @@ PassDogDataEvent, EVT_PASS_DOG_DATA = NewEvt()
 DisplayAllDogsEvent, EVT_DISPLAY_ALL_DOGS = NewEvt()
 RequestDogByID, EVT_REQUEST_DOG_BY_ID = NewEvt()
 RequestGenotypeByID, EVT_REQUEST_GENOTYPE_BY_ID = NewEvt()
+RequestDogs, EVT_REQUEST_DOGS = NewEvt()
+PassDogs, EVT_PASS_DOGS = NewEvt()
+PassSelectedParentDataEvent, EVT_PASS_SELECTED_PARENT_DATA = NewEvt()
 
 #DOG EVENTS
 DogIncorrectGenotypeEvent, EVT_INCORRECT_GENOTYPE = NewEvt()
 DogGenotypeChangedEvent, EVT_GENOTYPE_CHANGED = NewEvt()
+ParentSelectedEvent, EVT_PARENT_SELECTED = NewEvt()
