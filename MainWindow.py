@@ -33,7 +33,11 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_EDIT_LOCUS, self.PassToTopLayer)
         self.Bind(EVT_OPEN_EDIT_LOCUS, self.PassToTopLayer)
         self.Bind(EVT_PASS_EDIT_LOCUS_DATA, self.OpenEditLocus)
-        self.Bind(EVT_GENOTYPE_CHANGED, self.InitViewGenotype)
+        self.Bind(EVT_GENOTYPE_CHANGED, self.GenotypeChangedHandler)
+
+    def GenotypeChangedHandler(self, e):
+        wx.PostEvent(self.app, SaveEvent())
+        self.InitViewGenotype()
 
     def PassToTopLayer(self, e):
         wx.PostEvent(self.app, e)
@@ -88,7 +92,7 @@ class MainWindow(wx.Frame):
 
     def IncorrectGenotypeAlert(self, e):
         dialog = wx.MessageDialog(self, TEXT_INCORRECT_GENOTYPE, TEXT_WARNING, wx.OK | wx.ICON_WARNING)
-        dialog.ShowModal()  # Show the dialog modally
+        dialog.ShowModal()
         dialog.Destroy()
 
     def PassDogData(self, e):

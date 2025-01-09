@@ -68,7 +68,7 @@ class NotAllele(Allele):
             self.notValue = [notValue]
         else:
             self.notValue = notValue
-        self.value = "Any allele except {}".format(str(self.notValue)[1:-1])
+        self.value = "Any allele except {}".format(str(self.notValue)[1:-1]).replace('"',"").replace("'","")
 
     def __eq__(self, other):
         return all([x != other for x in self.notValue])
@@ -78,7 +78,7 @@ class NotAllele(Allele):
             print("BEFORENOTVALUE", self.notValue)
             self.notValue += other.notValue
             self.notValue = unique(self.notValue)
-            self.value = "Any allele except {}".format(str(self.notValue)[1:-1])
+            self.value = "Any allele except {}".format(str(self.notValue)[1:-1]).replace('"',"").replace("'","")
             print("AFTER NOTVALUE", self.notValue,self.value)
         return self
 
@@ -109,6 +109,7 @@ class Locus:
 
     def CreateFromString(self, string):
         allele1, allele2 = string.split("/")
+        self.alleles = []
         if "except" in allele1:
             self.alleles.append(NotAllele(allele1.split(" ")[-1].split(",")))
         elif "Any" in allele1:
@@ -453,8 +454,10 @@ class Genotype:
             self.loci = loci
 
     def CreateFromString(self, string):
+        print("creating")
         loci_text = string.split("|")
         for i in range(10):
+            print(i, self.loci[i], loci_text[i])
             self.loci[i].CreateFromString(loci_text[i])
 
     def __getitem__(self, item):

@@ -51,7 +51,6 @@ class LogicLayer(wx.EvtHandler):
         if canreplace:
             genotype[number].replace(replacementlocus)
             wx.PostEvent(self.parent, DogGenotypeChangedEvent(dogid=dogid))
-            print("changed")
         else:
             wx.PostEvent(self.parent, DogIncorrectGenotypeEvent())
 

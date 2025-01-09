@@ -31,6 +31,7 @@ class DogApp(wx.App):
         self.Bind(EVT_OPEN_EDIT_LOCUS, self.PassToLogicLayer)
         self.Bind(EVT_PASS_EDIT_LOCUS_DATA, self.PassToMainWindow)
         self.Bind(EVT_GENOTYPE_CHANGED, self.PassToMainWindow)
+        self.Bind(EVT_SAVE, self.PassToDataLayer)
         wx.PostEvent(self.DataLayer,LoadEvent())
 
     def RequestGenotypeData(self, evt):
