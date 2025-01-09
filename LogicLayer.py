@@ -52,7 +52,7 @@ class LogicLayer(wx.EvtHandler):
             genotype[number].replace(replacementlocus)
             wx.PostEvent(self.parent, DogGenotypeChangedEvent(dogid=dogid))
         else:
-            wx.PostEvent(self.parent, DogIncorrectGenotypeEvent())
+            wx.PostEvent(self.parent, DogIncorrectGenotypeEvent(dogid=dogid))
 
     def GetOptionsForEditLocus(self, evt):
         locusnumber = evt.number

@@ -192,6 +192,12 @@ class GenotypePanel(wx.Panel):
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
         titlelabel = wx.StaticText(self, label="Genotype of " + name)
         titlelabel.SetFont(FONT_BIG)
+        backbutton = RoundedButton(self, label=TEXT_BACK, colors=BUTTONCOLORS)
+        backbutton.Bind(wx.EVT_LEFT_DOWN, self.GoBack)
+        topsizer = wx.BoxSizer(wx.HORIZONTAL)
+        topsizer.Add(titlelabel, 0, wx.ALL, 5)
+        topsizer.AddStretchSpacer(2)
+        topsizer.Add(backbutton, 0, wx.ALL, 5)
         genotypesizer = wx.GridSizer(2, 5, 30, 5)
         for locusnumber, locus in enumerate(genotype):
             value1 = locus[0][0]
@@ -219,7 +225,7 @@ class GenotypePanel(wx.Panel):
             locussizer.Add(button2, 2, wx.EXPAND | wx.ALL, 5)
             genotypesizer.Add(locussizer, 1, wx.EXPAND | wx.ALL, 0)
         mainsizer = wx.BoxSizer(wx.VERTICAL)
-        mainsizer.Add(titlelabel, 1, wx.EXPAND | wx.ALL, 10)
+        mainsizer.Add(topsizer, 1, wx.EXPAND | wx.ALL, 10)
         mainsizer.Add(genotypesizer, 5, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(mainsizer)
 
@@ -227,6 +233,9 @@ class GenotypePanel(wx.Panel):
         number = e.GetEventObject().locusnumber
         evt = OpenEditLocusEvent(number=number, dogid=self.dogid)
         wx.PostEvent(self.GetParent(), evt)
+
+    def GoBack(self, e):
+        wx.PostEvent(self.GetParent(), OpenDogPageEvent(num=self.dogid))
 
 
 class AllelePanel(wx.Panel):
@@ -239,6 +248,7 @@ class AllelePanel(wx.Panel):
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
         titlelabel = wx.StaticText(self, label=TEXT_CHANGE_ALLELE + str(number))
         titlelabel.SetFont(FONT_BIG)
+
         typelabel = wx.StaticText(self, label=TEXT_TYPE)
         typelabel.SetFont(FONT_BIG)
         typebutton1 = wx.RadioButton(self, label=TEXT_ALLELE,style=wx.RB_GROUP)
@@ -258,6 +268,7 @@ class AllelePanel(wx.Panel):
         buttonsave = RoundedButton(self, label=TEXT_SAVE, colors=BUTTONCOLORS)
         buttonsave.Bind(wx.EVT_LEFT_DOWN, self.ProcessEdit)
         buttoncancel = RoundedButton(self, label=TEXT_CANCEL, colors=BUTTONCOLORS)
+        buttoncancel.Bind(wx.EVT_LEFT_DOWN, self.CancelButton)
         buttonsizer.AddStretchSpacer(4)
         buttonsizer.Add(buttonsave, 0, wx.ALL, 5)
         buttonsizer.Add(buttoncancel, 0, wx.ALL, 5)
@@ -268,6 +279,9 @@ class AllelePanel(wx.Panel):
         mainsizer.Add(buttonsizer, 1, wx.EXPAND | wx.ALL, 5)
         self.SetSizer(mainsizer)
         self.Layout()
+
+    def CancelButton(self, e):
+        wx.PostEvent(self.GetParent(), OpenGenotypeViewEvent(dogid=self.dogid))
 
     def ProcessEdit(self, e):
         print("processing edit")

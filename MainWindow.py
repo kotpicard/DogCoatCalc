@@ -37,7 +37,7 @@ class MainWindow(wx.Frame):
 
     def GenotypeChangedHandler(self, e):
         wx.PostEvent(self.app, SaveEvent())
-        self.InitViewGenotype()
+        self.InitViewGenotype(e)
 
     def PassToTopLayer(self, e):
         wx.PostEvent(self.app, e)
@@ -94,6 +94,7 @@ class MainWindow(wx.Frame):
         dialog = wx.MessageDialog(self, TEXT_INCORRECT_GENOTYPE, TEXT_WARNING, wx.OK | wx.ICON_WARNING)
         dialog.ShowModal()
         dialog.Destroy()
+        self.InitViewGenotype(e)
 
     def PassDogData(self, e):
         wx.PostEvent(self.app, e)
