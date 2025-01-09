@@ -33,9 +33,25 @@ class DogApp(wx.App):
         self.Bind(EVT_GENOTYPE_CHANGED, self.PassToMainWindow)
         self.Bind(EVT_SAVE, self.PassToDataLayer)
         self.Bind(EVT_REQUEST_DOGS, self.PassToDataLayer)
-        self.Bind(EVT_PASS_DOGS, self.PassToMainWindow)
+        self.Bind(EVT_PASS_DOGS, self.ProcessPassDogs)
         self.Bind(EVT_PARENT_SELECTED, self.PassToDataLayer)
+        self.Bind(EVT_ADD_RELATIVE, self.RequestRelativeData)
         wx.PostEvent(self.DataLayer, LoadEvent())
+
+    def RequestRelativeData(self, evt):
+        dogid = evt.dogid
+        relativeid = evt.relativeid
+        relativetype = evt.type
+        wx.PostEvent(self.DataLayer, RequestDogs(filter=lambda x: x.id in [dogid, relativeid], data=relativetype, destination="top"))
+
+    def ProcessAddRelative(self, evt):
+        print(evt.data, evt.dogs)
+
+    def ProcessPassDogs(self, evt):
+        if evt.destination!="top":
+            self.PassToMainWindow(evt)
+        else:
+            self.ProcessAddRelative(evt)
 
     def RequestGenotypeData(self, evt):
         dogid = evt.dogid

@@ -6,14 +6,20 @@ from CustomEvents import *
 
 
 class DogSelectDialog(wx.Frame):
-    def __init__(self, parent, who):
+    def __init__(self, parent, who, data=None):
         super().__init__(parent, title=TEXT_SELECTDOG, size=(400, 500))
         if who == "Dam":
-            wx.PostEvent(parent, RequestDogs(filter=lambda x: x.sex == "f", destination="selectdog"))
+            wx.PostEvent(parent, RequestDogs(filter=lambda x: x.sex == "f", destination="selectdog", data=None))
+            self.type = "parentselector"
         elif who == "Sire":
-            wx.PostEvent(parent, RequestDogs(filter=lambda x: x.sex == "m", destination="selectdog"))
-        else:
-            wx.PostEvent(parent, RequestDogs(filter=lambda x: True, destination="selectdog"))
+            wx.PostEvent(parent, RequestDogs(filter=lambda x: x.sex == "m", destination="selectdog", data=None))
+            self.type = "parentselector"
+        elif who == "Parent":
+            wx.PostEvent(parent, RequestDogs(filter=lambda x: True, destination="selectdog",data=None))
+            self.type = "parentselector"
+        elif who == "Relative":
+            wx.PostEvent(parent, RequestDogs(filter=lambda x: x.id != data, destination="addrelative", data=None))
+            self.type = "relativeselector"
 
         self.who = who
         self.Bind(EVT_PASS_DOGS, self.ReceiveData)
@@ -23,12 +29,13 @@ class DogSelectDialog(wx.Frame):
     def GoToDogPage(self, e):
         dialog = wx.MessageDialog(self, TEXT_GOTODOGPAGEWARNING, style=wx.OK | wx.CANCEL)
         test = dialog.ShowModal()
+        evt = OpenDogPageEvent(num=e.num, status="confirmed")
         if test == wx.ID_OK:
-            wx.PostEvent(self.GetParent(), e(status="confirmed"))
+            wx.PostEvent(self.GetParent(), evt)
             self.Destroy()
 
     def ReceiveData(self, e):
-        data = e.data
+        data = e.dogs
         self.ContinueSetup(data)
 
     def ContinueSetup(self, data):
@@ -55,7 +62,10 @@ class DogSelectDialog(wx.Frame):
         self.Center()
 
     def Selected(self, e):
-        wx.PostEvent(self.GetParent(), ParentSelectedEvent(dogid=self.panel.selected[0], type="parentselected"))
+        if self.type == "parentselector":
+            wx.PostEvent(self.GetParent(), ParentSelectedEvent(dogid=self.panel.selected[0], type="parentselected"))
+        if self.type == "relativeselector":
+            wx.PostEvent(self.GetParent(), PotentialRelativeSelectedEvent(dogid=self.panel.selected[0]))
         self.Destroy()
 
     def Cancel(self, e):

@@ -155,6 +155,7 @@ class DogPanel(wx.Panel):
         relativeslinkbox = LinkBoxCtrl(self)
         addrelativebutton = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_ADDRELATIVE,
                                           colors=BUTTONCOLORS)
+        addrelativebutton.Bind(wx.EVT_LEFT_DOWN, self.AddRelative)
         breedingtestresultslabel = wx.StaticText(self, label=TEXT_BREEDINGTESTRESULTS)
         breedingtestresultslabel.SetFont(FONT_BIG)
         breedingtestresultslinkbox = LinkBoxCtrl(self)
@@ -193,6 +194,30 @@ class DogPanel(wx.Panel):
         dogsizer.Add(bottomsizer, 1, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(dogsizer)
 
+        self.Bind(EVT_PASS_DOGS, self.PopulateRelativeSelection)
+        self.Bind(EVT_OPEN_DOG_PAGE, self.passToMainWindow)
+        self.Bind(EVT_RELATIVE_SELECTED, self.GetTypeOfRelative)
+        self.Bind(EVT_PASS_DATA, self.ProcessAddRelative)
+
+    def ProcessAddRelative(self, e):
+        wx.PostEvent(self.GetParent(), AddRelativeEvent(type=e.relativetype, relativeid=e.relativedogid, dogid=e.dogid))
+
+    def GetTypeOfRelative(self, e):
+        PopupAddRelative(self, relativedogid=e.dogid, dogid=self.dogid)
+
+    def passToMainWindow(self, e):
+        wx.PostEvent(self.GetParent(), e)
+
+    def AddRelative(self, e):
+        self.PopUpDogSelector()
+
+    def PopulateRelativeSelection(self, e):
+        wx.PostEvent([x for x in self.GetChildren() if type(x) == DogSelectDialog][0], e)
+
+    def PopUpDogSelector(self, dogtype="Relative"):
+        dialog = DogSelectDialog(parent=self, who=dogtype, data=self.dogid)
+        dialog.Show()
+
     def OpenCalcWithData(self, e):
         wx.PostEvent(self.GetParent(), NavigationEvent(destination="BreedingCalc"))
         wx.PostEvent(self.GetParent(), ParentSelectedEvent(dogid=self.dogid, type="parentselected"))
@@ -206,6 +231,53 @@ class DogPanel(wx.Panel):
 
     def OpenGenotypeView(self, e):
         wx.PostEvent(self.GetParent(), OpenGenotypeViewEvent(dogid=self.dogid))
+
+
+class PopupAddRelative(wx.Frame):
+    def __init__(self, parent, relativedogid, dogid):
+        super().__init__(parent)
+        self.relativedogid = relativedogid
+        self.dogid = dogid
+        titlelabel = wx.StaticText(self, label=TEXT_ADDRELATIVE)
+        titlelabel.SetFont(FONT_BIG)
+        typelabel = wx.StaticText(self, label=TEXT_TYPE)
+        typelabel.SetFont(FONT_BIG)
+        option1 = wx.RadioButton(self, label=TEXT_PARENT)
+        option2 = wx.RadioButton(self, label=TEXT_FULLSIBLING)
+        option3 = wx.RadioButton(self, label=TEXT_HALFSIBLING_FATHER)
+        option4 = wx.RadioButton(self, label=TEXT_HALFSIBLING_MOTHER)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
+        buttonselect = RoundedButton(self, TEXT_SELECT, colors=BUTTONCOLORS)
+        buttoncancel = RoundedButton(self, TEXT_CANCEL, colors=BUTTONCOLORS)
+        buttonsizer.AddStretchSpacer()
+        buttonsizer.Add(buttonselect, 1, wx.ALL, 15)
+        buttonsizer.Add(buttoncancel, 1, wx.BOTTOM | wx.TOP | wx.RIGHT, 15)
+        buttoncancel.Bind(wx.EVT_LEFT_DOWN, self.Cancel)
+        buttonselect.Bind(wx.EVT_LEFT_DOWN, self.Selected)
+
+        sizer.Add(titlelabel)
+        sizer.Add(typelabel)
+        sizer.Add(option1)
+        sizer.Add(option2)
+        sizer.Add(option3)
+        sizer.Add(option4)
+        sizer.Add(buttonsizer)
+        self.SetSizer(sizer)
+        self.Layout()
+        self.Center()
+        self.Show()
+
+    def Selected(self, e):
+        values = [x.GetLabel() if x.GetValue() else "" for x in self.GetChildren() if type(x) == wx.RadioButton]
+        value = "".join(values)
+        wx.PostEvent(self.GetParent(),
+                     PassDataEvent(origin="addrelativepopup", target="dogpanel", relativetype=value,
+                                   relativedogid=self.relativedogid, dogid=self.dogid))
+        self.Destroy()
+
+    def Cancel(self, e):
+        self.Destroy()
 
 
 class GenotypePanel(wx.Panel):
@@ -423,7 +495,6 @@ class BreedingPanel(wx.Panel):
         self.Bind(EVT_PARENT_SELECTED, self.passToMainWindow)
         self.Bind(EVT_PASS_SELECTED_PARENT_DATA, self.SetParentData)
 
-
     def GoBack(self, e):
         wx.PostEvent(self.GetParent(), OpenMainMenu())
 
@@ -491,7 +562,7 @@ class BreedingPanel(wx.Panel):
         wx.PostEvent(self, OpenDogPageEvent(num=e.GetEventObject().num, status="unconfirmed"))
 
     def GoToDogPage(self, e):
-        if e.status=="unconfirmed":
+        if e.status == "unconfirmed":
             dialog = wx.MessageDialog(self, TEXT_GOTODOGPAGEWARNING, style=wx.OK | wx.CANCEL)
             test = dialog.ShowModal()
             dialog.Destroy()

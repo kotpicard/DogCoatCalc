@@ -104,3 +104,8 @@ TEXT_VALUE = "Value"
 TEXT_NOT_VALUE = "Not Value"
 TEXT_BACK = "Back"
 TEXT_GOTODOGPAGEWARNING = "Go to dog page?"
+
+TEXT_PARENT = "Parent"
+TEXT_FULLSIBLING = "Full sibling"
+TEXT_HALFSIBLING_MOTHER = "Half sibling, same mother"
+TEXT_HALFSIBLING_FATHER = "Half sibling, same father"

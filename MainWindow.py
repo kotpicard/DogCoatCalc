@@ -39,6 +39,7 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_PASS_DOGS, self.ProcessPassDogs)
         self.Bind(EVT_PARENT_SELECTED, self.PassToTopLayer)
         self.Bind(EVT_PASS_SELECTED_PARENT_DATA, self.SetSelectedParent)
+        self.Bind(EVT_ADD_RELATIVE, self.PassToTopLayer)
 
     def SetSelectedParent(self, e):
         target = [x for x in self.GetChildren() if type(x)==BreedingPanel][0]
@@ -47,6 +48,9 @@ class MainWindow(wx.Frame):
     def ProcessPassDogs(self, e):
         if e.destination == "selectdog":
             for child in [x for x in self.GetChildren() if type(x) == BreedingPanel]:
+                wx.PostEvent(child, e)
+        if e.destination == "addrelative":
+            for child in [x for x in self.GetChildren() if type(x) == DogPanel]:
                 wx.PostEvent(child, e)
 
     def GenotypeChangedHandler(self, e):

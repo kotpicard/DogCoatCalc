@@ -23,9 +23,9 @@ class DataLayer(wx.EvtHandler):
 
     def PassDogsByCondition(self, evt):
         result = [dog for dog in self.dogs if evt.filter(dog)]
-        if evt.destination == "selectdog":
+        if evt.destination == "selectdog" or evt.destination == "addrelative":
             result = [self.FormatForSelection(dog) for dog in result]
-        e = PassDogs(data=result, destination=evt.destination)
+        e = PassDogs(dogs=result, destination=evt.destination, data=evt.data)
         wx.PostEvent(self.parent, e)
 
     def FormatForSelection(self, dog):
