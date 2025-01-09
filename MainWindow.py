@@ -34,6 +34,7 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_OPEN_EDIT_LOCUS, self.PassToTopLayer)
         self.Bind(EVT_PASS_EDIT_LOCUS_DATA, self.OpenEditLocus)
         self.Bind(EVT_GENOTYPE_CHANGED, self.GenotypeChangedHandler)
+        self.Bind(EVT_MAIN_MENU, self.OpenDefaultPanel)
 
     def GenotypeChangedHandler(self, e):
         wx.PostEvent(self.app, SaveEvent())
@@ -59,6 +60,12 @@ class MainWindow(wx.Frame):
         print(e.destination)
         self.NAVDICT[e.destination](e.data)
         print("layout")
+        self.Layout()
+        self.Center()
+
+    def OpenDefaultPanel(self, e):
+        self.MainSizer.Clear(delete_windows=True)
+        self.CreateDefaultPanel()
         self.Layout()
         self.Center()
 

@@ -75,15 +75,23 @@ class MyDogsPanel(wx.Panel):
                                colors=BUTTONCOLORS)
         button2 = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_REFRESH,
                                 colors=BUTTONCOLORS)
+        button3 = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_BACK,
+                                colors=BUTTONCOLORS)
+        button3.Bind(wx.EVT_LEFT_DOWN, self.GoBack)
         button2.Bind(wx.EVT_LEFT_DOWN, self.Reload)
         buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.dogspanel, 5, wx.EXPAND | wx.ALL, 10)
         buttonsizer.Add(button, 0, wx.ALL, 10)
+        buttonsizer.AddStretchSpacer()
         buttonsizer.Add(button2, 0, wx.ALL, 10)
-        buttonsizer.AddStretchSpacer(3)
+        buttonsizer.AddStretchSpacer()
+        buttonsizer.Add(button3, 0, wx.ALL, 10)
         sizer.Add(buttonsizer, 0, wx.ALL, 0)
         self.SetSizer(sizer)
         button.Bind(wx.EVT_LEFT_DOWN, self.AddDog)
+
+    def GoBack(self, e):
+        wx.PostEvent(self.GetParent(), OpenMainMenu())
 
     def Fill(self, elems):
         print("FILLING")
@@ -160,16 +168,23 @@ class DogPanel(wx.Panel):
                                    colors=BUTTONCOLORS)
         buttonnext.num = nextid
         buttonnext.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
+        buttonback = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_BACK,
+                                   colors=BUTTONCOLORS)
+        buttonback.Bind(wx.EVT_LEFT_DOWN, self.GoBack)
 
         bottomsizer.Add(buttonprev, 0, wx.ALL, 10)
-        bottomsizer.AddStretchSpacer()
+        bottomsizer.Add(buttonback, 0, wx.ALL, 10)
         bottomsizer.Add(buttonnext, 0, wx.ALL, 10)
+
 
         dogsizer = wx.BoxSizer(wx.VERTICAL)
         dogsizer.Add(topsizer, 5, wx.EXPAND | wx.ALL, 10)
         dogsizer.AddSpacer(50)
         dogsizer.Add(bottomsizer, 1, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(dogsizer)
+
+    def GoBack(self, e):
+        wx.PostEvent(self.GetParent(), NavigationEvent(destination="MyDogs"))
 
     def OpenDogPage(self, e):
         num = e.GetEventObject().num

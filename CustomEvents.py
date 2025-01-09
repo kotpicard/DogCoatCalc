@@ -14,6 +14,7 @@ EditLocusEvent, EVT_EDIT_LOCUS = NewEvt()
 OpenEditLocusEvent, EVT_OPEN_EDIT_LOCUS = NewEvt()
 PassGenotypeDataEvent, EVT_PASS_GENOTYPE = NewEvt()
 PassEditLocusDataEvent, EVT_PASS_EDIT_LOCUS_DATA = NewEvt()
+OpenMainMenu, EVT_MAIN_MENU = NewEvt()
 
 #SAVE/LOAD
 SaveEvent, EVT_SAVE = NewEvt()
