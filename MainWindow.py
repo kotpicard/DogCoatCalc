@@ -42,6 +42,7 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_ADD_RELATIVE, self.PassToTopLayer)
         self.Bind(EVT_OPEN_ADD_GOAL, self.OpenAddGoal)
         self.Bind(EVT_ADD_GOAL, self.PassToTopLayer)
+        self.Bind(EVT_DELETE_GOAL, self.PassToTopLayer)
 
     def OpenAddGoal(self, e):
         self.MainSizer.Clear(delete_windows=True)
@@ -134,9 +135,9 @@ class MainWindow(wx.Frame):
         wx.PostEvent(self.app, e)
 
     def CreateGoalsPage(self, data):
-        print("HERE")
+        print("HERE", data)
         goalspanel = GoalsPanel(self)
-        # goalspanel.Fill(data)
+        goalspanel.Fill(data)
         self.MainSizer.Add(goalspanel)
 
     def GoToDogPage(self, evt):

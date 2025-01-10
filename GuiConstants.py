@@ -14,7 +14,7 @@ Hex_GOALTICKINGLIGHT = "D45388"
 Hex_GOALGREYING = "9D4848"
 Hex_GOALGREYINGLIGHT = "BF5151"
 
-#other
+# other
 Hex_BACKGROUND = "D9D9D9"
 Hex_BACKGROUNDBOX = "C4C4C4"
 Hex_BUTTONCOLOR = "2C2C2C"
@@ -23,7 +23,7 @@ Hex_FONTCOLORBG = "150F0F"
 Hex_FONTLINKCOLORHOVER = "4548EF"
 Hex_FONTLINKCOLOR = "48499D"
 
-#allele hex codes
+# allele hex codes
 Hex_ALLELE = "13557E"
 Hex_NOTALLELE = "7E1313"
 Hex_ANYALLELE = "968C1F"
@@ -37,10 +37,14 @@ class Color:
         self.blue = int(self.hex[4:6], 16)
         self.rgb = (self.red, self.green, self.blue, 255)
 
+
 # GOAL FORMAT: (Name, Type) -> ("Black", "COLOR")
 GOALCOLORS = {
-    "COLOR": (Color(Hex_GOALCOLOR).rgb, Color(Hex_GOALCOLORLIGHT).rgb),
-    "PATTERN": (Color(Hex_GOALPATTERN).rgb, Color(Hex_GOALPATTERNLIGHT).rgb),
+    "COLOR_BLACK": (Color(Hex_GOALCOLOR).rgb, Color(Hex_GOALCOLORLIGHT).rgb),
+    "COLOR_RED": (Color(Hex_GOALCOLOR).rgb, Color(Hex_GOALCOLORLIGHT).rgb),
+    "K_LOCUS": (Color(Hex_GOALPATTERN).rgb, Color(Hex_GOALPATTERNLIGHT).rgb),
+    "E_LOCUS": (Color(Hex_GOALPATTERN).rgb, Color(Hex_GOALPATTERNLIGHT).rgb),
+    "AGOUTI": (Color(Hex_GOALPATTERN).rgb, Color(Hex_GOALPATTERNLIGHT).rgb),
     "WHITE": (Color(Hex_GOALWHITE).rgb, Color(Hex_GOALWHITELIGHT).rgb),
     "MERLE": (Color(Hex_GOALMERLE).rgb, Color(Hex_GOALMERLELIGHT).rgb),
     "TICKING": (Color(Hex_GOALTICKING).rgb, Color(Hex_GOALTICKINGLIGHT).rgb),
@@ -48,7 +52,6 @@ GOALCOLORS = {
 }
 
 BUTTONCOLORS = (Color(Hex_BUTTONCOLOR).rgb, Color(Hex_BUTTONCOLORHOVER).rgb)
-
 
 BREEDINGTYPES = ("CONVENTIONAL", "PICKMATE", "PICKPAIR", "CREATE")
 

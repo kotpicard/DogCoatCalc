@@ -38,6 +38,8 @@ class DogApp(wx.App):
         self.Bind(EVT_ADD_RELATIVE, self.RequestRelativeData)
         self.Bind(EVT_ADD_GOAL, self.PassToLogicLayer)
         self.Bind(EVT_PASS_GOAL, self.PassToDataLayer)
+        self.Bind(EVT_NAV_DATA_PASS, self.PassToMainWindow)
+        self.Bind(EVT_DELETE_GOAL, self.PassToDataLayer)
 
         wx.PostEvent(self.DataLayer, LoadEvent())
 
@@ -75,7 +77,6 @@ class DogApp(wx.App):
             wx.PostEvent(self.MainWindow, PassDataForDogPageEvent(dog=evt.dog))
         if evt.type == "add":
             wx.PostEvent(self.LogicLayer, evt)
-            wx.PostEvent(self, NavigationEvent(destination="MyDogs"))
         if evt.type == "parentselected":
             wx.PostEvent(self.MainWindow, PassSelectedParentDataEvent(dog=evt.dog))
 
@@ -85,7 +86,7 @@ class DogApp(wx.App):
         if evt.destination == "BreedingCalc":
             wx.PostEvent(self.MainWindow, NavDataPass(destination="BreedingCalc", data=None))
         if evt.destination == "Goals":
-            wx.PostEvent(self.MainWindow, NavDataPass(destination="Goals", data=None))
+            wx.PostEvent(self.DataLayer, RequestAllGoalsEvent(type="displayall"))
 
     def DisplayDogs(self, evt):
         event = NavDataPass(destination="MyDogs", data=evt.descs)

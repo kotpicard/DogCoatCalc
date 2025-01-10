@@ -486,10 +486,9 @@ class Genotype:
             self.loci = loci
 
     def CreateFromString(self, string):
-        print("creating")
         loci_text = string.split("|")
         for i in range(10):
-            print(i, self.loci[i], loci_text[i])
+            # print(i, self.loci[i], loci_text[i])
             self.loci[i].CreateFromString(loci_text[i])
 
     def __getitem__(self, item):
@@ -908,44 +907,44 @@ class BreedingResult:
 
 #### TESTS
 
+#
+# test_genotype = Genotype()
+# ISABELLA.ImposeConditions(test_genotype)
+# BLACK.ImposeConditions(test_genotype)
+# possible_phenotypes = [x.desc for x in OTHER_PHENOTYPES + COLOR_PHENOTYPES if x.TestConditions(test_genotype)[0]]
+# print(possible_phenotypes)
+# test_dog = Dog(test_genotype, name="Test Dog", coat=[BLACK])
+# test_dog.CreateParents()
+# ISABELLA.ImposeConditions(test_dog.dam.genotype)
+# ISABELLA.ImposeConditions(test_dog.sire.genotype)
+# print(test_dog.dam.genotype)
+# print(test_dog.sire.genotype)
+# test_dog.CreateAllParentConditions()
+# test_dog.ImposeAllParentConditions()
+# print(test_dog.genotype)
+# print(test_dog.dam.genotype)
+# print(test_dog.sire.genotype)
+#
+# test_dog.CreateChildData()
+# print(test_dog.genotype)
+# test_dog.dam.ImposeChildConditions()
+# print(test_dog.dam.childConditions)
+# print(test_dog.genotype)
+# test_dog.CreateAllParentConditions()
+# test_dog.ImposeAllParentConditions()
 
-test_genotype = Genotype()
-ISABELLA.ImposeConditions(test_genotype)
-BLACK.ImposeConditions(test_genotype)
-possible_phenotypes = [x.desc for x in OTHER_PHENOTYPES + COLOR_PHENOTYPES if x.TestConditions(test_genotype)[0]]
-print(possible_phenotypes)
-test_dog = Dog(test_genotype, name="Test Dog", coat=[BLACK])
-test_dog.CreateParents()
-ISABELLA.ImposeConditions(test_dog.dam.genotype)
-ISABELLA.ImposeConditions(test_dog.sire.genotype)
-print(test_dog.dam.genotype)
-print(test_dog.sire.genotype)
-test_dog.CreateAllParentConditions()
-test_dog.ImposeAllParentConditions()
-print(test_dog.genotype)
-print(test_dog.dam.genotype)
-print(test_dog.sire.genotype)
-
-test_dog.CreateChildData()
-print(test_dog.genotype)
-test_dog.dam.ImposeChildConditions()
-print(test_dog.dam.childConditions)
-print(test_dog.genotype)
-test_dog.CreateAllParentConditions()
-test_dog.ImposeAllParentConditions()
-
-print(test_dog.genotype)
-print(test_dog.dam.genotype)
-print(test_dog.sire.genotype)
-print("\n\n\n")
-
-test_dog.dam.Breed(test_dog.sire)
-breeding = test_dog.dam.Breed(test_dog.sire)
-print(breeding.possibleGenotype)
-print(breeding.possibleGenotype.TestMultiplePhenotypes([ISABELLA, BLACK, BLUE, NO_WHITE]), "THIS HERE")
-goal = Goal([ISABELLA, BLACK, BLUE, NO_WHITE])
-print(goal.CheckConditions(breeding.possibleGenotype))
-a = Locus(0)
-a1 = [a]
-c = Condition(0, "IsNotHomozygousFor", "a")
-print(goal.ToList())
+# print(test_dog.genotype)
+# print(test_dog.dam.genotype)
+# print(test_dog.sire.genotype)
+# print("\n\n\n")
+#
+# test_dog.dam.Breed(test_dog.sire)
+# breeding = test_dog.dam.Breed(test_dog.sire)
+# print(breeding.possibleGenotype)
+# print(breeding.possibleGenotype.TestMultiplePhenotypes([ISABELLA, BLACK, BLUE, NO_WHITE]), "THIS HERE")
+# goal = Goal([ISABELLA, BLACK, BLUE, NO_WHITE])
+# print(goal.CheckConditions(breeding.possibleGenotype))
+# a = Locus(0)
+# a1 = [a]
+# c = Condition(0, "IsNotHomozygousFor", "a")
+# print(goal.ToList())

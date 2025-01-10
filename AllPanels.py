@@ -438,6 +438,7 @@ class GoalsPanel(wx.Panel):
         buttonadd = RoundedButton(self, label=TEXT_ADD, colors=BUTTONCOLORS)
         buttonadd.Bind(wx.EVT_LEFT_DOWN, self.AddGoal)
         buttondelete = RoundedButton(self, label=TEXT_DELETE, colors=BUTTONCOLORS)
+        buttondelete.Bind(wx.EVT_LEFT_DOWN, self.DeleteGoal)
         buttonback = RoundedButton(self, label=TEXT_BACK, colors=BUTTONCOLORS)
         buttonback.Bind(wx.EVT_LEFT_DOWN, self.GoBack)
         buttonsizer.Add(buttonadd, 1, wx.ALL, 5)
@@ -455,8 +456,20 @@ class GoalsPanel(wx.Panel):
     def GoBack(self, e):
         wx.PostEvent(self.GetParent(), OpenMainMenu())
 
+    def Fill(self, data):
+        for elem in data:
+            self.goalctrl.AddGoal(elem)
+        self.Layout()
+
     def AddGoal(self, e):
         wx.PostEvent(self.GetParent(), OpenAddGoalPanel())
+
+    def DeleteGoal(self, e):
+        dialog = wx.MessageDialog(self, TEXT_DELETE_WARNING, style=wx.OK | wx.CANCEL)
+        test = dialog.ShowModal()
+        dialog.Destroy()
+        if test == wx.ID_OK:
+            wx.PostEvent(self.GetParent(), DeleteGoalEvent(data=self.goalctrl.selected))
 
 
 class AddGoalPanel(wx.Panel):
@@ -539,6 +552,9 @@ class AddGoalPanel(wx.Panel):
         children = [x for x in self.GetChildren() if type(x) == wx.CheckBox]
         selected = [x.GetLabel() for x in children if x.GetValue()]
         wx.PostEvent(self.GetParent(), AddGoalEvent(data=selected))
+
+
+
 
 
 class BreedingPanel(wx.Panel):

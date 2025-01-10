@@ -29,6 +29,7 @@ class GoalCtrl(wx.ScrolledWindow):
         selector.num = self.currentgoalid
         self.currentgoalid += 1
         goal_sizer.Add(selector, 0, wx.ALIGN_CENTER)
+        print(goallist)
         for goal in goallist[:-1]:
             button = RoundedButton(parent=self, label=goal[0], colors=GOALCOLORS[goal[1]])
             goal_sizer.Add(button, 1, wx.EXPAND)

@@ -21,14 +21,34 @@ class DataLayer(wx.EvtHandler):
         self.Bind(EVT_REQUEST_DOGS, self.PassDogsByCondition)
         self.Bind(EVT_PARENT_SELECTED, self.PassDogByID)
         self.Bind(EVT_PASS_GOAL, self.ProcessPassGoal)
+        self.Bind(EVT_REQUEST_ALL_GOALS, self.ProcessPassGoal)
+        self.Bind(EVT_DELETE_GOAL, self.DeleteGoal)
+
+    def DeleteGoal(self, evt):
+        which = evt.data
+        keep = []
+        for i in range(len(self.goals)):
+            if i not in which:
+                keep.append(self.goals[i])
+        self.goals = keep
+        wx.PostEvent(self.parent, NavigationEvent(destination="Goals"))
 
     def ProcessPassGoal(self, evt):
-        if evt.type=="add":
+        if evt.type == "add":
             self.AddGoal(evt.data)
+        if evt.type == "displayall":
+            self.PassAllGoals()
+
+    def PassAllGoals(self):
+        data = []
+        for goal in self.goals:
+            data.append([(x.desc, x.type) for x in goal.elements])
+        wx.PostEvent(self.parent, NavDataPass(destination="Goals", data=data))
 
     def AddGoal(self, goal):
         self.goals.append(goal)
         wx.PostEvent(self, SaveEvent())
+        wx.PostEvent(self.parent, NavigationEvent(destination="Goals"))
 
     def PassDogsByCondition(self, evt):
         result = [dog for dog in self.dogs if evt.filter(dog)]
@@ -54,12 +74,13 @@ class DataLayer(wx.EvtHandler):
             wx.PostEvent(self.parent, newevt)
 
     def AddDogFromTopLayer(self, evt):
-        if evt.dog.id is not None:
-            self.dogs.append(evt.dog)
-        else:
-            evt.dog.id = self.currentDogID
-            self.currentDogID += 1
-            self.dogs.append(evt.dog)
+        # if evt.dog.id is not None:
+        #     self.dogs.append(evt.dog)
+        # else:
+        self.currentDogID = len(self.dogs)
+        evt.dog.id = self.currentDogID
+        self.currentDogID += 1
+        self.dogs.append(evt.dog)
         wx.PostEvent(self, SaveEvent())
 
     def PassDogByID(self, evt):
@@ -85,7 +106,7 @@ class DataLayer(wx.EvtHandler):
             datafile.write("#")
             dogdata = dog.ToList()
             for elem in dogdata:
-                print(elem)
+                # print(elem)
                 datafile.write(elem[0].upper() + ":" + str(elem[1]) + "\n")
 
         datafile.write("##BREEDINGS")
@@ -124,3 +145,5 @@ class DataLayer(wx.EvtHandler):
                 dogslice = data_dogs[i:i + 10]
                 evt = LoadDogFromDataEvent(data=dogslice)
                 wx.PostEvent(self.parent, evt)
+
+

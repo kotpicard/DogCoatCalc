@@ -95,7 +95,7 @@ class LogicLayer(wx.EvtHandler):
 
     def LoadDog(self, evt):
         data = [x.split(":")[1].strip() for x in evt.data]
-        print(data)
+        # print(data)
         genotype = Genotype()
         genotype.CreateFromString(data[5])
         dogid = int(data[0])
@@ -126,5 +126,6 @@ class LogicLayer(wx.EvtHandler):
         if dog.genotype.status:
             evt = PassDogToDataLayerEvent(dog=dog)
             wx.PostEvent(self.parent, evt)
+            wx.PostEvent(self.parent, NavigationEvent(destination="MyDogs"))
         else:
             wx.PostEvent(self.parent, DogIncorrectGenotypeEvent())
