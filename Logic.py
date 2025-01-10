@@ -521,20 +521,22 @@ class PossibleGenotype(Genotype):
             result, prob = phenotype.TestConditions(self)
             results.append(result)
             probabilities.append(prob)
-        if all(results):
-            probability = 1
-            for p in probabilities:
-                probability *= p
-            return True, probability
-        else:
-            return False, 0
+        return results, probabilities
+        # if all(results):
+        #     probability = 1
+        #     for p in probabilities:
+        #         probability *= p
+        #     return True, probability
+        # else:
+        #     return False, 0
 
 
 class Phenotype:
-    def __init__(self):
+    def __init__(self, type):
         self.desc = "description of phenotype"
         self.conditions = []  # list of conditions for this phenotype to show
         self.reverseConditions = []
+        self.type = type
 
     def AddCondition(self, locus, cond, argument):
         self.conditions.append(Condition(locus, cond, argument))
@@ -594,17 +596,17 @@ class Possibility:
 ##### PHENOTYPES
 
 ## COLOR - EUMELANIN
-BLACK = Phenotype()
-LIVER = Phenotype()
-BLUE = Phenotype()
-ISABELLA = Phenotype()
+BLACK = Phenotype("COLOR_BLACK")
+LIVER = Phenotype("COLOR_BLACK")
+BLUE = Phenotype("COLOR_BLACK")
+ISABELLA = Phenotype("COLOR_BLACK")
 
 ## COLOR - PHEOMELANIN
-RED = Phenotype()
-DILUTE_RED = Phenotype()
+RED = Phenotype("COLOR_RED")
+DILUTE_RED = Phenotype("COLOR_RED")
 
 ## WHITE
-WHITE = Phenotype()
+WHITE = Phenotype("COLOR_RED")
 
 # COLORS - NAMES
 BLACK.desc = "Black"
@@ -645,26 +647,26 @@ WHITE.AddCondition(5, "IsHomozygousFor", "i")
 COLOR_PHENOTYPES = [BLACK, LIVER, BLUE, ISABELLA, RED, DILUTE_RED, WHITE]
 
 #### OTHER
-SABLE = Phenotype()
-AGOUTI = Phenotype()
-TANPOINT = Phenotype()
-BRINDLE = Phenotype()
-SOLID_EUMELANIN = Phenotype()
-SOLID_PHEOMELANIN = Phenotype()
-MASK = Phenotype()
-NO_MERLE = Phenotype()
-MERLE = Phenotype()
-DOUBLE_MERLE = Phenotype()
-NO_WHITE = Phenotype()
-MINOR_WHITE = Phenotype()
-PIEBALD = Phenotype()
-IRISH_WHITE = Phenotype()
-MINOR_TICKING = Phenotype()
-NO_TICKING = Phenotype()
-TICKING = Phenotype()
-ROANING = Phenotype()
-NO_GREYING = Phenotype()
-GREYING = Phenotype()
+SABLE = Phenotype("AGOUTI")
+AGOUTI = Phenotype("AGOUTI")
+TANPOINT = Phenotype("AGOUTI")
+BRINDLE = Phenotype("K_LOCUS")
+SOLID_EUMELANIN = Phenotype("K_LOCUS")
+SOLID_PHEOMELANIN = Phenotype("E_LOCUS")
+MASK = Phenotype("E_LOCUS")
+NO_MERLE = Phenotype("MERLE")
+MERLE = Phenotype("MERLE")
+DOUBLE_MERLE = Phenotype("MERLE")
+NO_WHITE = Phenotype("WHITE")
+MINOR_WHITE = Phenotype("WHITE")
+PIEBALD = Phenotype("WHITE")
+IRISH_WHITE = Phenotype("WHITE")
+MINOR_TICKING = Phenotype("TICKING")
+NO_TICKING = Phenotype("TICKING")
+TICKING = Phenotype("TICKING")
+ROANING = Phenotype("TICKING")
+NO_GREYING = Phenotype("GREYING")
+GREYING = Phenotype("GREYING")
 
 ## DESCRIPTIONS
 SABLE.desc = "Sable"
@@ -752,6 +754,47 @@ for elem in OTHER_PHENOTYPES + COLOR_PHENOTYPES:
     PHEN_DICT[elem.desc] = elem
 
 
+class Goal:
+    def __init__(self, elements):
+        self.elements = elements
+
+    def CheckConditions(self, target):
+        # target is possiblegenotype
+        results, probs = target.TestMultiplePhenotypes(self.elements)
+        # results is true/false if possible, probs is % of possible genotypes that pass the test for each element
+        elementresults = []
+        # result meanings
+        # 0: impossible
+        # 1: might be possible (any allele in genotype)
+        # 2: is possible (known alleles)
+        # 3: is certain
+        for i in range(len(results)):
+            print(i, len(results))
+            if not results[i]:
+                elementresults.append(0)
+            else:
+                # we know it's at least possible - need to check for nonspecific alleles in given locus
+                loci = [x.locus for x in self.elements[i].conditions]
+                temp = []
+                for ln in loci:
+                    locus = target.loci[ln]
+                    possible_locus_versions = [x[0] for x in locus]
+                    # if there is any version where we don't know an allele it's not specific
+                    nonspecific = any(
+                        [not all([type(x) == Allele for x in l.alleles]) for l in possible_locus_versions])
+                    if nonspecific:
+                        # might be possible but we can't be sure as parent alleles are not fully known
+                        temp.append(1)
+                    else:
+                        if probs[i] != 1:
+                            # result is specific but uncertain
+                            temp.append(2)
+                        else:
+                            # result is both specific and certain
+                            temp.append(3)
+                elementresults.append(sum(temp)/len(temp))
+        return elementresults
+
 class Dog:
     def __init__(self, genotype, coat=None, dogid=None, name=None, age=None, dam=None, sire=None, sex=None):
         self.genotype = genotype
@@ -785,10 +828,10 @@ class Dog:
 
     def CreateParents(self):
         if type(self.dam) != Dog:
-            self.dam = Dog(Genotype(), "Mother of {}".format(self.name), sex="f")
+            self.dam = Dog(Genotype(), name="Mother of {}".format(self.name), sex="f", coat=[])
             self.dam.children.append(self)
         if type(self.sire) != Dog:
-            self.sire = Dog(Genotype(), "Father of {}".format(self.name), sex="m")
+            self.sire = Dog(Genotype(), name="Father of {}".format(self.name), sex="m", coat=[])
             self.sire.children.append(self)
 
     def CreateAllParentConditions(self):
@@ -855,7 +898,8 @@ class BreedingResult:
             parent2_locus = self.parent2.childPossibilities[locus_number]
             self.possible_loci.append(parent1_locus.Combine(parent2_locus, locus_number))
 
-##### TESTS
+
+#### TESTS
 
 
 # test_genotype = Genotype()
@@ -863,10 +907,10 @@ class BreedingResult:
 # BLACK.ImposeConditions(test_genotype)
 # possible_phenotypes = [x.desc for x in OTHER_PHENOTYPES + COLOR_PHENOTYPES if x.TestConditions(test_genotype)[0]]
 # print(possible_phenotypes)
-# test_dog = Dog(test_genotype, "Test Dog")
+# test_dog = Dog(test_genotype, name="Test Dog", coat=[BLACK])
 # test_dog.CreateParents()
 # ISABELLA.ImposeConditions(test_dog.dam.genotype)
-# BLACK.ImposeConditions(test_dog.sire.genotype)
+# ISABELLA.ImposeConditions(test_dog.sire.genotype)
 # print(test_dog.dam.genotype)
 # print(test_dog.sire.genotype)
 # test_dog.CreateAllParentConditions()
@@ -891,7 +935,9 @@ class BreedingResult:
 # test_dog.dam.Breed(test_dog.sire)
 # breeding = test_dog.dam.Breed(test_dog.sire)
 # print(breeding.possibleGenotype)
-# print(breeding.possibleGenotype.TestMultiplePhenotypes([LIVER]))
+# print(breeding.possibleGenotype.TestMultiplePhenotypes([ISABELLA, BLACK, BLUE, NO_WHITE]), "THIS HERE")
+# goal = Goal([ISABELLA, BLACK, BLUE, NO_WHITE])
+# print(goal.CheckConditions(breeding.possibleGenotype))
 # a = Locus(0)
 # a1 = [a]
 # c = Condition(0, "IsNotHomozygousFor", "a")

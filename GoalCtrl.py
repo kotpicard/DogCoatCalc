@@ -65,6 +65,8 @@ class GoalCtrl(wx.ScrolledWindow):
         print(self.selected)
 
 
+class AddGoalDialog(wx.Frame):
+    ...
 # # Main application for testing
 # if __name__ == "__main__":
 #     app = wx.App(False)
