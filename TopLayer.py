@@ -42,13 +42,14 @@ class DogApp(wx.App):
         dogid = evt.dogid
         relativeid = evt.relativeid
         relativetype = evt.type
-        wx.PostEvent(self.DataLayer, RequestDogs(filter=lambda x: x.id in [dogid, relativeid], data=relativetype, destination="top"))
+        wx.PostEvent(self.DataLayer,
+                     RequestDogs(filter=lambda x: x.id in [dogid, relativeid], data=relativetype, destination="top"))
 
     def ProcessAddRelative(self, evt):
         print(evt.data, evt.dogs)
 
     def ProcessPassDogs(self, evt):
-        if evt.destination!="top":
+        if evt.destination != "top":
             self.PassToMainWindow(evt)
         else:
             self.ProcessAddRelative(evt)

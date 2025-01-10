@@ -426,12 +426,18 @@ class AllelePanel(wx.Panel):
                 self.bottomsizer.Add(wx.CheckBox(self, label=option), 0, wx.ALL, 5)
         self.Layout()
 
+class GoalsPanel(wx.Panel):
+    def __init__(self, parent):
+        super().__init__(self, parent)
+        self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
+
+
+
 
 class BreedingPanel(wx.Panel):
     def __init__(self, parent, damdata=None, siredata=None):
         super().__init__(parent)
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
-        self.Bind(EVT_SELECT_DOG, self.SelectHandler)
         breedingtypesizer = wx.BoxSizer(wx.VERTICAL)
         breedingtypelabel = wx.StaticText(self, label=TEXT_BREEDINGTYPE)
         breedingtypelabel.SetFont(FONT_BIG)
@@ -489,6 +495,7 @@ class BreedingPanel(wx.Panel):
         breedingtestsizer.Add(rightsizer, 1, wx.EXPAND)
         self.SetSizer(breedingtestsizer)
 
+        self.Bind(EVT_SELECT_DOG, self.SelectHandler)
         self.Bind(EVT_REQUEST_DOGS, self.passToMainWindow)
         self.Bind(EVT_OPEN_DOG_PAGE, self.GoToDogPage)
         self.Bind(EVT_PASS_DOGS, self.ReceiveData)

@@ -125,7 +125,9 @@ class MainWindow(wx.Frame):
         wx.PostEvent(self.app, e)
 
     def CreateGoalsPage(self, data):
-        ...
+        goalspanel = GoalsPanel(self)
+        goalspanel.Fill(data)
+        self.MainSizer.Add(goalspanel)
 
     def GoToDogPage(self, evt):
         print("GO TO DOG PAGE", evt.num)
