@@ -1,3 +1,5 @@
+from text_en import *
+
 # LOCI
 # 0 - Agouti Ay, aw, at, a
 # 1 - Liver B, b
@@ -609,13 +611,13 @@ DILUTE_RED = Phenotype("COLOR_RED")
 WHITE = Phenotype("COLOR_RED")
 
 # COLORS - NAMES
-BLACK.desc = "Black"
-LIVER.desc = "Liver"
-BLUE.desc = "Blue"
-ISABELLA.desc = "Isabella"
-RED.desc = "Red"
-DILUTE_RED.desc = "Fawn/cream/silver/white"
-WHITE.desc = "White"
+BLACK.desc = TEXT_BLACK
+LIVER.desc = TEXT_LIVER
+BLUE.desc = TEXT_BLUE
+ISABELLA.desc = TEXT_ISABELLA
+RED.desc = TEXT_RED
+DILUTE_RED.desc = TEXT_DILUTE_RED
+WHITE.desc = TEXT_WHITE
 
 # COLORS - CONDITIONS
 # BLACK
@@ -665,30 +667,28 @@ MINOR_TICKING = Phenotype("TICKING")
 NO_TICKING = Phenotype("TICKING")
 TICKING = Phenotype("TICKING")
 ROANING = Phenotype("TICKING")
-NO_GREYING = Phenotype("GREYING")
 GREYING = Phenotype("GREYING")
 
 ## DESCRIPTIONS
-SABLE.desc = "Sable"
-AGOUTI.desc = "Agouti"
-TANPOINT.desc = "Tan points"
-BRINDLE.desc = "Brindle"
-SOLID_EUMELANIN.desc = "Solid color"
-SOLID_PHEOMELANIN.desc = "Solid color"
-MASK.desc = "Masked"
-NO_MERLE.desc = "No merle"
-MERLE.desc = "Merle"
-DOUBLE_MERLE.desc = "Double merle"
-NO_WHITE.desc = "No white spotting"
-MINOR_WHITE.desc = "Little white spotting"
-PIEBALD.desc = "Piebald white pattern"
-IRISH_WHITE.desc = "Irish white pattern"
-NO_TICKING.desc = "No ticking/roaning"
-MINOR_TICKING.desc = "Minor ticking"
-TICKING.desc = "Ticking"
-ROANING.desc = "Roaning"
-NO_GREYING.desc = "No greying"
-GREYING.desc = "Greying"
+SABLE.desc = TEXT_SABLE
+AGOUTI.desc = TEXT_AGOUTI
+TANPOINT.desc = TEXT_TANPOINT
+BRINDLE.desc = TEXT_BRINDLE
+SOLID_EUMELANIN.desc = TEXT_SOLID_EUMELANIN
+SOLID_PHEOMELANIN.desc = TEXT_SOLID_EUMELANIN
+MASK.desc = TEXT_MASK
+NO_MERLE.desc = TEXT_NO_MERLE
+MERLE.desc = TEXT_MERLE
+DOUBLE_MERLE.desc = TEXT_DOUBLE_MERLE
+NO_WHITE.desc = TEXT_NO_WHITE
+MINOR_WHITE.desc = TEXT_MINOR_WHITE
+PIEBALD.desc = TEXT_PIEBALD
+IRISH_WHITE.desc = TEXT_IRISH_WHITE
+NO_TICKING.desc = TEXT_NO_TICKING
+MINOR_TICKING.desc = TEXT_MINOR_TICKING
+TICKING.desc = TEXT_TICKING
+ROANING.desc = TEXT_ROANING
+GREYING.desc = TEXT_GREYING
 
 ### CONDITIONS
 SABLE.AddCondition(6, "IsNotHomozygousFor", "K")
@@ -746,7 +746,7 @@ GREYING.AddCondition(4, "HasAtLeastOne", "G")
 GREYING.AddCondition(3, "IsNotHomozygousFor", "e")
 
 OTHER_PHENOTYPES = [SABLE, AGOUTI, TANPOINT, BRINDLE, SOLID_EUMELANIN, SOLID_PHEOMELANIN, MASK, MERLE, DOUBLE_MERLE,
-                    NO_WHITE, MINOR_WHITE, PIEBALD, IRISH_WHITE, MINOR_TICKING, TICKING, ROANING, GREYING, NO_GREYING,
+                    NO_WHITE, MINOR_WHITE, PIEBALD, IRISH_WHITE, MINOR_TICKING, TICKING, ROANING, GREYING,
                     NO_MERLE, NO_TICKING]
 
 PHEN_DICT = dict()
@@ -757,6 +757,12 @@ for elem in OTHER_PHENOTYPES + COLOR_PHENOTYPES:
 class Goal:
     def __init__(self, elements):
         self.elements = elements
+
+    def FromString(self, text):
+        ...
+
+    def ToList(self):
+        return [(x.type, x.desc) for x in self.elements]
 
     def CheckConditions(self, target):
         # target is possiblegenotype
@@ -792,8 +798,9 @@ class Goal:
                         else:
                             # result is both specific and certain
                             temp.append(3)
-                elementresults.append(sum(temp)/len(temp))
+                elementresults.append(sum(temp) / len(temp))
         return elementresults
+
 
 class Dog:
     def __init__(self, genotype, coat=None, dogid=None, name=None, age=None, dam=None, sire=None, sex=None):
@@ -902,43 +909,43 @@ class BreedingResult:
 #### TESTS
 
 
-# test_genotype = Genotype()
-# ISABELLA.ImposeConditions(test_genotype)
-# BLACK.ImposeConditions(test_genotype)
-# possible_phenotypes = [x.desc for x in OTHER_PHENOTYPES + COLOR_PHENOTYPES if x.TestConditions(test_genotype)[0]]
-# print(possible_phenotypes)
-# test_dog = Dog(test_genotype, name="Test Dog", coat=[BLACK])
-# test_dog.CreateParents()
-# ISABELLA.ImposeConditions(test_dog.dam.genotype)
-# ISABELLA.ImposeConditions(test_dog.sire.genotype)
-# print(test_dog.dam.genotype)
-# print(test_dog.sire.genotype)
-# test_dog.CreateAllParentConditions()
-# test_dog.ImposeAllParentConditions()
-# print(test_dog.genotype)
-# print(test_dog.dam.genotype)
-# print(test_dog.sire.genotype)
-#
-# test_dog.CreateChildData()
-# print(test_dog.genotype)
-# test_dog.dam.ImposeChildConditions()
-# print(test_dog.dam.childConditions)
-# print(test_dog.genotype)
-# test_dog.CreateAllParentConditions()
-# test_dog.ImposeAllParentConditions()
-#
-# print(test_dog.genotype)
-# print(test_dog.dam.genotype)
-# print(test_dog.sire.genotype)
-# print("\n\n\n")
-#
-# test_dog.dam.Breed(test_dog.sire)
-# breeding = test_dog.dam.Breed(test_dog.sire)
-# print(breeding.possibleGenotype)
-# print(breeding.possibleGenotype.TestMultiplePhenotypes([ISABELLA, BLACK, BLUE, NO_WHITE]), "THIS HERE")
-# goal = Goal([ISABELLA, BLACK, BLUE, NO_WHITE])
-# print(goal.CheckConditions(breeding.possibleGenotype))
-# a = Locus(0)
-# a1 = [a]
-# c = Condition(0, "IsNotHomozygousFor", "a")
-# print(c.Execute(a1))
+test_genotype = Genotype()
+ISABELLA.ImposeConditions(test_genotype)
+BLACK.ImposeConditions(test_genotype)
+possible_phenotypes = [x.desc for x in OTHER_PHENOTYPES + COLOR_PHENOTYPES if x.TestConditions(test_genotype)[0]]
+print(possible_phenotypes)
+test_dog = Dog(test_genotype, name="Test Dog", coat=[BLACK])
+test_dog.CreateParents()
+ISABELLA.ImposeConditions(test_dog.dam.genotype)
+ISABELLA.ImposeConditions(test_dog.sire.genotype)
+print(test_dog.dam.genotype)
+print(test_dog.sire.genotype)
+test_dog.CreateAllParentConditions()
+test_dog.ImposeAllParentConditions()
+print(test_dog.genotype)
+print(test_dog.dam.genotype)
+print(test_dog.sire.genotype)
+
+test_dog.CreateChildData()
+print(test_dog.genotype)
+test_dog.dam.ImposeChildConditions()
+print(test_dog.dam.childConditions)
+print(test_dog.genotype)
+test_dog.CreateAllParentConditions()
+test_dog.ImposeAllParentConditions()
+
+print(test_dog.genotype)
+print(test_dog.dam.genotype)
+print(test_dog.sire.genotype)
+print("\n\n\n")
+
+test_dog.dam.Breed(test_dog.sire)
+breeding = test_dog.dam.Breed(test_dog.sire)
+print(breeding.possibleGenotype)
+print(breeding.possibleGenotype.TestMultiplePhenotypes([ISABELLA, BLACK, BLUE, NO_WHITE]), "THIS HERE")
+goal = Goal([ISABELLA, BLACK, BLUE, NO_WHITE])
+print(goal.CheckConditions(breeding.possibleGenotype))
+a = Locus(0)
+a1 = [a]
+c = Condition(0, "IsNotHomozygousFor", "a")
+print(goal.ToList())

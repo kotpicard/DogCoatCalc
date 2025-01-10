@@ -93,7 +93,9 @@ class DataLayer(wx.EvtHandler):
             datafile.write("#")
             goaldata = goal.ToList()
             for elem in goaldata:
-                datafile.write(elem[0].upper() + ":" + elem[1] + "\n")
+                datafile.write(elem[0].upper() + ":" + elem[1] + "|")
+            datafile.write("\n")
+        datafile.write("\n")
         datafile.close()
 
     def LoadData(self, evt):
