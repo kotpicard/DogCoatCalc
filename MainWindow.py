@@ -40,6 +40,15 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_PARENT_SELECTED, self.PassToTopLayer)
         self.Bind(EVT_PASS_SELECTED_PARENT_DATA, self.SetSelectedParent)
         self.Bind(EVT_ADD_RELATIVE, self.PassToTopLayer)
+        self.Bind(EVT_OPEN_ADD_GOAL, self.OpenAddGoal)
+        self.Bind(EVT_ADD_GOAL, self.PassToTopLayer)
+
+    def OpenAddGoal(self, e):
+        self.MainSizer.Clear(delete_windows=True)
+        addgoalpanel = AddGoalPanel(self)
+        self.MainSizer.Add(addgoalpanel)
+        self.Layout()
+        self.Center()
 
     def SetSelectedParent(self, e):
         target = [x for x in self.GetChildren() if type(x)==BreedingPanel][0]

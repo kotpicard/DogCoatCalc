@@ -13,6 +13,15 @@ class LogicLayer(wx.EvtHandler):
         self.Bind(EVT_EDIT_LOCUS, self.StartLocusEdit)
         self.Bind(EVT_PASS_GENOTYPE, self.ProcessGenotype)
         self.Bind(EVT_OPEN_EDIT_LOCUS, self.GetOptionsForEditLocus)
+        self.Bind(EVT_ADD_GOAL, self.ProcessAddGoal)
+
+    def ProcessAddGoal(self, evt):
+        descs = evt.data
+        phens = []
+        for elem in descs:
+            phens.append(PHEN_DICT[elem])
+        goal = Goal(phens)
+        wx.PostEvent(self.parent, PassGoalEvent(data=goal, type="add"))
 
     def StartLocusEdit(self, evt):
         dogid = evt.dogid

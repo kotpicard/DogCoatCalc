@@ -15,6 +15,9 @@ OpenEditLocusEvent, EVT_OPEN_EDIT_LOCUS = NewEvt()
 PassGenotypeDataEvent, EVT_PASS_GENOTYPE = NewEvt()
 PassEditLocusDataEvent, EVT_PASS_EDIT_LOCUS_DATA = NewEvt()
 OpenMainMenu, EVT_MAIN_MENU = NewEvt()
+OpenAddGoalPanel, EVT_OPEN_ADD_GOAL = NewEvt()
+AddGoalEvent, EVT_ADD_GOAL = NewEvt()
+PassGoalEvent, EVT_PASS_GOAL = NewEvt()
 
 #SAVE/LOAD
 SaveEvent, EVT_SAVE = NewEvt()

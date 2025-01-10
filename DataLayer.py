@@ -20,6 +20,15 @@ class DataLayer(wx.EvtHandler):
         self.Bind(EVT_REQUEST_GENOTYPE_BY_ID, self.PassGenotypeByID)
         self.Bind(EVT_REQUEST_DOGS, self.PassDogsByCondition)
         self.Bind(EVT_PARENT_SELECTED, self.PassDogByID)
+        self.Bind(EVT_PASS_GOAL, self.ProcessPassGoal)
+
+    def ProcessPassGoal(self, evt):
+        if evt.type=="add":
+            self.AddGoal(evt.data)
+
+    def AddGoal(self, goal):
+        self.goals.append(goal)
+        wx.PostEvent(self, SaveEvent())
 
     def PassDogsByCondition(self, evt):
         result = [dog for dog in self.dogs if evt.filter(dog)]

@@ -436,7 +436,7 @@ class GoalsPanel(wx.Panel):
         self.goalctrl = GoalCtrl(self)
         buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
         buttonadd = RoundedButton(self, label=TEXT_ADD, colors=BUTTONCOLORS)
-        # buttonadd.Bind(wx.EVT_LEFT_DOWN, self.AddGoal)
+        buttonadd.Bind(wx.EVT_LEFT_DOWN, self.AddGoal)
         buttondelete = RoundedButton(self, label=TEXT_DELETE, colors=BUTTONCOLORS)
         buttonback = RoundedButton(self, label=TEXT_BACK, colors=BUTTONCOLORS)
         buttonback.Bind(wx.EVT_LEFT_DOWN, self.GoBack)
@@ -454,6 +454,91 @@ class GoalsPanel(wx.Panel):
 
     def GoBack(self, e):
         wx.PostEvent(self.GetParent(), OpenMainMenu())
+
+    def AddGoal(self, e):
+        wx.PostEvent(self.GetParent(), OpenAddGoalPanel())
+
+
+class AddGoalPanel(wx.Panel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
+        goalsizer = wx.BoxSizer(wx.VERTICAL)
+        coatlabel = wx.StaticText(self, label=TEXT_ADD_GOAL)
+        coatlabel.SetFont(FONT_BIG)
+        coatsizer = wx.FlexGridSizer(2, 3, 20, 20)
+
+        blackcolorsizer = wx.BoxSizer(wx.VERTICAL)
+        blackcolorsizer.Add(wx.StaticText(self, label=TEXT_BLACK_COLOR), 0, wx.ALL, 5)
+        blackcolorsizer.Add(wx.CheckBox(self, label=TEXT_BLACK), 0, wx.ALL, 5)
+        blackcolorsizer.Add(wx.CheckBox(self, label=TEXT_LIVER), 0, wx.ALL, 5)
+        blackcolorsizer.Add(wx.CheckBox(self, label=TEXT_BLUE), 0, wx.ALL, 5)
+        blackcolorsizer.Add(wx.CheckBox(self, label=TEXT_ISABELLA), 0, wx.ALL, 5)
+
+        redcolorsizer = wx.BoxSizer(wx.VERTICAL)
+        redcolorsizer.Add(wx.StaticText(self, label=TEXT_RED_COLOR), 0, wx.ALL, 5)
+        redcolorsizer.Add(wx.CheckBox(self, label=TEXT_RED), 0, wx.ALL, 5)
+        redcolorsizer.Add(wx.CheckBox(self, label=TEXT_DILUTE_RED), 0, wx.ALL, 5)
+
+        spottingsizer = wx.BoxSizer(wx.VERTICAL)
+        spottingsizer.Add(wx.StaticText(self, label=TEXT_WHITE_SPOTTING), 0, wx.ALL, 5)
+        spottingsizer.Add(wx.CheckBox(self, label=TEXT_NO_WHITE), 0, wx.ALL, 5)
+        spottingsizer.Add(wx.CheckBox(self, label=TEXT_MINOR_WHITE), 0, wx.ALL, 5)
+        spottingsizer.Add(wx.CheckBox(self, label=TEXT_PIEBALD), 0, wx.ALL, 5)
+        spottingsizer.Add(wx.CheckBox(self, label=TEXT_IRISH_WHITE), 0, wx.ALL, 5)
+
+        merlesizer = wx.BoxSizer(wx.VERTICAL)
+        merlesizer.Add(wx.StaticText(self, label=TEXT_MERLE), 0, wx.ALL, 5)
+        merlesizer.Add(wx.CheckBox(self, label=TEXT_NO_MERLE), 0, wx.ALL, 5)
+        merlesizer.Add(wx.CheckBox(self, label=TEXT_MERLE), 0, wx.ALL, 5)
+        merlesizer.Add(wx.CheckBox(self, label=TEXT_DOUBLE_MERLE), 0, wx.ALL, 5)
+
+        tickingsizer = wx.BoxSizer(wx.VERTICAL)
+        tickingsizer.Add(wx.StaticText(self, label=TEXT_TICKING), 0, wx.ALL, 5)
+        tickingsizer.Add(wx.CheckBox(self, label=TEXT_NO_TICKING), 0, wx.ALL, 5)
+        tickingsizer.Add(wx.CheckBox(self, label=TEXT_MINOR_TICKING), 0, wx.ALL, 5)
+        tickingsizer.Add(wx.CheckBox(self, label=TEXT_TICKING), 0, wx.ALL, 5)
+        tickingsizer.Add(wx.CheckBox(self, label=TEXT_ROANING), 0, wx.ALL, 5)
+
+        patternsizer = wx.BoxSizer(wx.VERTICAL)
+        patternsizer.Add(wx.StaticText(self, label=TEXT_COATPATTERN), 0, wx.ALL, 5)
+        patternsizer.Add(wx.CheckBox(self, label=TEXT_SOLID_EUMELANIN), 0, wx.ALL, 5)
+        patternsizer.Add(wx.CheckBox(self, label=TEXT_SABLE), 0, wx.ALL, 5)
+        patternsizer.Add(wx.CheckBox(self, label=TEXT_AGOUTI), 0, wx.ALL, 5)
+        patternsizer.Add(wx.CheckBox(self, label=TEXT_TANPOINT), 0, wx.ALL, 5)
+        patternsizer.Add(wx.CheckBox(self, label=TEXT_BRINDLE), 0, wx.ALL, 5)
+        patternsizer.Add(wx.CheckBox(self, label=TEXT_MASK), 0, wx.ALL, 5)
+        patternsizer.Add(wx.CheckBox(self, label=TEXT_GREYING), 0, wx.ALL, 5)
+
+        coatsizer.AddMany([blackcolorsizer, redcolorsizer, spottingsizer, merlesizer, tickingsizer, patternsizer])
+        goalsizer.Add(coatlabel, 0, wx.ALL, 10)
+        goalsizer.Add(coatsizer, 5, wx.EXPAND)
+
+        topsizer = wx.BoxSizer(wx.HORIZONTAL)
+        topsizer.Add(goalsizer, 5, wx.EXPAND | wx.ALL, 15)
+        bottomsizer = wx.BoxSizer(wx.HORIZONTAL)
+        bottomsizer.AddStretchSpacer(3)
+        addbutton = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_ADD,
+                                  colors=BUTTONCOLORS)
+        cancelbutton = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_CANCEL,
+                                     colors=BUTTONCOLORS)
+        bottomsizer.Add(addbutton, 1, wx.ALL, 10)
+        bottomsizer.Add(cancelbutton, 1, wx.ALL, 10)
+        cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.Cancel)
+        addbutton.Bind(wx.EVT_LEFT_DOWN, self.AddGoal)
+        mainsizer = wx.BoxSizer(wx.VERTICAL)
+        mainsizer.Add(topsizer, 3, wx.EXPAND)
+        mainsizer.AddStretchSpacer(2)
+        mainsizer.Add(bottomsizer, 1, wx.ALL, 10)
+        self.SetSizer(mainsizer)
+
+    def Cancel(self, e):
+        wx.PostEvent(self.GetParent(), NavigationEvent(destination="Goals"))
+
+    def AddGoal(self, e):
+        children = [x for x in self.GetChildren() if type(x) == wx.CheckBox]
+        selected = [x.GetLabel() for x in children if x.GetValue()]
+        wx.PostEvent(self.GetParent(), AddGoalEvent(data=selected))
 
 
 class BreedingPanel(wx.Panel):

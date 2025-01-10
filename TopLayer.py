@@ -36,6 +36,9 @@ class DogApp(wx.App):
         self.Bind(EVT_PASS_DOGS, self.ProcessPassDogs)
         self.Bind(EVT_PARENT_SELECTED, self.PassToDataLayer)
         self.Bind(EVT_ADD_RELATIVE, self.RequestRelativeData)
+        self.Bind(EVT_ADD_GOAL, self.PassToLogicLayer)
+        self.Bind(EVT_PASS_GOAL, self.PassToDataLayer)
+
         wx.PostEvent(self.DataLayer, LoadEvent())
 
     def RequestRelativeData(self, evt):
