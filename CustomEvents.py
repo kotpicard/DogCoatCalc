@@ -34,6 +34,7 @@ RequestDogs, EVT_REQUEST_DOGS = NewEvt()
 PassDogs, EVT_PASS_DOGS = NewEvt()
 PassSelectedParentDataEvent, EVT_PASS_SELECTED_PARENT_DATA = NewEvt()
 PassDataEvent, EVT_PASS_DATA = NewEvt()
+PassGoalsForDisplay, EVT_DISPLAY_GOALS = NewEvt()
 
 #DOG EVENTS
 DogIncorrectGenotypeEvent, EVT_INCORRECT_GENOTYPE = NewEvt()

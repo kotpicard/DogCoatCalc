@@ -34,21 +34,32 @@ class DataLayer(wx.EvtHandler):
         wx.PostEvent(self.parent, NavigationEvent(destination="Goals"))
 
     def ProcessPassGoal(self, evt):
+        print(evt.type)
         if evt.type == "add":
-            self.AddGoal(evt.data)
+            self.AddGoal(evt.data, evt.origin)
         if evt.type == "displayall":
-            self.PassAllGoals()
+            self.PassAllGoals("Goals")
+        if evt.type == "displaybreeding":
+            self.PassAllGoals("Breeding")
 
-    def PassAllGoals(self):
+    def PassAllGoals(self, type):
         data = []
         for goal in self.goals:
             data.append([(x.desc, x.type) for x in goal.elements])
-        wx.PostEvent(self.parent, NavDataPass(destination="Goals", data=data))
+        if type == "Goals":
+            wx.PostEvent(self.parent, NavDataPass(destination="Goals", data=data))
+        elif type == "Breeding":
+            wx.PostEvent(self.parent, PassGoalsForDisplay(destination="breeding", data=data))
 
-    def AddGoal(self, goal):
+    def AddGoal(self, goal, origin):
         self.goals.append(goal)
+        print(self.goals)
         wx.PostEvent(self, SaveEvent())
-        wx.PostEvent(self.parent, NavigationEvent(destination="Goals"))
+        if origin=="goals":
+            wx.PostEvent(self.parent, NavigationEvent(destination="Goals"))
+        elif origin=="breeding":
+            wx.PostEvent(self.parent, NavigationEvent(destination="BreedingCalc"))
+            wx.PostEvent(self, RequestAllGoalsEvent(type="displaybreeding"))
 
     def PassDogsByCondition(self, evt):
         result = [dog for dog in self.dogs if evt.filter(dog)]
@@ -145,5 +156,3 @@ class DataLayer(wx.EvtHandler):
                 dogslice = data_dogs[i:i + 10]
                 evt = LoadDogFromDataEvent(data=dogslice)
                 wx.PostEvent(self.parent, evt)
-
-

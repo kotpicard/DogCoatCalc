@@ -40,6 +40,8 @@ class DogApp(wx.App):
         self.Bind(EVT_PASS_GOAL, self.PassToDataLayer)
         self.Bind(EVT_NAV_DATA_PASS, self.PassToMainWindow)
         self.Bind(EVT_DELETE_GOAL, self.PassToDataLayer)
+        self.Bind(EVT_REQUEST_ALL_GOALS, self.PassToDataLayer)
+        self.Bind(EVT_DISPLAY_GOALS, self.PassToMainWindow)
 
         wx.PostEvent(self.DataLayer, LoadEvent())
 

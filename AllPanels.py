@@ -457,12 +457,12 @@ class GoalsPanel(wx.Panel):
         wx.PostEvent(self.GetParent(), OpenMainMenu())
 
     def Fill(self, data):
-        for elem in data:
-            self.goalctrl.AddGoal(elem)
+        self.goalctrl.Fill(data)
         self.Layout()
 
     def AddGoal(self, e):
-        wx.PostEvent(self.GetParent(), OpenAddGoalPanel())
+        wx.PostEvent(self.GetParent(), OpenAddGoalPanel(origin="goals"))
+        print("ADDING")
 
     def DeleteGoal(self, e):
         dialog = wx.MessageDialog(self, TEXT_DELETE_WARNING, style=wx.OK | wx.CANCEL)
@@ -473,8 +473,9 @@ class GoalsPanel(wx.Panel):
 
 
 class AddGoalPanel(wx.Panel):
-    def __init__(self, parent):
+    def __init__(self, parent, origin):
         super().__init__(parent)
+        self.origin = origin
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
         goalsizer = wx.BoxSizer(wx.VERTICAL)
         coatlabel = wx.StaticText(self, label=TEXT_ADD_GOAL)
@@ -551,10 +552,7 @@ class AddGoalPanel(wx.Panel):
     def AddGoal(self, e):
         children = [x for x in self.GetChildren() if type(x) == wx.CheckBox]
         selected = [x.GetLabel() for x in children if x.GetValue()]
-        wx.PostEvent(self.GetParent(), AddGoalEvent(data=selected))
-
-
-
+        wx.PostEvent(self.GetParent(), AddGoalEvent(data=selected, origin=self.origin))
 
 
 class BreedingPanel(wx.Panel):
@@ -592,21 +590,22 @@ class BreedingPanel(wx.Panel):
         breedinggoalslabel = wx.StaticText(self, label=TEXT_GOALS)
 
         breedinggoalslabel.SetFont(FONT_BIG)
-        goalctrl = GoalCtrl(self)
+        self.goalctrl = GoalCtrl(self)
         buttonsizer = wx.GridSizer(2, 2, 10, 20)
         addgoalbutton = RoundedButton(self, TEXT_ADD, colors=BUTTONCOLORS)
+        addgoalbutton.Bind(wx.EVT_LEFT_DOWN, self.AddGoal)
         cleargoalbutton = RoundedButton(self, TEXT_CLEAR, colors=BUTTONCOLORS)
+        cleargoalbutton.Bind(wx.EVT_LEFT_DOWN, self.ClearGoals)
         loadgoalbutton = RoundedButton(self, TEXT_LOAD, colors=BUTTONCOLORS)
-        savegoalbutton = RoundedButton(self, TEXT_SAVE, colors=BUTTONCOLORS)
+        loadgoalbutton.Bind(wx.EVT_LEFT_DOWN, self.LoadGoals)
         buttonsizer.Add(addgoalbutton, 1, wx.EXPAND)
         buttonsizer.Add(cleargoalbutton, 1, wx.EXPAND)
         buttonsizer.Add(loadgoalbutton, 1, wx.EXPAND)
-        buttonsizer.Add(savegoalbutton, 1, wx.EXPAND)
         calculatebutton = RoundedButton(self, TEXT_CALCULATE, colors=BUTTONCOLORS)
         backbutton = RoundedButton(self, TEXT_BACK, colors=BUTTONCOLORS)
         backbutton.Bind(wx.EVT_LEFT_DOWN, self.GoBack)
         rightsizer.Add(breedinggoalslabel, 0, wx.RIGHT, 5)
-        rightsizer.Add(goalctrl, 2, wx.EXPAND | wx.RIGHT | wx.TOP, 15)
+        rightsizer.Add(self.goalctrl, 2, wx.EXPAND | wx.RIGHT | wx.TOP, 15)
         rightsizer.Add(buttonsizer, 1, wx.EXPAND | wx.RIGHT | wx.TOP, 15)
         rightsizer.AddSpacer(200)
         rightsizer.Add(calculatebutton, 0, wx.EXPAND | wx.RIGHT | wx.BOTTOM, 15)
@@ -624,6 +623,21 @@ class BreedingPanel(wx.Panel):
         self.Bind(EVT_PASS_DOGS, self.ReceiveData)
         self.Bind(EVT_PARENT_SELECTED, self.passToMainWindow)
         self.Bind(EVT_PASS_SELECTED_PARENT_DATA, self.SetParentData)
+        self.Bind(EVT_DISPLAY_GOALS, self.FillGoalCtrl)
+
+    def FillGoalCtrl(self, e):
+        data = e.data
+        self.goalctrl.Fill(data)
+        self.goalctrl.Layout()
+
+    def ClearGoals(self, e):
+        self.goalctrl.ClearGoals()
+
+    def LoadGoals(self, e):
+        wx.PostEvent(self.GetParent(), RequestAllGoalsEvent(type="displaybreeding"))
+
+    def AddGoal(self, e):
+        wx.PostEvent(self.GetParent(), OpenAddGoalPanel(origin="breeding"))
 
     def GoBack(self, e):
         wx.PostEvent(self.GetParent(), OpenMainMenu())

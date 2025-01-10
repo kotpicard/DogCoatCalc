@@ -21,7 +21,7 @@ class LogicLayer(wx.EvtHandler):
         for elem in descs:
             phens.append(PHEN_DICT[elem])
         goal = Goal(phens)
-        wx.PostEvent(self.parent, PassGoalEvent(data=goal, type="add"))
+        wx.PostEvent(self.parent, PassGoalEvent(data=goal, type="add", origin=evt.origin))
 
     def StartLocusEdit(self, evt):
         dogid = evt.dogid

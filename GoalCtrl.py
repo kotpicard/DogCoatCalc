@@ -6,17 +6,13 @@ import wx
 class GoalCtrl(wx.ScrolledWindow):
     def __init__(self, parent, size=(600, 150)):
         super().__init__(parent=parent, size=size)
-
+        self.fillstatus = 0
         # Set up scrolling properties
         self.SetScrollRate(10, 10)
         self.SetBackgroundColour(wx.Colour(Color(Hex_BACKGROUNDBOX).rgb))
 
-        # Main sizer for the panel
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-
-        # Example: Uncomment and test with sample goals
-        # testgoals = [("Black", "COLOR"), ("Liver", "COLOR"), ("Merle", "MERLE"), ("No Spotting", "WHITE")]
-        # self.AddGoal(testgoals)
+        self.goal_sizers = []
         self.currentgoalid = 0
         self.SetSizer(self.sizer)
         self.selected = []
@@ -29,7 +25,6 @@ class GoalCtrl(wx.ScrolledWindow):
         selector.num = self.currentgoalid
         self.currentgoalid += 1
         goal_sizer.Add(selector, 0, wx.ALIGN_CENTER)
-        print(goallist)
         for goal in goallist[:-1]:
             button = RoundedButton(parent=self, label=goal[0], colors=GOALCOLORS[goal[1]])
             goal_sizer.Add(button, 1, wx.EXPAND)
@@ -39,16 +34,28 @@ class GoalCtrl(wx.ScrolledWindow):
 
         button = RoundedButton(parent=self, label=goallist[-1][0], colors=GOALCOLORS[goallist[-1][1]])
         goal_sizer.Add(button, 1, wx.EXPAND)
-
         self.sizer.Add(goal_sizer, 1, wx.EXPAND | wx.ALL, 10)
+        self.goal_sizers.append(goal_sizer)
 
         # Adjust scrollable area
         self.Layout()
         self.SetupScrolling()
 
+    def Fill(self, data):
+        if not self.fillstatus:
+            for elem in data:
+                self.AddGoal(elem)
+            self.fillstatus = 1
+
     def SetupScrolling(self):
         self.SetVirtualSize(self.sizer.GetMinSize())
         self.FitInside()
+    
+    def ClearGoals(self):
+        for sizer in self.goal_sizers:
+            sizer.Clear(delete_windows=True)
+        self.Layout()
+        self.fillstatus = 0
 
     def UpdateSelected(self, e):
         num = e.GetEventObject().num

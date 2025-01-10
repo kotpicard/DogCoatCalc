@@ -38,20 +38,27 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_REQUEST_DOGS, self.PassToTopLayer)
         self.Bind(EVT_PASS_DOGS, self.ProcessPassDogs)
         self.Bind(EVT_PARENT_SELECTED, self.PassToTopLayer)
-        self.Bind(EVT_PASS_SELECTED_PARENT_DATA, self.SetSelectedParent)
+        self.Bind(EVT_PASS_SELECTED_PARENT_DATA, self.PassToBreedingPanel)
         self.Bind(EVT_ADD_RELATIVE, self.PassToTopLayer)
         self.Bind(EVT_OPEN_ADD_GOAL, self.OpenAddGoal)
         self.Bind(EVT_ADD_GOAL, self.PassToTopLayer)
         self.Bind(EVT_DELETE_GOAL, self.PassToTopLayer)
+        self.Bind(EVT_REQUEST_ALL_GOALS, self.PassToTopLayer)
+        self.Bind(EVT_DISPLAY_GOALS, self.DisplayGoals)
+
+    def DisplayGoals(self, e):
+        if e.destination == "breeding":
+            self.PassToBreedingPanel(e)
+
 
     def OpenAddGoal(self, e):
         self.MainSizer.Clear(delete_windows=True)
-        addgoalpanel = AddGoalPanel(self)
+        addgoalpanel = AddGoalPanel(self, e.origin)
         self.MainSizer.Add(addgoalpanel)
         self.Layout()
         self.Center()
 
-    def SetSelectedParent(self, e):
+    def PassToBreedingPanel(self, e):
         target = [x for x in self.GetChildren() if type(x)==BreedingPanel][0]
         wx.PostEvent(target, e)
 
