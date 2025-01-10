@@ -104,6 +104,8 @@ TEXT_VALUE = "Value"
 TEXT_NOT_VALUE = "Not Value"
 TEXT_BACK = "Back"
 TEXT_GOTODOGPAGEWARNING = "Go to dog page?"
+TEXT_DELETE = "Delete"
+TEXT_DELETE_WARNING = "Delete selected elements?"
 
 TEXT_PARENT = "Parent"
 TEXT_FULLSIBLING = "Full sibling"

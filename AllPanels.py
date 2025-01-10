@@ -63,7 +63,7 @@ class DefaultPanel(wx.Panel):
         wx.PostEvent(self.GetParent(), evt)
 
     def ClickedBreedingGoalsButton(self, e):
-        evt = NavigationEvent(destination="Goals")
+        evt = NavigationEvent(destination="Goals", data=None)
         wx.PostEvent(self.GetParent(), evt)
 
 
@@ -426,12 +426,34 @@ class AllelePanel(wx.Panel):
                 self.bottomsizer.Add(wx.CheckBox(self, label=option), 0, wx.ALL, 5)
         self.Layout()
 
+
 class GoalsPanel(wx.Panel):
     def __init__(self, parent):
-        super().__init__(self, parent)
+        super().__init__(parent)
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
+        titlelabel = wx.StaticText(self, label=TEXT_MYGOALS)
+        titlelabel.SetFont(FONT_BIG)
+        self.goalctrl = GoalCtrl(self)
+        buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
+        buttonadd = RoundedButton(self, label=TEXT_ADD, colors=BUTTONCOLORS)
+        # buttonadd.Bind(wx.EVT_LEFT_DOWN, self.AddGoal)
+        buttondelete = RoundedButton(self, label=TEXT_DELETE, colors=BUTTONCOLORS)
+        buttonback = RoundedButton(self, label=TEXT_BACK, colors=BUTTONCOLORS)
+        buttonback.Bind(wx.EVT_LEFT_DOWN, self.GoBack)
+        buttonsizer.Add(buttonadd, 1, wx.ALL, 5)
+        buttonsizer.Add(buttondelete, 1, wx.ALL, 5)
+        buttonsizer.AddStretchSpacer(1)
+        buttonsizer.Add(buttonback, 1, wx.ALL, 5)
+        mainsizer = wx.BoxSizer(wx.VERTICAL)
+        mainsizer.Add(titlelabel, 0, wx.ALL, 10)
+        mainsizer.Add(self.goalctrl, 1, wx.EXPAND | wx.ALL, 10)
+        mainsizer.Add(buttonsizer, 0, wx.EXPAND | wx.ALL, 10)
+        self.SetSizer(mainsizer)
+        self.Layout()
+        self.Center()
 
-
+    def GoBack(self, e):
+        wx.PostEvent(self.GetParent(), OpenMainMenu())
 
 
 class BreedingPanel(wx.Panel):

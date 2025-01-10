@@ -81,6 +81,8 @@ class DogApp(wx.App):
             wx.PostEvent(self.DataLayer, DisplayAllDogsEvent())
         if evt.destination == "BreedingCalc":
             wx.PostEvent(self.MainWindow, NavDataPass(destination="BreedingCalc", data=None))
+        if evt.destination == "Goals":
+            wx.PostEvent(self.MainWindow, NavDataPass(destination="Goals", data=None))
 
     def DisplayDogs(self, evt):
         event = NavDataPass(destination="MyDogs", data=evt.descs)

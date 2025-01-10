@@ -17,13 +17,19 @@ class GoalCtrl(wx.ScrolledWindow):
         # Example: Uncomment and test with sample goals
         # testgoals = [("Black", "COLOR"), ("Liver", "COLOR"), ("Merle", "MERLE"), ("No Spotting", "WHITE")]
         # self.AddGoal(testgoals)
-
+        self.currentgoalid = 0
         self.SetSizer(self.sizer)
+        self.selected = []
         self.Layout()
 
     def AddGoal(self, goallist):
         # Create a horizontal sizer for the row of goals
         goal_sizer = wx.FlexGridSizer(1, 0, 0, 0)  # One row, unlimited columns
+        selector = wx.CheckBox(self)
+        selector.Bind(wx.EVT_CHECKBOX, self.UpdateSelected)
+        selector.num = self.currentgoalid
+        self.currentgoalid += 1
+        goal_sizer.Add(selector, 0, wx.ALIGN_CENTER)
         for goal in goallist[:-1]:
             # Add a button for each goal
             button = RoundedButton(parent=self, label=goal[0], colors=GOALCOLORS[goal[1]])
@@ -48,27 +54,44 @@ class GoalCtrl(wx.ScrolledWindow):
         self.SetVirtualSize(self.sizer.GetMinSize())
         self.FitInside()
 
+    def UpdateSelected(self, e):
+        num = e.GetEventObject().num
+        if num in self.selected:
+            self.selected.remove(num)
+            print(num, "deselected")
+        else:
+            self.selected.append(num)
+            print(num, "selected")
+        print(self.selected)
 
 
-# Main application for testing
-if __name__ == "__main__":
-    app = wx.App(False)
-    frame = wx.Frame(None, title="Scrollable Panel Example", size=(800, 400))
-
-    panel = wx.Panel(frame)
-    goal_ctrl = GoalCtrl(panel, size=(600, 150))
-
-    # Sample data for testing
-    testgoals = [("Black", "COLOR"), ("Liver", "COLOR"), ("Merle", "MERLE"), ("No Spotting", "WHITE")]
-    goal_ctrl.AddGoal(testgoals)
-
-    sizer = wx.BoxSizer(wx.VERTICAL)
-    sizer.Add(goal_ctrl, 1, wx.EXPAND | wx.ALL, 10)
-    panel.SetSizer(sizer)
-
-    frame.Show()
-    app.MainLoop()
-
+# # Main application for testing
+# if __name__ == "__main__":
+#     app = wx.App(False)
+#     frame = wx.Frame(None, title="Scrollable Panel Example", size=(800, 400))
+#
+#     panel = wx.Panel(frame)
+#     goal_ctrl = GoalCtrl(panel, size=(600, 150))
+#
+#     # Sample data for testing
+#     testgoals = [("Black", "COLOR"), ("Liver", "COLOR"), ("Merle", "MERLE"), ("No Spotting", "WHITE")]
+#     goal_ctrl.AddGoal(testgoals)
+#     goal_ctrl.AddGoal(testgoals)
+#     goal_ctrl.AddGoal(testgoals)
+#     goal_ctrl.AddGoal(testgoals)
+#     goal_ctrl.AddGoal(testgoals)
+#     goal_ctrl.AddGoal(testgoals)
+#     goal_ctrl.AddGoal(testgoals)
+#     goal_ctrl.AddGoal(testgoals)
+#     goal_ctrl.AddGoal(testgoals)
+#
+#     sizer = wx.BoxSizer(wx.VERTICAL)
+#     sizer.Add(goal_ctrl, 1, wx.EXPAND | wx.ALL, 10)
+#     panel.SetSizer(sizer)
+#
+#     frame.Show()
+#     app.MainLoop()
+#
 # class MyFrame(wx.Frame):
 #     def __init__(self, *args, **kwargs):
 #         super().__init__(*args, **kwargs)
@@ -88,7 +111,7 @@ if __name__ == "__main__":
 #         # Set frame size and center it
 #         self.SetSize((1000, 800))
 #         self.Center()
-#
+# #
 #
 # class MyApp(wx.App):
 #     def OnInit(self):
@@ -100,5 +123,3 @@ if __name__ == "__main__":
 # if __name__ == "__main__":
 #     app = MyApp()
 #     app.MainLoop()
-
-
