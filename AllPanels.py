@@ -558,33 +558,33 @@ class AddGoalPanel(wx.Panel):
 class BreedingPanel(wx.Panel):
     def __init__(self, parent, damdata=None, siredata=None):
         super().__init__(parent)
+        self.damdata = damdata
+        self.siredata = siredata
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
         breedingtypesizer = wx.BoxSizer(wx.VERTICAL)
         breedingtypelabel = wx.StaticText(self, label=TEXT_BREEDINGTYPE)
         breedingtypelabel.SetFont(FONT_BIG)
         breedingtypelabel.SetForegroundColour(Color(Hex_FONTCOLORBG).rgb)
         radio1 = wx.RadioButton(self, label=TEXT_CONV)
+        radio1.SetValue(True)
+        self.breedingtype = "Conventional"
+        radio1.Bind(wx.EVT_RADIOBUTTON, self.SetUpConventional)
         radio2 = wx.RadioButton(self, label=TEXT_PICKMATE)
+        radio2.Bind(wx.EVT_RADIOBUTTON, self.SetUpPickMate)
         breedingtypesizer.Add(breedingtypelabel, 0, wx.ALL, 5)
         breedingtypesizer.Add(radio1, 0, wx.ALL, 5)
         breedingtypesizer.Add(radio2, 0, wx.ALL, 5)
 
+        self.parentsizer = wx.BoxSizer(wx.VERTICAL)
+        self.pickmateparentsizer = wx.BoxSizer(wx.VERTICAL)
         self.damsizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetupDamSizer(damdata)
-
         self.siresizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetupSireSizer(siredata)
-
-        parentsizer = wx.BoxSizer(wx.VERTICAL)
-        parentsizer.Add(self.damsizer)
-        parentsizer.AddStretchSpacer(1)
-        parentsizer.Add(self.siresizer)
-        parentsizer.AddStretchSpacer(1)
+        self.SetUpConventional(None)
 
         leftsizer = wx.BoxSizer(wx.VERTICAL)
         leftsizer.Add(breedingtypesizer, 1, wx.EXPAND | wx.ALL, 10)
         leftsizer.AddSpacer(30)
-        leftsizer.Add(parentsizer, 2, wx.EXPAND | wx.ALL, 10)
+        leftsizer.Add(self.parentsizer, 2, wx.EXPAND | wx.ALL, 10)
 
         rightsizer = wx.BoxSizer(wx.VERTICAL)
         breedinggoalslabel = wx.StaticText(self, label=TEXT_GOALS)
@@ -625,6 +625,61 @@ class BreedingPanel(wx.Panel):
         self.Bind(EVT_PASS_SELECTED_PARENT_DATA, self.SetParentData)
         self.Bind(EVT_DISPLAY_GOALS, self.FillGoalCtrl)
 
+    def SetUpConventional(self, e):
+        self.breedingtype = "Conventional"
+        self.parentsizer.Clear(delete_windows=True)
+        self.pickmateparentsizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetupParentSizer(self.damdata, self.damsizer, "Dam")
+        self.SetupParentSizer(self.siredata, self.siresizer, "Sire")
+        self.parentsizer.Add(self.damsizer)
+        self.parentsizer.AddStretchSpacer(1)
+        self.parentsizer.Add(self.siresizer)
+        self.parentsizer.AddStretchSpacer(1)
+        self.Layout()
+
+    def SetupParentSizer(self, data, sizer, who):
+        if data is not None:
+            name, age, coat, dogid = data
+        else:
+            name = TEXT_NAMEBARE
+            age, coat = "", ""
+            dogid = -1
+        if who=="Parent":
+            parentlabel = wx.StaticText(self, label=TEXT_PARENT)
+        elif who=="Dam":
+            parentlabel = wx.StaticText(self, label=TEXT_DAM)
+        else:
+            parentlabel = wx.StaticText(self, label=TEXT_SIRE)
+        sizer.Clear(delete_windows=True)
+        parentlabel.SetFont(FONT_BIG)
+        parentlabel.SetForegroundColour(Color(Hex_FONTCOLORBG).rgb)
+        parentselectbutton = RoundedButton(self, TEXT_SELECT, (100, 25), 15, BUTTONCOLORS)
+        parentselectbutton.type = who
+        parentselectbutton.Bind(wx.EVT_LEFT_DOWN, self.parentselectbutton)
+        parentselectsizer = wx.BoxSizer(wx.HORIZONTAL)
+        parentselectsizer.Add(parentlabel, 2)
+        parentselectsizer.Add(parentselectbutton, 3, wx.TOP, 7)
+        parentnamelinkbutton = LinkButton(self, name)
+        parentnamelinkbutton.num = dogid
+        parentnamelinkbutton.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
+        parentagelabel = wx.StaticText(self, label=TEXT_AGE + age)
+        parentcoatlabel = wx.StaticText(self, label=TEXT_COAT + coat)
+        sizer.Add(parentselectsizer)
+        sizer.Add(parentnamelinkbutton)
+        sizer.Add(parentagelabel)
+        sizer.Add(parentcoatlabel)
+        self.Layout()
+
+
+    def SetUpPickMate(self, e):
+        self.breedingtype = "PickMate"
+        self.parentsizer.Clear(delete_windows=True)
+        self.damsizer = wx.BoxSizer(wx.VERTICAL)
+        self.siresizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetupParentSizer(None, self.pickmateparentsizer, "Parent")
+        self.parentsizer.Add(self.pickmateparentsizer)
+        self.Layout()
+
     def FillGoalCtrl(self, e):
         data = e.data
         self.goalctrl.Fill(data)
@@ -645,87 +700,49 @@ class BreedingPanel(wx.Panel):
     def SetParentData(self, e):
         data = e.dog.name, str(e.dog.age), e.dog.coatdesc, e.dog.id
         if e.dog.sex == "m":
-            self.SetupSireSizer(data)
+            if self.breedingtype=="Conventional":
+                self.SetupParentSizer(data, self.siresizer, "Sire")
+            else:
+                self.SetupParentSizer(data, self.pickmateparentsizer, "Parent")
         else:
-            self.SetupDamSizer(data)
+            if self.breedingtype=="Conventional":
+                self.SetupParentSizer(data, self.damsizer, "Dam")
+            else:
+                self.SetupParentSizer(data, self.pickmateparentsizer, "Parent")
         self.Layout()
 
     def passToMainWindow(self, e):
         wx.PostEvent(self.GetParent(), e)
 
-    def SetupDamSizer(self, data=None):
-        if data is not None:
-            name, age, coat, dogid = data
-        else:
-            name = TEXT_NAMEBARE
-            age, coat = "", ""
-        self.damsizer.Clear(delete_windows=True)
-        damlabel = wx.StaticText(self, label=TEXT_DAM)
-        damlabel.SetFont(FONT_BIG)
-        damlabel.SetForegroundColour(Color(Hex_FONTCOLORBG).rgb)
-        damselectbutton = RoundedButton(self, TEXT_SELECT, (100, 25), 15, BUTTONCOLORS)
-        damselectbutton.Bind(wx.EVT_LEFT_DOWN, self.damselectbutton)
-        damselectsizer = wx.BoxSizer(wx.HORIZONTAL)
-        damselectsizer.Add(damlabel, 2)
-        damselectsizer.Add(damselectbutton, 3, wx.TOP, 7)
-        damnamelinkbutton = LinkButton(self, name)
-        damagelabel = wx.StaticText(self, label=TEXT_AGE + age)
-        damcoatlabel = wx.StaticText(self, label=TEXT_COAT + coat)
-        self.damsizer.Add(damselectsizer)
-        self.damsizer.Add(damnamelinkbutton)
-        self.damsizer.Add(damagelabel)
-        self.damsizer.Add(damcoatlabel)
-
-    def SetupSireSizer(self, data=None):
-        if data is not None:
-            name, age, coat, dogid = data
-        else:
-            name = TEXT_NAMEBARE
-            age, coat = "", ""
-        self.siresizer.Clear(delete_windows=True)
-        sirelabel = wx.StaticText(self, label=TEXT_SIRE)
-        sirelabel.SetFont(FONT_BIG)
-        sirelabel.SetForegroundColour(Color(Hex_FONTCOLORBG).rgb)
-        sireselectbutton = RoundedButton(self, TEXT_SELECT, (100, 25), 15, BUTTONCOLORS)
-        sireselectbutton.Bind(wx.EVT_LEFT_DOWN, self.sireselectbutton)
-        sireselectsizer = wx.BoxSizer(wx.HORIZONTAL)
-        sireselectsizer.Add(sirelabel, 2)
-        sireselectsizer.Add(sireselectbutton, 3, wx.TOP, 7)
-        sirenamelinkbutton = LinkButton(self, name)
-        if data is not None:
-            sirenamelinkbutton.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
-            sirenamelinkbutton.num = dogid
-        sireagelabel = wx.StaticText(self, label=TEXT_AGE + age)
-        sirecoatlabel = wx.StaticText(self, label=TEXT_COAT + coat)
-        self.siresizer.Add(sireselectsizer)
-        self.siresizer.Add(sirenamelinkbutton)
-        self.siresizer.Add(sireagelabel)
-        self.siresizer.Add(sirecoatlabel)
-
     def OpenDogPage(self, e):
         wx.PostEvent(self, OpenDogPageEvent(num=e.GetEventObject().num, status="unconfirmed"))
 
     def GoToDogPage(self, e):
-        if e.status == "unconfirmed":
-            dialog = wx.MessageDialog(self, TEXT_GOTODOGPAGEWARNING, style=wx.OK | wx.CANCEL)
-            test = dialog.ShowModal()
-            dialog.Destroy()
-            if test == wx.ID_OK:
-                wx.PostEvent(self.GetParent(), e)
-        else:
-            self.passToMainWindow(e)
+        if e.num != -1:
+            if e.status == "unconfirmed":
+                dialog = wx.MessageDialog(self, TEXT_GOTODOGPAGEWARNING, style=wx.OK | wx.CANCEL)
+                test = dialog.ShowModal()
+                dialog.Destroy()
+                if test == wx.ID_OK:
+                    wx.PostEvent(self.GetParent(), e)
+            else:
+                self.passToMainWindow(e)
 
     def ReceiveData(self, e):
         target = [x for x in self.GetChildren() if type(x) == DogSelectDialog][0]
         wx.PostEvent(target, e)
 
-    def sireselectbutton(self, e):
-        evt = SelectDogEvent(who="Sire")
+    def parentselectbutton(self, e):
+        evt = SelectDogEvent(who=e.GetEventObject().type)
         wx.PostEvent(self, evt)
 
-    def damselectbutton(self, e):
-        evt = SelectDogEvent(who="Dam")
-        wx.PostEvent(self, evt)
+    # def sireselectbutton(self, e):
+    #     evt = SelectDogEvent(who="Sire")
+    #     wx.PostEvent(self, evt)
+    #
+    # def damselectbutton(self, e):
+    #     evt = SelectDogEvent(who="Dam")
+    #     wx.PostEvent(self, evt)
 
     def SelectHandler(self, e):
         self.PopUpDogSelector(e.who)
@@ -734,11 +751,6 @@ class BreedingPanel(wx.Panel):
         dialog = DogSelectDialog(parent=self, who=dogtype)
         dialog.Show()
 
-    def GoToDogPage(self, e):
-        dialog = wx.MessageDialog(self, TEXT_GOTODOGPAGEWARNING, style=wx.OK | wx.CANCEL)
-        test = dialog.ShowModal()
-        if test == wx.ID_OK:
-            wx.PostEvent(self.GetParent(), e)
 
 
 class BreedingResultPanel(wx.Panel):
