@@ -15,6 +15,7 @@ class MainWindow(wx.Frame):
         self.CreateDefaultPanel()
         self.Center()
         self.Show()
+        self.temp = None
         self.Bind(EVT_NAVIGATION, self.NavigationHandler)
         self.NAVDICT = {
             "MyDogs": self.CreateMyDogsPanel,
@@ -45,21 +46,53 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_DELETE_GOAL, self.PassToTopLayer)
         self.Bind(EVT_REQUEST_ALL_GOALS, self.PassToTopLayer)
         self.Bind(EVT_DISPLAY_GOALS, self.DisplayGoals)
+        self.Bind(EVT_BEGIN_BREEDCALC, self.PassToTopLayer)
+        self.Bind(EVT_BREEDING_RETURN, self.ReturnToBreeding)
+
+        self.SetSizer(self.MainSizer)
+
+    def ReturnToBreeding(self, e):
+        if self.temp.GetContainingSizer() != self.MainSizer:
+            self.MainSizer.Clear(delete_windows=True)
+            self.MainSizer.Add(self.temp, 1, wx.EXPAND)
+            self.PassToBreedingPanel(e)
+            self.temp.Show()
+            self.temp = None
+            self.MainSizer.Layout()
+            self.Layout()
 
     def DisplayGoals(self, e):
+        print("display dest", e.destination)
+        print(e.data)
         if e.destination == "breeding":
-            self.PassToBreedingPanel(e)
-
+            if type(self.temp) == BreedingPanel:
+                print(type(self.temp), ": temp type")
+                self.ReturnToBreeding(e)
+            else:
+                self.PassToBreedingPanel(e)
 
     def OpenAddGoal(self, e):
-        self.MainSizer.Clear(delete_windows=True)
+        if e.origin != "breeding":
+            self.MainSizer.Clear(delete_windows=True)
+        else:
+            print("origin breeding")
+            for child in self.MainSizer.GetChildren():
+                print(type(child.GetWindow()))
+                # self.MainSizer.Clear(delete_windows=True)
+                if type(child.GetWindow()) == BreedingPanel:
+                    self.temp = child.GetWindow()
+                    self.MainSizer.Detach(child.GetWindow())
+                    self.temp.Hide()
+                    self.MainSizer.Layout()
+                    self.Layout()
         addgoalpanel = AddGoalPanel(self, e.origin)
         self.MainSizer.Add(addgoalpanel)
+        self.MainSizer.Layout()
         self.Layout()
         self.Center()
 
     def PassToBreedingPanel(self, e):
-        target = [x for x in self.GetChildren() if type(x)==BreedingPanel][0]
+        target = [x for x in self.GetChildren() if type(x) == BreedingPanel][0]
         wx.PostEvent(target, e)
 
     def ProcessPassDogs(self, e):
@@ -106,7 +139,7 @@ class MainWindow(wx.Frame):
 
     def CreateDefaultPanel(self):
         defaultpanel = DefaultPanel(self)
-        self.MainSizer.Add(defaultpanel)
+        self.MainSizer.Add(defaultpanel, 1, wx.EXPAND)
 
     def InitViewGenotype(self, e):
         wx.PostEvent(self.app, OpenGenotypeViewEvent(dogid=e.dogid))
@@ -114,21 +147,21 @@ class MainWindow(wx.Frame):
     def OpenEditLocus(self, e):
         self.MainSizer.Clear(delete_windows=True)
         editlocuspanel = AllelePanel(self, number=e.number, dogid=e.dogid, options=e.options)
-        self.MainSizer.Add(editlocuspanel)
+        self.MainSizer.Add(editlocuspanel, 1, wx.EXPAND)
         self.Layout()
         self.Center()
 
     def OpenGenotypeView(self, e):
         self.MainSizer.Clear(delete_windows=True)
         genotypepanel = GenotypePanel(self, e.data)
-        self.MainSizer.Add(genotypepanel)
+        self.MainSizer.Add(genotypepanel, 1, wx.EXPAND)
         self.Layout()
         self.Center()
 
     def AddDogHandler(self, e):
         self.MainSizer.Clear(delete_windows=True)
         test = AddDogPanel(self)
-        self.MainSizer.Add(test)
+        self.MainSizer.Add(test, 1, wx.EXPAND)
         self.Layout()
         self.Center()
 
@@ -145,7 +178,7 @@ class MainWindow(wx.Frame):
         print("HERE", data)
         goalspanel = GoalsPanel(self)
         goalspanel.Fill(data)
-        self.MainSizer.Add(goalspanel)
+        self.MainSizer.Add(goalspanel, 1, wx.EXPAND)
 
     def GoToDogPage(self, evt):
         print("GO TO DOG PAGE", evt.num)
@@ -156,23 +189,23 @@ class MainWindow(wx.Frame):
         self.MainSizer.Clear(delete_windows=True)
         data = evt.dog.ToDesc()
         dogpanel = DogPanel(self, data)
-        self.MainSizer.Add(dogpanel)
+        self.MainSizer.Add(dogpanel, 1, wx.EXPAND)
         self.Layout()
         self.Center()
 
     def CreateMyDogsPanel(self, data):
         mydogspanel = MyDogsPanel(self)
         mydogspanel.Fill(data)
-        self.MainSizer.Add(mydogspanel)
+        self.MainSizer.Add(mydogspanel, 1, wx.EXPAND)
 
     def CreateBreedingTestPanel(self, data):
         breedingpanel = BreedingPanel(self)
-        self.MainSizer.Add(breedingpanel)
+        self.MainSizer.Add(breedingpanel, 1, wx.EXPAND)
 
     def CreateBreedingResultsPanel(self, data):
         allbreedingresultspanel = AllBreedingResultsPanel(self)
-        self.MainSizer.Add(allbreedingresultspanel)
+        self.MainSizer.Add(allbreedingresultspanel, 1, wx.EXPAND)
 
     def CreateBreedingResult(self, data):
         breedingresultpanel = BreedingResultPanel(self, data["breedingtype"])
-        self.MainSizer.Add(breedingresultpanel)
+        self.MainSizer.Add(breedingresultpanel, 1, wx.EXPAND)

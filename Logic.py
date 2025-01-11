@@ -114,6 +114,7 @@ class Locus:
 
     def CreateFromString(self, string):
         allele1, allele2 = string.split("/")
+        allele2 = allele2[:-1]
         self.alleles = []
         if "except" in allele1:
             self.alleles.append(NotAllele(allele1.split(" ")[-1].split(",")))
@@ -164,7 +165,6 @@ class Locus:
         if type(replacement) == Locus:
             replacement = replacement.alleles
         print("replacing", self.alleles, replacement)
-
         if self.CanBeReplacedBy(self.alleles[0], replacement[0]) and self.CanBeReplacedBy(self.alleles[1],
                                                                                           replacement[1]):
             if self.CanBeReplacedBy(self.alleles[0], replacement[0]) == "test other" or self.CanBeReplacedBy(
@@ -187,14 +187,21 @@ class Locus:
             result.append(False)
 
         if "test other 1" in result:
+            print("test other 1")
             if -1 in result:
+                print("-1")
                 return -1
+
             else:
+                print("1")
                 return 1
         elif "test other -1" in result:
+            print("test other -1")
             if 1 in result:
+                print("1")
                 return 1
             else:
+                print("-1")
                 return -1
         elif False in result:
             return False
@@ -209,10 +216,11 @@ class Locus:
         order = self.CanReplace(replacement)
         if type(order) == int:
             self.alleles = self.alleles[::order]
-            # print(self.alleles)
+            print(self.alleles)
             temp = []
             for i in range(2):
-                if type(replacement[i]) != AnyAllele and self != replacement:
+                # print("original", self.alleles[i], "replacement", replacement[i])
+                if type(replacement[i]) != AnyAllele:
                     if type(self.alleles[i]) == type(replacement[i]) == NotAllele:
                         temp.append(self.alleles[i] + replacement[i])
                         print("ADDED TO NOTVALUE")
@@ -488,7 +496,7 @@ class Genotype:
     def CreateFromString(self, string):
         loci_text = string.split("|")
         for i in range(10):
-            # print(i, self.loci[i], loci_text[i])
+            print(i, loci_text[i] if "K" in loci_text[i] else "")
             self.loci[i].CreateFromString(loci_text[i])
 
     def __getitem__(self, item):
@@ -886,13 +894,14 @@ class Dog:
 
 
 class BreedingResult:
-    def __init__(self, parent1, parent2):
+    def __init__(self, parent1, parent2, goals=None):
         self.parent1 = parent1
         self.parent2 = parent2
         self.Preparations()
         self.possible_loci = []
         self.CalculatePossibleLoci()
         self.possibleGenotype = PossibleGenotype(self.possible_loci)
+        self.goals = goals
 
     def Preparations(self):
         self.parent1.CreateChildData()
@@ -904,6 +913,12 @@ class BreedingResult:
             parent2_locus = self.parent2.childPossibilities[locus_number]
             self.possible_loci.append(parent1_locus.Combine(parent2_locus, locus_number))
 
+    def GetGoalScores(self):
+        results = []
+        if self.goals:
+            for goal in self.goals:
+                results.append(goal.CheckConditions(self.possibleGenotype))
+        return results
 
 #### TESTS
 

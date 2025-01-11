@@ -42,6 +42,8 @@ class DogApp(wx.App):
         self.Bind(EVT_DELETE_GOAL, self.PassToDataLayer)
         self.Bind(EVT_REQUEST_ALL_GOALS, self.PassToDataLayer)
         self.Bind(EVT_DISPLAY_GOALS, self.PassToMainWindow)
+        self.Bind(EVT_BEGIN_BREEDCALC, self.PassToDataLayer)
+        self.Bind(EVT_DO_BREEDCALC, self.PassToLogicLayer)
 
         wx.PostEvent(self.DataLayer, LoadEvent())
 

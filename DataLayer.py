@@ -23,6 +23,17 @@ class DataLayer(wx.EvtHandler):
         self.Bind(EVT_PASS_GOAL, self.ProcessPassGoal)
         self.Bind(EVT_REQUEST_ALL_GOALS, self.ProcessPassGoal)
         self.Bind(EVT_DELETE_GOAL, self.DeleteGoal)
+        self.Bind(EVT_BEGIN_BREEDCALC, self.PassBreedingCalculationData)
+
+
+    def PassBreedingCalculationData(self, e):
+        breedingtype, parents, goals = e.data
+        print(breedingtype, parents, goals)
+        parents = [self.dogs[x] for x in parents if x is not None]
+        if breedingtype == "PickMate":
+            parents.append([dog for dog in self.dogs if dog.sex != parents[0].sex])
+        goals = [self.goals[x] for x in goals]
+        wx.PostEvent(self.parent, DoBreedingCalculation(data=(breedingtype, parents, goals)))
 
     def DeleteGoal(self, evt):
         which = evt.data
@@ -55,9 +66,9 @@ class DataLayer(wx.EvtHandler):
         self.goals.append(goal)
         print(self.goals)
         wx.PostEvent(self, SaveEvent())
-        if origin=="goals":
+        if origin == "goals":
             wx.PostEvent(self.parent, NavigationEvent(destination="Goals"))
-        elif origin=="breeding":
+        elif origin == "breeding":
             wx.PostEvent(self.parent, NavigationEvent(destination="BreedingCalc"))
             wx.PostEvent(self, RequestAllGoalsEvent(type="displaybreeding"))
 

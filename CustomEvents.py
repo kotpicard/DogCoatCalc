@@ -20,6 +20,7 @@ AddGoalEvent, EVT_ADD_GOAL = NewEvt()
 DeleteGoalEvent, EVT_DELETE_GOAL = NewEvt()
 PassGoalEvent, EVT_PASS_GOAL = NewEvt()
 RequestAllGoalsEvent, EVT_REQUEST_ALL_GOALS = NewEvt()
+ReturnToBreedingFromGoal, EVT_BREEDING_RETURN = NewEvt()
 
 #SAVE/LOAD
 SaveEvent, EVT_SAVE = NewEvt()
@@ -35,6 +36,10 @@ PassDogs, EVT_PASS_DOGS = NewEvt()
 PassSelectedParentDataEvent, EVT_PASS_SELECTED_PARENT_DATA = NewEvt()
 PassDataEvent, EVT_PASS_DATA = NewEvt()
 PassGoalsForDisplay, EVT_DISPLAY_GOALS = NewEvt()
+
+#BREEDING
+BeginBreedingCalculation, EVT_BEGIN_BREEDCALC = NewEvt()
+DoBreedingCalculation, EVT_DO_BREEDCALC = NewEvt()
 
 #DOG EVENTS
 DogIncorrectGenotypeEvent, EVT_INCORRECT_GENOTYPE = NewEvt()

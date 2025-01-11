@@ -6,8 +6,9 @@ import wx
 class GoalCtrl(wx.ScrolledWindow):
     def __init__(self, parent, size=(600, 150)):
         super().__init__(parent=parent, size=size)
-        self.fillstatus = 0
         # Set up scrolling properties
+        self.goals = []
+
         self.SetScrollRate(10, 10)
         self.SetBackgroundColour(wx.Colour(Color(Hex_BACKGROUNDBOX).rgb))
 
@@ -42,15 +43,15 @@ class GoalCtrl(wx.ScrolledWindow):
         self.SetupScrolling()
 
     def Fill(self, data):
-        if not self.fillstatus:
-            for elem in data:
+        for elem in data:
+            if elem not in self.goals:
+                self.goals.append(elem)
                 self.AddGoal(elem)
-            self.fillstatus = 1
 
     def SetupScrolling(self):
         self.SetVirtualSize(self.sizer.GetMinSize())
         self.FitInside()
-    
+
     def ClearGoals(self):
         for sizer in self.goal_sizers:
             sizer.Clear(delete_windows=True)
@@ -66,8 +67,6 @@ class GoalCtrl(wx.ScrolledWindow):
             self.selected.append(num)
             print(num, "selected")
         print(self.selected)
-
-
 
 # # Main application for testing
 # if __name__ == "__main__":

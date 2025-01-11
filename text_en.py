@@ -112,6 +112,9 @@ TEXT_GOTODOGPAGEWARNING = "Go to dog page?"
 TEXT_DELETE = "Delete"
 TEXT_DELETE_WARNING = "Delete selected elements?"
 TEXT_ADD_GOAL = "Add goal"
+TEXT_MISSING_DATA_TITLE = "Missing data"
+TEXT_MISSING_DATA = "Not all necessary data has been provided."
+TEXT_MISSING_DATA_BREEDING = " Conventional breeding requires two parents. Pick Mate breeding requires one parent and at least one goal."
 
 
 TEXT_PARENT = "Parent"

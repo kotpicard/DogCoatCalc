@@ -14,6 +14,17 @@ class LogicLayer(wx.EvtHandler):
         self.Bind(EVT_PASS_GENOTYPE, self.ProcessGenotype)
         self.Bind(EVT_OPEN_EDIT_LOCUS, self.GetOptionsForEditLocus)
         self.Bind(EVT_ADD_GOAL, self.ProcessAddGoal)
+        self.Bind(EVT_DO_BREEDCALC, self.DoBreedCalc)
+
+    def DoBreedCalc(self, evt):
+        breedingtype, parents, goals = evt.data
+        print(breedingtype, [x.name for x in parents], goals)
+        if breedingtype=="Conventional":
+            breedingresult = parents[0].Breed(parents[1])
+            breedingresult.goals = goals
+            print(breedingresult.GetGoalScores())
+        if breedingtype=="PickMate":
+            print(parents)
 
     def ProcessAddGoal(self, evt):
         descs = evt.data

@@ -457,6 +457,7 @@ class GoalsPanel(wx.Panel):
         wx.PostEvent(self.GetParent(), OpenMainMenu())
 
     def Fill(self, data):
+        print("FILLING GOALS")
         self.goalctrl.Fill(data)
         self.Layout()
 
@@ -545,14 +546,19 @@ class AddGoalPanel(wx.Panel):
         mainsizer.AddStretchSpacer(2)
         mainsizer.Add(bottomsizer, 1, wx.ALL, 10)
         self.SetSizer(mainsizer)
+        self.Layout()
 
     def Cancel(self, e):
-        wx.PostEvent(self.GetParent(), NavigationEvent(destination="Goals"))
+        if self.origin == "breeding":
+            wx.PostEvent(self.GetParent(), ReturnToBreedingFromGoal())
+        else:
+            wx.PostEvent(self.GetParent(), NavigationEvent(destination="Goals"))
 
     def AddGoal(self, e):
         children = [x for x in self.GetChildren() if type(x) == wx.CheckBox]
         selected = [x.GetLabel() for x in children if x.GetValue()]
-        wx.PostEvent(self.GetParent(), AddGoalEvent(data=selected, origin=self.origin))
+        if selected:
+            wx.PostEvent(self.GetParent(), AddGoalEvent(data=selected, origin=self.origin))
 
 
 class BreedingPanel(wx.Panel):
@@ -561,6 +567,8 @@ class BreedingPanel(wx.Panel):
         self.damdata = damdata
         self.siredata = siredata
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
+        self.sire = None
+        self.dam = None
         breedingtypesizer = wx.BoxSizer(wx.VERTICAL)
         breedingtypelabel = wx.StaticText(self, label=TEXT_BREEDINGTYPE)
         breedingtypelabel.SetFont(FONT_BIG)
@@ -602,6 +610,7 @@ class BreedingPanel(wx.Panel):
         buttonsizer.Add(cleargoalbutton, 1, wx.EXPAND)
         buttonsizer.Add(loadgoalbutton, 1, wx.EXPAND)
         calculatebutton = RoundedButton(self, TEXT_CALCULATE, colors=BUTTONCOLORS)
+        calculatebutton.Bind(wx.EVT_LEFT_DOWN, self.CalculateButtonClicked)
         backbutton = RoundedButton(self, TEXT_BACK, colors=BUTTONCOLORS)
         backbutton.Bind(wx.EVT_LEFT_DOWN, self.GoBack)
         rightsizer.Add(breedinggoalslabel, 0, wx.RIGHT, 5)
@@ -626,6 +635,7 @@ class BreedingPanel(wx.Panel):
         self.Bind(EVT_DISPLAY_GOALS, self.FillGoalCtrl)
 
     def SetUpConventional(self, e):
+        self.dam = self.sire = None
         self.breedingtype = "Conventional"
         self.parentsizer.Clear(delete_windows=True)
         self.pickmateparentsizer = wx.BoxSizer(wx.VERTICAL)
@@ -644,9 +654,9 @@ class BreedingPanel(wx.Panel):
             name = TEXT_NAMEBARE
             age, coat = "", ""
             dogid = -1
-        if who=="Parent":
+        if who == "Parent":
             parentlabel = wx.StaticText(self, label=TEXT_PARENT)
-        elif who=="Dam":
+        elif who == "Dam":
             parentlabel = wx.StaticText(self, label=TEXT_DAM)
         else:
             parentlabel = wx.StaticText(self, label=TEXT_SIRE)
@@ -670,8 +680,8 @@ class BreedingPanel(wx.Panel):
         sizer.Add(parentcoatlabel)
         self.Layout()
 
-
     def SetUpPickMate(self, e):
+        self.dam = self.sire = None
         self.breedingtype = "PickMate"
         self.parentsizer.Clear(delete_windows=True)
         self.damsizer = wx.BoxSizer(wx.VERTICAL)
@@ -681,7 +691,9 @@ class BreedingPanel(wx.Panel):
         self.Layout()
 
     def FillGoalCtrl(self, e):
+        print("FILLING GOAL CTRL")
         data = e.data
+        print("RECEIVED DATA", e.data)
         self.goalctrl.Fill(data)
         self.goalctrl.Layout()
 
@@ -700,12 +712,14 @@ class BreedingPanel(wx.Panel):
     def SetParentData(self, e):
         data = e.dog.name, str(e.dog.age), e.dog.coatdesc, e.dog.id
         if e.dog.sex == "m":
-            if self.breedingtype=="Conventional":
+            self.sire = e.dog.id
+            if self.breedingtype == "Conventional":
                 self.SetupParentSizer(data, self.siresizer, "Sire")
             else:
                 self.SetupParentSizer(data, self.pickmateparentsizer, "Parent")
         else:
-            if self.breedingtype=="Conventional":
+            self.dam = e.dog.id
+            if self.breedingtype == "Conventional":
                 self.SetupParentSizer(data, self.damsizer, "Dam")
             else:
                 self.SetupParentSizer(data, self.pickmateparentsizer, "Parent")
@@ -736,14 +750,6 @@ class BreedingPanel(wx.Panel):
         evt = SelectDogEvent(who=e.GetEventObject().type)
         wx.PostEvent(self, evt)
 
-    # def sireselectbutton(self, e):
-    #     evt = SelectDogEvent(who="Sire")
-    #     wx.PostEvent(self, evt)
-    #
-    # def damselectbutton(self, e):
-    #     evt = SelectDogEvent(who="Dam")
-    #     wx.PostEvent(self, evt)
-
     def SelectHandler(self, e):
         self.PopUpDogSelector(e.who)
 
@@ -751,6 +757,30 @@ class BreedingPanel(wx.Panel):
         dialog = DogSelectDialog(parent=self, who=dogtype)
         dialog.Show()
 
+    def CheckIfAllDataPresent(self):
+        if self.breedingtype == "Conventional":
+            print(self.sire, self.dam)
+            return True if self.sire is not None and self.dam is not None else False
+        if self.breedingtype == "PickMate":
+            return True if (self.sire is not None or self.dam is not None) and self.goalctrl.selected else False
+
+    def PrepareData(self):
+        parents = self.sire, self.dam
+        goals = self.goalctrl.selected
+        return self.breedingtype, parents, goals
+
+    def CalculateButtonClicked(self, e):
+        # check if all necessary data has been input
+        # if conventional, needs both parents
+        # if pickmate, needs parent and at least one selected goal
+        if self.CheckIfAllDataPresent():
+            data = self.PrepareData()
+            wx.PostEvent(self.GetParent(), BeginBreedingCalculation(data=data))
+        else:
+            dialog = wx.MessageDialog(self, message=TEXT_MISSING_DATA + TEXT_MISSING_DATA_BREEDING,
+                                      caption=TEXT_MISSING_DATA_TITLE, style=wx.OK | wx.ICON_WARNING)
+            dialog.ShowModal()
+            dialog.Destroy()
 
 
 class BreedingResultPanel(wx.Panel):
@@ -778,37 +808,13 @@ class BreedingResultPanel(wx.Panel):
             leftwidget = GoalCtrl(self)
             rightwidget = GoalCtrl(self)
 
-        elif breedingtype == BREEDINGTYPES[1]:  # pick best mate
+        else:  # pick best mate
             title = TEXT_PICKMATERESULTS
             subtitleleft = TEXT_GOALS
             subtitleright = TEXT_BESTMATE
             titleright = LinkButton(self, TEXT_NAMEBARE)
             leftwidget = GoalCtrl(self)
             rightwidget = BrowseDogsPanel(self, Color(Hex_BACKGROUNDBOX).rgb, 1)
-
-        elif breedingtype == BREEDINGTYPES[2]:  # pick best pair
-            title = TEXT_PICKPAIRRESULTS
-            subtitleleft = TEXT_GOALS
-            subtitleright = TEXT_BESTPAIR
-            titleright = wx.StaticText(self, label="")
-            leftwidget = GoalCtrl(self)
-            rightwidget = BrowseDogsPanel(self, Color(Hex_BACKGROUNDBOX).rgb, 1)
-
-        else:  # create best mate
-            title = TEXT_CREATERESULTS
-            subtitleleft = TEXT_GOALS
-            subtitleright = TEXT_BESTMATE
-            titleright = LinkButton(self, TEXT_NAMEBARE)
-            leftwidget = GoalCtrl(self)
-            rightwidget = wx.BoxSizer(wx.VERTICAL)
-            buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
-            buttonviewgenotype = RoundedButton(self, TEXT_VIEWGENOTYPE, colors=BUTTONCOLORS)
-            buttonsavetomydogs = RoundedButton(self, TEXT_SAVETOMYDOGS, colors=BUTTONCOLORS)
-            buttonsizer.Add(buttonviewgenotype, 1, wx.ALL, 15)
-            buttonsizer.Add(buttonsavetomydogs, 1, wx.BOTTOM | wx.TOP | wx.RIGHT, 15)
-            matectrl = GoalCtrl(self)
-            rightwidget.Add(matectrl, 2, wx.EXPAND)
-            rightwidget.Add(buttonsizer, 1, wx.EXPAND)
 
         title = wx.StaticText(self, label=title)
         subtitleleft = wx.StaticText(self, label=subtitleleft)
