@@ -793,6 +793,7 @@ class BreedingResultPanel(wx.Panel):
         buttonbackcalc = RoundedButton(self, TEXT_BACK_TO_CALC, colors=BUTTONCOLORS)
         buttonbackcalc.Bind(wx.EVT_LEFT_DOWN, self.GoBackToBreedCalc)
         buttonbackbreedings = RoundedButton(self, TEXT_BACK_TO_MY_BREEDINGS, colors=BUTTONCOLORS)
+        buttonbackbreedings.Bind(wx.EVT_LEFT_DOWN, self.GoBackToBreedings)
         bottombuttonsizer.AddStretchSpacer(3)
         bottombuttonsizer.Add(buttonbackcalc, 1, wx.ALL, 15)
         bottombuttonsizer.Add(buttonbackbreedings, 1, wx.BOTTOM | wx.TOP | wx.RIGHT, 15)
@@ -827,7 +828,7 @@ class BreedingResultPanel(wx.Panel):
             subtitleright = TEXT_BESTMATE
             titleright = LinkButton(self, self.breedingresult.mainparent.name)
             titleright.Bind(wx.EVT_LEFT_DOWN, self.GoToDogPage)
-            titleright.num=self.breedingresult.mainparent.id
+            titleright.num = self.breedingresult.mainparent.id
             self.leftwidget = GoalCtrl(self)
             self.rightwidget = BrowseDogsPanel(self, Color(Hex_BACKGROUNDBOX).rgb, 1)
 
@@ -879,6 +880,7 @@ class BreedingResultPanel(wx.Panel):
             self.rightwidget.AddElement(self.breedingresult.bestmate[2].ToDesc(), self.breedingresult.bestmate[2].id)
 
     def GoBackToBreedings(self, e):
+        print("BACK")
         wx.PostEvent(self.GetParent(), NavigationEvent(destination="AllBreedingResults"))
 
     def GoBackToBreedCalc(self, e):
@@ -893,6 +895,40 @@ class BreedingResultPanel(wx.Panel):
             self.Destroy()
 
 
-class AllBreedingResultsPanel(BrowseDogsPanel):
-    def __init__(self, parent):
-        super().__init__(parent, Color(Hex_BACKGROUNDBOX).rgb, 8)
+class AllBreedingResultsPanel(wx.Panel):
+    def __init__(self, parent, data=None):
+        super().__init__(parent)
+        self.viewpanel = BrowseDogsPanel(self, Color(Hex_BACKGROUNDBOX).rgb, 1)
+        # data is list of breedings
+        self.Bind(EVT_OPEN_DOG_PAGE, self.GoToDogPage)
+        self.Bind(EVT_OPEN_BREEDING_RESULT, self.PassToParent)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
+        buttonback = RoundedButton(self, TEXT_BACK, colors=BUTTONCOLORS)
+        buttonback.Bind(wx.EVT_LEFT_DOWN, self.GoBack)
+        buttonsizer.AddStretchSpacer(3)
+        buttonsizer.Add(buttonback, 1, wx.EXPAND | wx.ALL, 10)
+        sizer.Add(self.viewpanel, 3, wx.EXPAND | wx.ALL, 10)
+        sizer.Add(buttonsizer, 1, wx.EXPAND)
+        if data:
+            for i, elem in enumerate(data):
+                self.viewpanel.AddBreedingElement(elem, i)
+
+        self.SetSizer(sizer)
+        sizer.Layout()
+        self.Layout()
+
+    def GoBack(self, e):
+        wx.PostEvent(self.GetParent(), OpenMainMenu())
+
+    def GoToDogPage(self, e):
+        print("GOOOO TOOOO DOG PAGE")
+        dialog = wx.MessageDialog(self, TEXT_GOTODOGPAGEWARNING, style=wx.OK | wx.CANCEL)
+        test = dialog.ShowModal()
+        evt = OpenDogPageEvent(num=e.num, status="confirmed")
+        if test == wx.ID_OK:
+            wx.PostEvent(self.GetParent(), evt)
+            self.Destroy()
+
+    def PassToParent(self, e):
+        wx.PostEvent(self.GetParent(), e)

@@ -52,6 +52,7 @@ TEXT_BESTPAIR = "Best Pair"
 TEXT_CREATERESULTS = "Create Best Mate Breeding Test Results"
 TEXT_BACK_TO_CALC = "Back to Breeding Calculator"
 TEXT_BACK_TO_MY_BREEDINGS = "Back to My Breedings"
+TEXT_VIEW_DETAILS = "View Details"
 
 # dog select dialog
 TEXT_SELECTDOG = "Select Dog"

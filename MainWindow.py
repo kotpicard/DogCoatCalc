@@ -49,6 +49,7 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_BEGIN_BREEDCALC, self.PassToTopLayer)
         self.Bind(EVT_BREEDING_RETURN, self.ReturnToBreeding)
         self.Bind(EVT_VIEW_BREEDING_RESULT, self.OpenBreedingResult)
+        self.Bind(EVT_OPEN_BREEDING_RESULT, self.PassToTopLayer)
 
         self.SetSizer(self.MainSizer)
 
@@ -132,7 +133,7 @@ class MainWindow(wx.Frame):
 
     def NavigationDataHandler(self, e):
         self.MainSizer.Clear(delete_windows=True)
-        print(e.destination)
+        print(e.destination, e.data)
         self.NAVDICT[e.destination](e.data)
         print("layout")
         self.Layout()
@@ -215,7 +216,7 @@ class MainWindow(wx.Frame):
         self.MainSizer.Layout()
 
     def CreateBreedingResultsPanel(self, data):
-        allbreedingresultspanel = AllBreedingResultsPanel(self)
+        allbreedingresultspanel = AllBreedingResultsPanel(self, data)
         self.MainSizer.Add(allbreedingresultspanel, 1, wx.EXPAND)
         self.MainSizer.Layout()
 

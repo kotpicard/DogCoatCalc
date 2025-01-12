@@ -25,6 +25,15 @@ class DataLayer(wx.EvtHandler):
         self.Bind(EVT_DELETE_GOAL, self.DeleteGoal)
         self.Bind(EVT_BEGIN_BREEDCALC, self.PassBreedingCalculationData)
         self.Bind(EVT_ADD_BREEDING_RES, self.AddBreedingResult)
+        self.Bind(EVT_REQUEST_ALL_BREEDINGS, self.PassAllBreedings)
+        self.Bind(EVT_OPEN_BREEDING_RESULT, self.PassBreedingByNumber)
+
+
+    def PassBreedingByNumber(self, e):
+        wx.PostEvent(self.parent, ViewBreedingResult(breedingresult=self.breedings[e.num]))
+
+    def PassAllBreedings(self, e):
+        wx.PostEvent(self.parent, NavDataPass(destination="AllBreedingResults", data=self.breedings))
 
     def AddBreedingResult(self, e):
         breedingresult = e.breeding

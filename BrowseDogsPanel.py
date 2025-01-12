@@ -1,8 +1,9 @@
 import wx
 from LinkButton import LinkButton
+from RoundedButton import RoundedButton
 from text_en import *
 from CustomEvents import *
-from GuiConstants import Hex_BACKGROUNDBOX, Color
+from GuiConstants import Hex_BACKGROUNDBOX, Color, BUTTONCOLORS
 
 
 class BrowseDogsPanel(wx.ScrolledWindow):
@@ -23,6 +24,39 @@ class BrowseDogsPanel(wx.ScrolledWindow):
     def AddLinkOnly(self, value):
         button = LinkButton(self, label=value)
         self.sizer.Add(button)
+
+    def AddBreedingElement(self, elem, i):
+        elemsizer = wx.BoxSizer(wx.HORIZONTAL)
+        breedingtype = elem.type
+        if breedingtype == "Conventional":
+            dam = elem.parent1 if elem.parent1.sex == "f" else elem.parent2
+            sire = elem.parent1 if dam != elem.parent1 else elem.parent2
+            damname = LinkButton(self, dam.name)
+            damname.num = dam.id
+            damname.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
+            xlabel = wx.StaticText(self, label="x")
+            sirename = LinkButton(self, sire.name)
+            sirename.num = sire.id
+            sirename.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
+            viewbutton = RoundedButton(self, TEXT_VIEW_DETAILS, colors=BUTTONCOLORS)
+            viewbutton.num = i
+            viewbutton.Bind(wx.EVT_LEFT_DOWN, self.OpenBreedingPage)
+            elemsizer.Add(damname, 0, wx.ALL, 5)
+            elemsizer.Add(xlabel, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+            elemsizer.Add(sirename, 0, wx.ALL, 5)
+            elemsizer.Add(viewbutton, 0, wx.ALL, 5)
+
+        else:
+            titleright = LinkButton(self, elem.mainparent.name)
+            titleright.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
+            titleright.num = elem.mainparent.id
+            viewbutton = RoundedButton(self, TEXT_VIEW_DETAILS, colors=BUTTONCOLORS)
+            viewbutton.num = i
+            viewbutton.Bind(wx.EVT_LEFT_DOWN, self.OpenBreedingPage)
+            elemsizer.Add(titleright, 0, wx.ALL, 5)
+            elemsizer.Add(viewbutton, 0, wx.ALL, 5)
+        self.sizer.Add(elemsizer)
+        self.sizer.Layout()
 
     def AddElement(self, values, i=None):
         elementsizer = wx.BoxSizer(wx.VERTICAL)
@@ -70,6 +104,14 @@ class BrowseDogsPanel(wx.ScrolledWindow):
             self.selected.remove(num)
         else:
             self.selected.append(num)
+
+    def OpenBreedingPage(self, e):
+        print("open breeding page", e.GetEventObject().num)
+        num = e.GetEventObject().num
+        print(num)
+        if num is not None:
+            print(self.GetParent())
+            wx.PostEvent(self.GetParent(), OpenBreedingPageEvent(num=num))
 
     def OpenDogPage(self, e):
         print("open dog page", e.GetEventObject().num)

@@ -42,6 +42,8 @@ BeginBreedingCalculation, EVT_BEGIN_BREEDCALC = NewEvt()
 DoBreedingCalculation, EVT_DO_BREEDCALC = NewEvt()
 AddBreedingResult, EVT_ADD_BREEDING_RES = NewEvt()
 ViewBreedingResult, EVT_VIEW_BREEDING_RESULT = NewEvt()
+OpenBreedingPageEvent, EVT_OPEN_BREEDING_RESULT = NewEvt()
+RequestAllBreedingsEvent, EVT_REQUEST_ALL_BREEDINGS = NewEvt()
 
 #DOG EVENTS
 DogIncorrectGenotypeEvent, EVT_INCORRECT_GENOTYPE = NewEvt()
