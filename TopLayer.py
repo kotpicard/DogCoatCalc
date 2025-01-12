@@ -81,7 +81,8 @@ class DogApp(wx.App):
 
     def PassDogData(self, evt):
         if evt.type == "byid":
-            wx.PostEvent(self.MainWindow, PassDataForDogPageEvent(dog=evt.dog))
+            print("BYID2", evt.dog.name)
+            wx.PostEvent(self.MainWindow, PassDataForDogPageEvent(dog=evt.dog, data=evt.data))
         if evt.type == "add":
             wx.PostEvent(self.LogicLayer, evt)
         if evt.type == "parentselected":

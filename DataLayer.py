@@ -28,7 +28,6 @@ class DataLayer(wx.EvtHandler):
         self.Bind(EVT_REQUEST_ALL_BREEDINGS, self.PassAllBreedings)
         self.Bind(EVT_OPEN_BREEDING_RESULT, self.PassBreedingByNumber)
 
-
     def PassBreedingByNumber(self, e):
         wx.PostEvent(self.parent, ViewBreedingResult(breedingresult=self.breedings[e.num]))
 
@@ -39,7 +38,6 @@ class DataLayer(wx.EvtHandler):
         breedingresult = e.breeding
         self.breedings.append(breedingresult)
         wx.PostEvent(self.parent, ViewBreedingResult(breedingresult=breedingresult))
-
 
     def PassBreedingCalculationData(self, e):
         breedingtype, parents, goals = e.data
@@ -122,7 +120,17 @@ class DataLayer(wx.EvtHandler):
 
     def PassDogByID(self, evt):
         if int(evt.dogid) in range(len(self.dogs)):
-            wx.PostEvent(self.parent, PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type=evt.type))
+            if evt.type == "byid":
+                print("BYID")
+                filtered_breedings = [(i, self.breedings[i]) for i in range(len(self.breedings)) if
+                                      self.breedings[i].parent1.id == int(evt.dogid) or self.breedings[
+                                          i].parent2.id == int(
+                                          evt.dogid)]
+                wx.PostEvent(self.parent,
+                             PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type=evt.type, data=filtered_breedings))
+            else:
+                wx.PostEvent(self.parent, PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type=evt.type))
+
 
     def PassDogsForDisplay(self, evt):
         dog_descs = []
@@ -152,7 +160,7 @@ class DataLayer(wx.EvtHandler):
             datafile.write("#")
             breedingdata = breeding.ToText()
             # for elem in breedingdata:
-            datafile.write(breedingdata+"\n")
+            datafile.write(breedingdata + "\n")
 
         datafile.write("##GOALS")
         datafile.write("\n")

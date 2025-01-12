@@ -90,6 +90,8 @@ class MyDogsPanel(wx.Panel):
         buttonsizer.Add(button3, 0, wx.ALL, 10)
         sizer.Add(buttonsizer, 0, wx.ALL, 0)
         self.SetSizer(sizer)
+        self.Layout()
+        sizer.Layout()
         button.Bind(wx.EVT_LEFT_DOWN, self.AddDog)
 
     def PassToMainWindow(self, e):
@@ -112,7 +114,7 @@ class MyDogsPanel(wx.Panel):
 
 
 class DogPanel(wx.Panel):
-    def __init__(self, parent, values):
+    def __init__(self, parent, values, breedingdata=None):
         super().__init__(parent)
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
         dogdatasizer = wx.BoxSizer(wx.VERTICAL)
@@ -158,12 +160,14 @@ class DogPanel(wx.Panel):
         addrelativebutton.Bind(wx.EVT_LEFT_DOWN, self.AddRelative)
         breedingtestresultslabel = wx.StaticText(self, label=TEXT_BREEDINGTESTRESULTS)
         breedingtestresultslabel.SetFont(FONT_BIG)
-        breedingtestresultslinkbox = LinkBoxCtrl(self)
-        linkeddatasizer.Add(relativeslabel, 0, wx.EXPAND | wx.ALL, 10)
-        linkeddatasizer.Add(relativeslinkbox, 0, wx.EXPAND | wx.ALL, 10)
+        breedingtestresultsbox = BrowseDogsPanel(self, Color(Hex_BACKGROUNDBOX).rgb, 1)
+        for elem in breedingdata:
+            breedingtestresultsbox.AddBreedingElement(elem[1], elem[0])
+        linkeddatasizer.Add(relativeslabel, 0, wx.ALL, 10)
+        linkeddatasizer.Add(relativeslinkbox, 1, wx.EXPAND | wx.ALL, 10)
         linkeddatasizer.Add(addrelativebutton, 0, wx.ALL, 10)
-        linkeddatasizer.Add(breedingtestresultslabel, 0, wx.EXPAND | wx.ALL, 10)
-        linkeddatasizer.Add(breedingtestresultslinkbox, 0, wx.EXPAND | wx.ALL, 10)
+        linkeddatasizer.Add(breedingtestresultslabel, 0, wx.ALL, 10)
+        linkeddatasizer.Add(breedingtestresultsbox, 1, wx.EXPAND | wx.ALL, 10)
 
         topsizer = wx.BoxSizer(wx.HORIZONTAL)
         topsizer.Add(dogdatasizer, 1, wx.EXPAND | wx.ALL, 20)
@@ -193,6 +197,8 @@ class DogPanel(wx.Panel):
         dogsizer.AddSpacer(50)
         dogsizer.Add(bottomsizer, 1, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(dogsizer)
+        self.Layout()
+        dogsizer.Layout()
 
         self.Bind(EVT_PASS_DOGS, self.PopulateRelativeSelection)
         self.Bind(EVT_OPEN_DOG_PAGE, self.passToMainWindow)
