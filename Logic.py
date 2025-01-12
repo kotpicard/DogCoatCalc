@@ -896,11 +896,11 @@ class Dog:
                     condition.Execute(child.genotype)
             child.CreateChildData()
 
-    def Breed(self, partner, breedingtype):
+    def Breed(self, partner, breedingtype, goals=None):
         if self.sex == partner.sex:
             return "Error: can't breed same sex dogs"
         else:
-            return BreedingResult(self, partner, breedingtype)
+            return BreedingResult(self, partner, breedingtype, goals)
 
 
 class BreedingResult:
@@ -913,11 +913,18 @@ class BreedingResult:
         self.CalculatePossibleLoci()
         self.possibleGenotype = PossibleGenotype(self.possible_loci)
         self.goals = goals
+        print("GOALS!!!!!!!!!!!!", self.goals, goals)
         if self.type == "Conventional":
             self.possiblePhens, self.impossiblePhens = self.GetPossiblePhenotypes()
             self.possiblePhensAsGoals = [Goal([x]).ToList() for x in self.possiblePhens]
             print(self.possiblePhensAsGoals)
             self.impossiblePhensAsGoals = [Goal([x]).ToList() for x in self.impossiblePhens]
+        if self.goals:
+            self.goalslist = [x.ToList() for x in self.goals]
+            self.goalscores = self.GetGoalScores()
+        else:
+            self.goalslist = []
+            self.goalscores = None
 
 
     def ToText(self):

@@ -1,6 +1,7 @@
 from RoundedButton import RoundedButton
 from GuiConstants import *
 import wx
+from math import floor, ceil
 
 
 class GoalCtrl(wx.ScrolledWindow):
@@ -19,7 +20,8 @@ class GoalCtrl(wx.ScrolledWindow):
         self.selected = []
         self.Layout()
 
-    def AddGoal(self, goallist, selectable):
+    def AddGoal(self, goallist, selectable, customcolors):
+        print(goallist, customcolors)
         goal_sizer = wx.FlexGridSizer(1, 0, 0, 0)
         if selectable:
             selector = wx.CheckBox(self)
@@ -27,14 +29,46 @@ class GoalCtrl(wx.ScrolledWindow):
             selector.num = self.currentgoalid
             self.currentgoalid += 1
             goal_sizer.Add(selector, 0, wx.ALIGN_CENTER)
-        for goal in goallist[:-1]:
-            button = RoundedButton(parent=self, label=goal[0], colors=GOALCOLORS[goal[1]])
+        for i, goal in enumerate(goallist[:-1]):
+            if not customcolors:
+                colors = GOALCOLORS[goal[1]]
+            else:
+                value = customcolors[i]
+                # value is 1-3
+                if value == 0:
+                    colors = (Color(Hex_IMPOSSIBLE).rgb, Color(Hex_IMPOSSIBLE).rgb)
+                else:
+                    low = floor(value)
+                    high = ceil(value)
+                    scale = value - low
+                    lowcolor = GOALTESTCOLORS[low - 1]
+                    highcolor = GOALTESTCOLORS[high - 1]
+                    color = Color().GetColorInBetween(lowcolor, highcolor, scale)
+                    colors = (color, color)
+
+            button = RoundedButton(parent=self, label=goal[0], colors=colors)
             goal_sizer.Add(button, 1, wx.EXPAND)
 
             line = wx.StaticLine(self, style=wx.LI_HORIZONTAL, size=(10, 5))
             goal_sizer.Add(line, 0, wx.ALIGN_CENTER)
 
-        button = RoundedButton(parent=self, label=goallist[-1][0], colors=GOALCOLORS[goallist[-1][1]])
+        if not customcolors:
+            colors = GOALCOLORS[goallist[-1][1]]
+        else:
+            value = customcolors[-1]
+            # value is 1-3
+            if value == 0:
+                colors = (Color(Hex_IMPOSSIBLE.rgb), Color(Hex_IMPOSSIBLE.rgb))
+            else:
+                low = floor(value)
+                high = ceil(value)
+                scale = value - low
+                lowcolor = GOALTESTCOLORS[low - 1]
+                highcolor = GOALTESTCOLORS[high - 1]
+                color = Color().GetColorInBetween(lowcolor, highcolor, scale)
+                colors = (color, color)
+
+        button = RoundedButton(parent=self, label=goallist[-1][0], colors=colors)
         goal_sizer.Add(button, 1, wx.EXPAND)
         self.sizer.Add(goal_sizer, 1, wx.EXPAND | wx.ALL, 10)
         self.goal_sizers.append(goal_sizer)
@@ -43,11 +77,14 @@ class GoalCtrl(wx.ScrolledWindow):
         self.Layout()
         self.SetupScrolling()
 
-    def Fill(self, data, selectable=True):
-        for elem in data:
+    def Fill(self, data, selectable=True, customcolors=False):
+        for i,elem in enumerate(data):
             if elem not in self.goals:
                 self.goals.append(elem)
-                self.AddGoal(elem, selectable)
+                if customcolors:
+                    self.AddGoal(elem, selectable, customcolors[i])
+                else:
+                    self.AddGoal(elem, selectable, customcolors)
 
     def SetupScrolling(self):
         self.SetVirtualSize(self.sizer.GetMinSize())
@@ -57,7 +94,6 @@ class GoalCtrl(wx.ScrolledWindow):
         for sizer in self.goal_sizers:
             sizer.Clear(delete_windows=True)
         self.Layout()
-        self.fillstatus = 0
 
     def UpdateSelected(self, e):
         num = e.GetEventObject().num

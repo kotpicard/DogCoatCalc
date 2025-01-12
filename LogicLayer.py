@@ -20,7 +20,7 @@ class LogicLayer(wx.EvtHandler):
         breedingtype, parents, goals = evt.data
         print(breedingtype, [x.name for x in parents], breedingtype, goals)
         if breedingtype == "Conventional":
-            breedingresult = parents[0].Breed(parents[1], breedingtype)
+            breedingresult = parents[0].Breed(parents[1], breedingtype, goals)
             breedingresult.goals = goals
             print(breedingresult.GetGoalScores())
             wx.PostEvent(self.parent, AddBreedingResult(breeding=breedingresult))

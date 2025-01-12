@@ -860,6 +860,8 @@ class BreedingResultPanel(wx.Panel):
         if self.breedingtype == "Conventional":
             self.leftwidget.Fill(self.breedingresult.possiblePhensAsGoals, False)
             self.rightwidget.Fill(self.breedingresult.impossiblePhensAsGoals, False)
+            print(self.breedingresult.goalslist, "GOALSLIST")
+            self.goalwidget.Fill(self.breedingresult.goalslist, False, self.breedingresult.goalscores)
 
     def GoBackToBreedings(self, e):
         ...

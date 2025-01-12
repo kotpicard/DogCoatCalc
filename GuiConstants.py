@@ -41,21 +41,24 @@ class Color:
         self.green = int(self.hex[2:4], 16)
         self.blue = int(self.hex[4:6], 16)
         self.rgb = (self.red, self.green, self.blue, 255)
-        
+
     def GetColorInBetween(self, color1, color2, scale):
-        rdiff = abs(color1.red-color2.red)
-        gdiff = abs(color1.green-color2.green)
-        bdiff = abs(color1.blue-color2.blue)
-        rdiff = int(rdiff*scale)
-        gdiff = int(gdiff*scale)
-        bdiff = int(bdiff*scale)
-        self.red = min(color1.red+rdiff, color2.red+rdiff)
-        self.green = min(color1.green+gdiff, color2.green+rdiff)
-        self.blue = min(color1.blue+bdiff, color2.blue+rdiff)
+        rdiff = abs(color1.red - color2.red)
+        gdiff = abs(color1.green - color2.green)
+        bdiff = abs(color1.blue - color2.blue)
+        rdiff = int(rdiff * scale)
+        gdiff = int(gdiff * scale)
+        bdiff = int(bdiff * scale)
+        self.red = min(color1.red + rdiff, color2.red + rdiff)
+        self.green = min(color1.green + gdiff, color2.green + rdiff)
+        self.blue = min(color1.blue + bdiff, color2.blue + rdiff)
         self.rgb = (self.red, self.green, self.blue, 255)
+        return self.rgb
 
 
-
+GOALTESTCOLORS = [Color(Hex_MAYBE),
+                  Color(Hex_POSSIBLE),
+                  Color(Hex_CERTAIN)]
 
 # GOAL FORMAT: (Name, Type) -> ("Black", "COLOR")
 GOALCOLORS = {
