@@ -25,7 +25,6 @@ class LinkButton(wx.Panel):
 
     def on_size(self, event):
         self.Refresh()
-        self.Update()
 
     def on_hover_enter(self, event):
         self.text_color = self.hover_text_color
@@ -39,6 +38,8 @@ class LinkButton(wx.Panel):
     #     wx.MessageBox(f"You clicked '{self.label}'!", "Info", wx.OK | wx.ICON_INFORMATION)
 
     def on_paint(self, event):
+        self.Refresh()
+        self.Update()
         # Create a graphics context for smooth drawing
         dc = wx.BufferedPaintDC(self)
         gc = wx.GraphicsContext.Create(dc)

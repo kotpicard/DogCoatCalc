@@ -147,6 +147,7 @@ class MainWindow(wx.Frame):
     def CreateDefaultPanel(self):
         defaultpanel = DefaultPanel(self)
         self.MainSizer.Add(defaultpanel, 1, wx.EXPAND)
+        self.MainSizer.Layout()
 
     def InitViewGenotype(self, e):
         wx.PostEvent(self.app, OpenGenotypeViewEvent(dogid=e.dogid))
@@ -186,6 +187,7 @@ class MainWindow(wx.Frame):
         goalspanel = GoalsPanel(self)
         goalspanel.Fill(data)
         self.MainSizer.Add(goalspanel, 1, wx.EXPAND)
+        self.MainSizer.Layout()
 
     def GoToDogPage(self, evt):
         print("GO TO DOG PAGE", evt.num)
@@ -197,22 +199,29 @@ class MainWindow(wx.Frame):
         data = evt.dog.ToDesc()
         dogpanel = DogPanel(self, data)
         self.MainSizer.Add(dogpanel, 1, wx.EXPAND)
-        self.Layout()
+        self.MainSizer.Layout()
         self.Center()
 
     def CreateMyDogsPanel(self, data):
         mydogspanel = MyDogsPanel(self)
         mydogspanel.Fill(data)
         self.MainSizer.Add(mydogspanel, 1, wx.EXPAND)
+        self.MainSizer.Layout()
+
 
     def CreateBreedingTestPanel(self, data):
         breedingpanel = BreedingPanel(self)
         self.MainSizer.Add(breedingpanel, 1, wx.EXPAND)
+        self.MainSizer.Layout()
 
     def CreateBreedingResultsPanel(self, data):
         allbreedingresultspanel = AllBreedingResultsPanel(self)
         self.MainSizer.Add(allbreedingresultspanel, 1, wx.EXPAND)
+        self.MainSizer.Layout()
+
 
     def CreateBreedingResult(self, data):
         breedingresultpanel = BreedingResultPanel(self, data["breedingtype"])
         self.MainSizer.Add(breedingresultpanel, 1, wx.EXPAND)
+        self.MainSizer.Layout()
+

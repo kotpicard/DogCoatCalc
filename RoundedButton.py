@@ -26,7 +26,6 @@ class RoundedButton(wx.Panel):
 
     def on_size(self, event):
         self.Refresh()
-        self.Update()
 
 
     def on_hover_enter(self, event):
@@ -38,7 +37,6 @@ class RoundedButton(wx.Panel):
         self.Refresh()
 
     def on_paint(self, event):
-        self.Refresh()
         # Create a graphics context for smooth drawing
         dc = wx.BufferedPaintDC(self)
         gc = wx.GraphicsContext.Create(dc)
@@ -61,6 +59,7 @@ class RoundedButton(wx.Panel):
         gc.SetFont(self.GetFont(), wx.Colour(255, 255, 255))  # White text
         text_width, text_height = gc.GetTextExtent(self.label)
         gc.DrawText(self.label, (w - text_width) / 2, (h - text_height) / 2)
+        self.Update()
 
 
 # class MyFrame(wx.Frame):
