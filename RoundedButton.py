@@ -22,6 +22,12 @@ class RoundedButton(wx.Panel):
         self.default_color = colors[0]  # Cornflower blue
         self.hover_color = colors[1]  # Dodger blue
         self.current_color = self.default_color
+        self.Bind(wx.EVT_SIZE, self.on_size)
+
+    def on_size(self, event):
+        self.Refresh()
+        self.Update()
+
 
     def on_hover_enter(self, event):
         self.current_color = self.hover_color
@@ -31,10 +37,8 @@ class RoundedButton(wx.Panel):
         self.current_color = self.default_color
         self.Refresh()
 
-    def on_click(self, event):
-        wx.MessageBox(f"You clicked '{self.label}'!", "Info", wx.OK | wx.ICON_INFORMATION)
-
     def on_paint(self, event):
+        self.Refresh()
         # Create a graphics context for smooth drawing
         dc = wx.BufferedPaintDC(self)
         gc = wx.GraphicsContext.Create(dc)

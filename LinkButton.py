@@ -14,12 +14,18 @@ class LinkButton(wx.Panel):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_ENTER_WINDOW, self.on_hover_enter)
         self.Bind(wx.EVT_LEAVE_WINDOW, self.on_hover_leave)
+        self.Bind(wx.EVT_SIZE, self.on_size)
+
 
         # Button colors
         self.default_color = parent.GetBackgroundColour()
         self.normal_text_color = textcolors[0]
         self.text_color = textcolors[0]
         self.hover_text_color = textcolors[1]
+
+    def on_size(self, event):
+        self.Refresh()
+        self.Update()
 
     def on_hover_enter(self, event):
         self.text_color = self.hover_text_color
