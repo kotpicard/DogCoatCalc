@@ -48,8 +48,15 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_DISPLAY_GOALS, self.DisplayGoals)
         self.Bind(EVT_BEGIN_BREEDCALC, self.PassToTopLayer)
         self.Bind(EVT_BREEDING_RETURN, self.ReturnToBreeding)
+        self.Bind(EVT_VIEW_BREEDING_RESULT, self.OpenBreedingResult)
 
         self.SetSizer(self.MainSizer)
+
+    def OpenBreedingResult(self, e):
+        self.MainSizer.Clear(delete_windows=True)
+        self.MainSizer.Add(BreedingResultPanel(self, e.breedingresult), 1, wx.EXPAND)
+        self.MainSizer.Layout()
+        self.Layout()
 
     def ReturnToBreeding(self, e):
         if self.temp.GetContainingSizer() != self.MainSizer:

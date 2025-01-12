@@ -744,6 +744,7 @@ MINOR_TICKING.AddCondition(8, "IsNotHomozygousFor", "S")
 TICKING.AddCondition(9, "HasAtLeastOne", "T")
 TICKING.AddCondition(9, "DoesntHaveAllele", "t")
 TICKING.AddCondition(8, "IsNotHomozygousFor", "S")
+NO_TICKING.AddCondition(9, "IsHomozygousFor", "t")
 
 ROANING.AddCondition(8, "IsNotHomozygousFor", "S")
 ROANING.AddCondition(9, "DoesntHaveAllele", "T")
@@ -755,6 +756,8 @@ GREYING.AddCondition(3, "IsNotHomozygousFor", "e")
 OTHER_PHENOTYPES = [SABLE, AGOUTI, TANPOINT, BRINDLE, SOLID_EUMELANIN, SOLID_PHEOMELANIN, MASK, MERLE, DOUBLE_MERLE,
                     NO_WHITE, MINOR_WHITE, PIEBALD, IRISH_WHITE, MINOR_TICKING, TICKING, ROANING, GREYING,
                     NO_MERLE, NO_TICKING]
+
+ALL_PHENOTYPES = COLOR_PHENOTYPES + OTHER_PHENOTYPES
 
 PHEN_DICT = dict()
 for elem in OTHER_PHENOTYPES + COLOR_PHENOTYPES:
@@ -768,8 +771,14 @@ class Goal:
     def FromString(self, text):
         ...
 
+    def ToText(self):
+        goaldata = self.ToList()
+        text = "|".join([x[0].upper() + ":" + x[1] for x in goaldata])
+        return text
+
+
     def ToList(self):
-        return [(x.type, x.desc) for x in self.elements]
+        return [(x.desc, x.type) for x in self.elements]
 
     def CheckConditions(self, target):
         # target is possiblegenotype
@@ -805,6 +814,7 @@ class Goal:
                         else:
                             # result is both specific and certain
                             temp.append(3)
+                print(temp)
                 elementresults.append(sum(temp) / len(temp))
         return elementresults
 
@@ -886,15 +896,16 @@ class Dog:
                     condition.Execute(child.genotype)
             child.CreateChildData()
 
-    def Breed(self, partner):
+    def Breed(self, partner, breedingtype):
         if self.sex == partner.sex:
             return "Error: can't breed same sex dogs"
         else:
-            return BreedingResult(self, partner)
+            return BreedingResult(self, partner, breedingtype)
 
 
 class BreedingResult:
-    def __init__(self, parent1, parent2, goals=None):
+    def __init__(self, parent1, parent2, type, goals=None):
+        self.type = type
         self.parent1 = parent1
         self.parent2 = parent2
         self.Preparations()
@@ -902,10 +913,24 @@ class BreedingResult:
         self.CalculatePossibleLoci()
         self.possibleGenotype = PossibleGenotype(self.possible_loci)
         self.goals = goals
+        if self.type == "Conventional":
+            self.possiblePhens, self.impossiblePhens = self.GetPossiblePhenotypes()
+            self.possiblePhensAsGoals = [Goal([x]).ToList() for x in self.possiblePhens]
+            print(self.possiblePhensAsGoals)
+            self.impossiblePhensAsGoals = [Goal([x]).ToList() for x in self.impossiblePhens]
+
+
+    def ToText(self):
+        return self.type+"|"+str(self.parent1.id)+"|"+str(self.parent2.id)+"|"+"&".join([goal.ToText() for goal in self.goals])
 
     def Preparations(self):
         self.parent1.CreateChildData()
         self.parent2.CreateChildData()
+
+    def GetPossiblePhenotypes(self):
+        possible_phenotypes = [x for x in ALL_PHENOTYPES if x.TestConditions(self.possibleGenotype)[0]]
+        impossible_phenotypes = [x for x in ALL_PHENOTYPES if x not in possible_phenotypes]
+        return possible_phenotypes, impossible_phenotypes
 
     def CalculatePossibleLoci(self):
         for locus_number in range(len(self.parent1.genotype)):

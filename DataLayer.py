@@ -24,6 +24,12 @@ class DataLayer(wx.EvtHandler):
         self.Bind(EVT_REQUEST_ALL_GOALS, self.ProcessPassGoal)
         self.Bind(EVT_DELETE_GOAL, self.DeleteGoal)
         self.Bind(EVT_BEGIN_BREEDCALC, self.PassBreedingCalculationData)
+        self.Bind(EVT_ADD_BREEDING_RES, self.AddBreedingResult)
+
+    def AddBreedingResult(self, e):
+        breedingresult = e.breeding
+        self.breedings.append(breedingresult)
+        wx.PostEvent(self.parent, ViewBreedingResult(breedingresult=breedingresult))
 
 
     def PassBreedingCalculationData(self, e):
@@ -143,9 +149,8 @@ class DataLayer(wx.EvtHandler):
         datafile.write("\n")
         for goal in self.goals:
             datafile.write("#")
-            goaldata = goal.ToList()
-            for elem in goaldata:
-                datafile.write(elem[0].upper() + ":" + elem[1] + "|")
+            goaldata = goal.ToText()
+            datafile.write(goaldata)
             datafile.write("\n")
         datafile.write("\n")
         datafile.close()

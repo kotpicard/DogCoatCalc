@@ -44,6 +44,8 @@ class DogApp(wx.App):
         self.Bind(EVT_DISPLAY_GOALS, self.PassToMainWindow)
         self.Bind(EVT_BEGIN_BREEDCALC, self.PassToDataLayer)
         self.Bind(EVT_DO_BREEDCALC, self.PassToLogicLayer)
+        self.Bind(EVT_ADD_BREEDING_RES, self.PassToDataLayer)
+        self.Bind(EVT_VIEW_BREEDING_RESULT, self.PassToMainWindow)
 
         wx.PostEvent(self.DataLayer, LoadEvent())
 
@@ -88,6 +90,7 @@ class DogApp(wx.App):
         if evt.destination == "MyDogs":
             wx.PostEvent(self.DataLayer, DisplayAllDogsEvent())
         if evt.destination == "BreedingCalc":
+            print("going to calc")
             wx.PostEvent(self.MainWindow, NavDataPass(destination="BreedingCalc", data=None))
         if evt.destination == "Goals":
             wx.PostEvent(self.DataLayer, RequestAllGoalsEvent(type="displayall"))

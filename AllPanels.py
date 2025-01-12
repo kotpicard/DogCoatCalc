@@ -784,39 +784,48 @@ class BreedingPanel(wx.Panel):
 
 
 class BreedingResultPanel(wx.Panel):
-    def __init__(self, parent, breedingtype):
+    def __init__(self, parent, breedingresult):
         super().__init__(parent)
+        self.breedingresult = breedingresult
+        self.breedingtype = self.breedingresult.type
         breedingresultsizer = wx.BoxSizer(wx.VERTICAL)
         bottombuttonsizer = wx.BoxSizer(wx.HORIZONTAL)
-        buttonsave = RoundedButton(self, TEXT_SAVE, colors=BUTTONCOLORS)
-        buttonclose = RoundedButton(self, TEXT_CLOSE, colors=BUTTONCOLORS)
+        buttonbackcalc = RoundedButton(self, TEXT_BACK_TO_CALC, colors=BUTTONCOLORS)
+        buttonbackcalc.Bind(wx.EVT_LEFT_DOWN, self.GoBackToBreedCalc)
+        buttonbackbreedings = RoundedButton(self, TEXT_BACK_TO_MY_BREEDINGS, colors=BUTTONCOLORS)
         bottombuttonsizer.AddStretchSpacer()
-        bottombuttonsizer.Add(buttonsave, 0, wx.ALL, 15)
-        bottombuttonsizer.Add(buttonclose, 0, wx.BOTTOM | wx.TOP | wx.RIGHT, 15)
+        bottombuttonsizer.Add(buttonbackcalc, 0, wx.ALL, 15)
+        bottombuttonsizer.Add(buttonbackbreedings, 0, wx.BOTTOM | wx.TOP | wx.RIGHT, 15)
 
-        if breedingtype == BREEDINGTYPES[0]:  # conventional
+        if self.breedingtype == "Conventional":
+            self.dam = self.breedingresult.parent1 if self.breedingresult.parent1.sex == "f" else self.breedingresult.parent2
+            self.sire = self.breedingresult.parent1 if self.dam != self.breedingresult.parent1 else self.breedingresult.parent2
             title = TEXT_CONVRESULTS
             subtitleleft = TEXT_POSSIBLECOATS
             subtitleright = TEXT_IMPOSSIBLECOATS
             titleright = wx.BoxSizer(wx.HORIZONTAL)
-            damname = LinkButton(self, TEXT_DAM)
+            damname = LinkButton(self, self.dam.name)
             xlabel = wx.StaticText(self, label="x")
-            sirename = LinkButton(self, TEXT_SIRE)
+            sirename = LinkButton(self, self.sire.name)
             titleright.Add(damname, 0, wx.BOTTOM, 5)
             titleright.Add(xlabel, 0, wx.TOP, 15)
             titleright.Add(sirename, 0, wx.BOTTOM, 5)
-            leftwidget = GoalCtrl(self)
-            rightwidget = GoalCtrl(self)
+            self.leftwidget = GoalCtrl(self, size=(300, 300))
+            self.rightwidget = GoalCtrl(self, size=(300, 300))
+            subtitlegoal = TEXT_GOALS
+            self.goalwidget = GoalCtrl(self, size=(300, 300))
+
 
         else:  # pick best mate
             title = TEXT_PICKMATERESULTS
             subtitleleft = TEXT_GOALS
             subtitleright = TEXT_BESTMATE
             titleright = LinkButton(self, TEXT_NAMEBARE)
-            leftwidget = GoalCtrl(self)
-            rightwidget = BrowseDogsPanel(self, Color(Hex_BACKGROUNDBOX).rgb, 1)
+            self.leftwidget = GoalCtrl(self)
+            self.rightwidget = BrowseDogsPanel(self, Color(Hex_BACKGROUNDBOX).rgb, 1)
 
         title = wx.StaticText(self, label=title)
+        title.SetFont(FONT_BIG)
         subtitleleft = wx.StaticText(self, label=subtitleleft)
         subtitleright = wx.StaticText(self, label=subtitleright)
         subtitleleft.SetFont(FONT_BIG)
@@ -829,15 +838,34 @@ class BreedingResultPanel(wx.Panel):
         leftsizer = wx.BoxSizer(wx.VERTICAL)
         rightsizer = wx.BoxSizer(wx.VERTICAL)
         leftsizer.Add(subtitleleft, 0, wx.ALL, 5)
-        leftsizer.Add(leftwidget, 2, wx.EXPAND | wx.ALL, 5)
+        leftsizer.Add(self.leftwidget, 2, wx.EXPAND | wx.ALL, 5)
         rightsizer.Add(subtitleright, 0, wx.ALL, 5)
-        rightsizer.Add(rightwidget, 2, wx.EXPAND | wx.ALL, 5)
+        rightsizer.Add(self.rightwidget, 2, wx.EXPAND | wx.ALL, 5)
         contentsizer.Add(leftsizer, 1, wx.EXPAND | wx.ALL, 10)
         contentsizer.Add(rightsizer, 1, wx.EXPAND | wx.ALL, 10)
-        breedingresultsizer.Add(contentsizer, 2, wx.EXPAND)
+        if self.breedingtype == "Conventional":
+            subtitlegoal = wx.StaticText(self, label=subtitlegoal)
+            subtitlegoal.SetFont(FONT_BIG)
+            goalsizer = wx.BoxSizer(wx.VERTICAL)
+            goalsizer.Add(subtitlegoal, 0, wx.ALL, 5)
+            goalsizer.Add(self.goalwidget, 2, wx.EXPAND | wx.ALL, 5)
+            contentsizer.Add(goalsizer, 1, wx.EXPAND | wx.ALL, 10)
+        breedingresultsizer.Add(contentsizer, 1, wx.EXPAND)
         breedingresultsizer.AddStretchSpacer()
         breedingresultsizer.Add(bottombuttonsizer, 0, wx.EXPAND)
+        self.PopulateWidgets()
         self.SetSizer(breedingresultsizer)
+
+    def PopulateWidgets(self):
+        if self.breedingtype == "Conventional":
+            self.leftwidget.Fill(self.breedingresult.possiblePhensAsGoals, False)
+            self.rightwidget.Fill(self.breedingresult.impossiblePhensAsGoals, False)
+
+    def GoBackToBreedings(self, e):
+        ...
+
+    def GoBackToBreedCalc(self, e):
+        wx.PostEvent(self.GetParent(), NavigationEvent(destination="BreedingCalc"))
 
 
 class AllBreedingResultsPanel(BrowseDogsPanel):

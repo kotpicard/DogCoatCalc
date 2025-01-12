@@ -19,13 +19,14 @@ class GoalCtrl(wx.ScrolledWindow):
         self.selected = []
         self.Layout()
 
-    def AddGoal(self, goallist):
+    def AddGoal(self, goallist, selectable):
         goal_sizer = wx.FlexGridSizer(1, 0, 0, 0)
-        selector = wx.CheckBox(self)
-        selector.Bind(wx.EVT_CHECKBOX, self.UpdateSelected)
-        selector.num = self.currentgoalid
-        self.currentgoalid += 1
-        goal_sizer.Add(selector, 0, wx.ALIGN_CENTER)
+        if selectable:
+            selector = wx.CheckBox(self)
+            selector.Bind(wx.EVT_CHECKBOX, self.UpdateSelected)
+            selector.num = self.currentgoalid
+            self.currentgoalid += 1
+            goal_sizer.Add(selector, 0, wx.ALIGN_CENTER)
         for goal in goallist[:-1]:
             button = RoundedButton(parent=self, label=goal[0], colors=GOALCOLORS[goal[1]])
             goal_sizer.Add(button, 1, wx.EXPAND)
@@ -42,11 +43,11 @@ class GoalCtrl(wx.ScrolledWindow):
         self.Layout()
         self.SetupScrolling()
 
-    def Fill(self, data):
+    def Fill(self, data, selectable=True):
         for elem in data:
             if elem not in self.goals:
                 self.goals.append(elem)
-                self.AddGoal(elem)
+                self.AddGoal(elem, selectable)
 
     def SetupScrolling(self):
         self.SetVirtualSize(self.sizer.GetMinSize())
