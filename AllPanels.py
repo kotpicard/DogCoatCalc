@@ -796,6 +796,7 @@ class BreedingResultPanel(wx.Panel):
         bottombuttonsizer.AddStretchSpacer(3)
         bottombuttonsizer.Add(buttonbackcalc, 1, wx.ALL, 15)
         bottombuttonsizer.Add(buttonbackbreedings, 1, wx.BOTTOM | wx.TOP | wx.RIGHT, 15)
+        self.Bind(EVT_OPEN_DOG_PAGE, self.PassToParent)
 
         if self.breedingtype == "Conventional":
             self.dam = self.breedingresult.parent1 if self.breedingresult.parent1.sex == "f" else self.breedingresult.parent2
@@ -805,8 +806,12 @@ class BreedingResultPanel(wx.Panel):
             subtitleright = TEXT_IMPOSSIBLECOATS
             titleright = wx.BoxSizer(wx.HORIZONTAL)
             damname = LinkButton(self, self.dam.name)
+            damname.num = self.dam.id
+            damname.Bind(wx.EVT_LEFT_DOWN, self.GoToDogPage)
             xlabel = wx.StaticText(self, label="x")
             sirename = LinkButton(self, self.sire.name)
+            sirename.num = self.sire.id
+            sirename.Bind(wx.EVT_LEFT_DOWN, self.GoToDogPage)
             titleright.Add(damname, 0, wx.BOTTOM, 5)
             titleright.Add(xlabel, 0, wx.TOP, 15)
             titleright.Add(sirename, 0, wx.BOTTOM, 5)
@@ -821,6 +826,8 @@ class BreedingResultPanel(wx.Panel):
             subtitleleft = TEXT_GOALS
             subtitleright = TEXT_BESTMATE
             titleright = LinkButton(self, self.breedingresult.mainparent.name)
+            titleright.Bind(wx.EVT_LEFT_DOWN, self.GoToDogPage)
+            titleright.num=self.breedingresult.mainparent.id
             self.leftwidget = GoalCtrl(self)
             self.rightwidget = BrowseDogsPanel(self, Color(Hex_BACKGROUNDBOX).rgb, 1)
 
@@ -856,6 +863,9 @@ class BreedingResultPanel(wx.Panel):
         self.PopulateWidgets()
         self.SetSizer(breedingresultsizer)
 
+    def PassToParent(self, e):
+        wx.PostEvent(self.GetParent(), e)
+
     def PopulateWidgets(self):
         if self.breedingtype == "Conventional":
             self.leftwidget.Fill(self.breedingresult.possiblePhensAsGoals, False)
@@ -873,6 +883,14 @@ class BreedingResultPanel(wx.Panel):
 
     def GoBackToBreedCalc(self, e):
         wx.PostEvent(self.GetParent(), NavigationEvent(destination="BreedingCalc"))
+
+    def GoToDogPage(self, e):
+        dialog = wx.MessageDialog(self, TEXT_GOTODOGPAGEWARNING, style=wx.OK | wx.CANCEL)
+        test = dialog.ShowModal()
+        evt = OpenDogPageEvent(num=e.GetEventObject().num, status="confirmed")
+        if test == wx.ID_OK:
+            wx.PostEvent(self.GetParent(), evt)
+            self.Destroy()
 
 
 class AllBreedingResultsPanel(BrowseDogsPanel):
