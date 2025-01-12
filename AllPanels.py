@@ -793,9 +793,9 @@ class BreedingResultPanel(wx.Panel):
         buttonbackcalc = RoundedButton(self, TEXT_BACK_TO_CALC, colors=BUTTONCOLORS)
         buttonbackcalc.Bind(wx.EVT_LEFT_DOWN, self.GoBackToBreedCalc)
         buttonbackbreedings = RoundedButton(self, TEXT_BACK_TO_MY_BREEDINGS, colors=BUTTONCOLORS)
-        bottombuttonsizer.AddStretchSpacer()
-        bottombuttonsizer.Add(buttonbackcalc, 0, wx.ALL, 15)
-        bottombuttonsizer.Add(buttonbackbreedings, 0, wx.BOTTOM | wx.TOP | wx.RIGHT, 15)
+        bottombuttonsizer.AddStretchSpacer(3)
+        bottombuttonsizer.Add(buttonbackcalc, 1, wx.ALL, 15)
+        bottombuttonsizer.Add(buttonbackbreedings, 1, wx.BOTTOM | wx.TOP | wx.RIGHT, 15)
 
         if self.breedingtype == "Conventional":
             self.dam = self.breedingresult.parent1 if self.breedingresult.parent1.sex == "f" else self.breedingresult.parent2
@@ -820,7 +820,7 @@ class BreedingResultPanel(wx.Panel):
             title = TEXT_PICKMATERESULTS
             subtitleleft = TEXT_GOALS
             subtitleright = TEXT_BESTMATE
-            titleright = LinkButton(self, TEXT_NAMEBARE)
+            titleright = LinkButton(self, self.breedingresult.mainparent.name)
             self.leftwidget = GoalCtrl(self)
             self.rightwidget = BrowseDogsPanel(self, Color(Hex_BACKGROUNDBOX).rgb, 1)
 
@@ -863,8 +863,13 @@ class BreedingResultPanel(wx.Panel):
             print(self.breedingresult.goalslist, "GOALSLIST")
             self.goalwidget.Fill(self.breedingresult.goalslist, False, self.breedingresult.goalscores)
 
+        else:
+            print(self.breedingresult.bestmate)
+            self.leftwidget.Fill(self.breedingresult.goalslist, False, self.breedingresult.bestmate[1])
+            self.rightwidget.AddElement(self.breedingresult.bestmate[2].ToDesc(), self.breedingresult.bestmate[2].id)
+
     def GoBackToBreedings(self, e):
-        ...
+        wx.PostEvent(self.GetParent(), NavigationEvent(destination="AllBreedingResults"))
 
     def GoBackToBreedCalc(self, e):
         wx.PostEvent(self.GetParent(), NavigationEvent(destination="BreedingCalc"))

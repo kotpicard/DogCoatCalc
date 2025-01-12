@@ -141,9 +141,9 @@ class DataLayer(wx.EvtHandler):
         datafile.write("\n")
         for breeding in self.breedings:
             datafile.write("#")
-            breedingdata = breeding.ToList()
-            for elem in breedingdata:
-                datafile.write(elem[0].upper() + ":" + elem[1] + "\n")
+            breedingdata = breeding.ToText()
+            # for elem in breedingdata:
+            datafile.write(breedingdata+"\n")
 
         datafile.write("##GOALS")
         datafile.write("\n")

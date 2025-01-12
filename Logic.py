@@ -776,7 +776,6 @@ class Goal:
         text = "|".join([x[0].upper() + ":" + x[1] for x in goaldata])
         return text
 
-
     def ToList(self):
         return [(x.desc, x.type) for x in self.elements]
 
@@ -897,9 +896,12 @@ class Dog:
             child.CreateChildData()
 
     def Breed(self, partner, breedingtype, goals=None):
-        if self.sex == partner.sex:
-            return "Error: can't breed same sex dogs"
-        else:
+        if breedingtype=="Conventional":
+            if self.sex == partner.sex:
+                return "Error: can't breed same sex dogs"
+            else:
+                return BreedingResult(self, partner, breedingtype, goals)
+        elif breedingtype=="PickMate":
             return BreedingResult(self, partner, breedingtype, goals)
 
 
@@ -908,31 +910,52 @@ class BreedingResult:
         self.type = type
         self.parent1 = parent1
         self.parent2 = parent2
-        self.Preparations()
-        self.possible_loci = []
-        self.CalculatePossibleLoci()
-        self.possibleGenotype = PossibleGenotype(self.possible_loci)
         self.goals = goals
-        print("GOALS!!!!!!!!!!!!", self.goals, goals)
+        if self.goals:
+            self.goalslist = [x.ToList() for x in self.goals]
+        else:
+            self.goalslist = []
+            self.goalscores = None
         if self.type == "Conventional":
+            self.Preparations()
+            self.possible_loci = []
+            self.CalculatePossibleLoci()
+            self.possibleGenotype = PossibleGenotype(self.possible_loci)
             self.possiblePhens, self.impossiblePhens = self.GetPossiblePhenotypes()
             self.possiblePhensAsGoals = [Goal([x]).ToList() for x in self.possiblePhens]
             print(self.possiblePhensAsGoals)
             self.impossiblePhensAsGoals = [Goal([x]).ToList() for x in self.impossiblePhens]
-        if self.goals:
-            self.goalslist = [x.ToList() for x in self.goals]
             self.goalscores = self.GetGoalScores()
-        else:
-            self.goalslist = []
-            self.goalscores = None
-
+        if self.type=="PickMate":
+            self.mainparent = None
+            self.bestmate = self.GetBestPartner()
 
     def ToText(self):
-        return self.type+"|"+str(self.parent1.id)+"|"+str(self.parent2.id)+"|"+"&".join([goal.ToText() for goal in self.goals])
+        return self.type + "|" + str(self.parent1.id) + "|" + str(self.parent2.id) + "|" + "&".join(
+            [goal.ToText() for goal in self.goals])
 
     def Preparations(self):
         self.parent1.CreateChildData()
         self.parent2.CreateChildData()
+
+    def GetBestPartner(self):
+        self.mainparent = self.parent1 if type(self.parent1) == Dog else self.parent2
+        otherpartners = self.parent1 if type(self.parent1) == list else self.parent2
+        results = []
+        for partner in otherpartners:
+            tempbreeding = BreedingResult(self.mainparent, partner, "Conventional", self.goals)
+            results.append(tempbreeding.goalscores)
+        filter_fails = [all([0 not in goal for goal in partner]) for partner in results]
+        filtered_results = []
+        averages = [sum([sum(goal) / len(goal) for goal in partner]) / len(partner) for partner in results]
+        for i, test in enumerate(filter_fails):
+            if test:
+                filtered_results.append((averages[i], results[i], otherpartners[i]))
+        else:
+            for i in range(len(averages)):
+                filtered_results.append((averages[i], results[i], otherpartners[i]))
+        filtered_results.sort(key=lambda x: x[0], reverse=True)
+        return filtered_results[0]
 
     def GetPossiblePhenotypes(self):
         possible_phenotypes = [x for x in ALL_PHENOTYPES if x.TestConditions(self.possibleGenotype)[0]]

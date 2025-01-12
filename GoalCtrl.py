@@ -58,7 +58,7 @@ class GoalCtrl(wx.ScrolledWindow):
             value = customcolors[-1]
             # value is 1-3
             if value == 0:
-                colors = (Color(Hex_IMPOSSIBLE.rgb), Color(Hex_IMPOSSIBLE.rgb))
+                colors = (Color(Hex_IMPOSSIBLE).rgb, Color(Hex_IMPOSSIBLE).rgb)
             else:
                 low = floor(value)
                 high = ceil(value)

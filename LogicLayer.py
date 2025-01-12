@@ -18,15 +18,16 @@ class LogicLayer(wx.EvtHandler):
 
     def DoBreedCalc(self, evt):
         breedingtype, parents, goals = evt.data
-        print(breedingtype, [x.name for x in parents], breedingtype, goals)
+        # print(breedingtype, [x.name for x in parents], breedingtype, goals)
         if breedingtype == "Conventional":
             breedingresult = parents[0].Breed(parents[1], breedingtype, goals)
-            breedingresult.goals = goals
-            print(breedingresult.GetGoalScores())
+            # print(breedingresult.GetGoalScores())
             wx.PostEvent(self.parent, AddBreedingResult(breeding=breedingresult))
-            print(breedingresult.ToText())
+            # print(breedingresult.ToText())
         if breedingtype == "PickMate":
-            print(parents)
+            breedingresult = parents[0].Breed(parents[1], breedingtype, goals)
+            # print(breedingresult.bestmate)
+            wx.PostEvent(self.parent, AddBreedingResult(breeding=breedingresult))
 
     def ProcessAddGoal(self, evt):
         descs = evt.data
