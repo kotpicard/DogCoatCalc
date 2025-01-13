@@ -22,12 +22,11 @@ class LogicLayer(wx.EvtHandler):
         if breedingtype == "Conventional":
             breedingresult = parents[0].Breed(parents[1], breedingtype, goals)
             # print(breedingresult.GetGoalScores())
-            wx.PostEvent(self.parent, AddBreedingResult(breeding=breedingresult))
             # print(breedingresult.ToText())
-        if breedingtype == "PickMate":
+        else:
             breedingresult = parents[0].Breed(parents[1], breedingtype, goals)
             # print(breedingresult.bestmate)
-            wx.PostEvent(self.parent, AddBreedingResult(breeding=breedingresult))
+        wx.PostEvent(self.parent, AddBreedingResult(breeding=breedingresult, origin=evt.origin))
 
     def ProcessAddGoal(self, evt):
         descs = evt.data
@@ -125,7 +124,7 @@ class LogicLayer(wx.EvtHandler):
         dog = Dog(genotype, coat, dogid, name, age, mother, father, sex)
         dog.children = None if children == ["None"] else children
         dog.relatives = None if relatives == ["None"] else relatives
-        evt = PassDogToDataLayerEvent(dog=dog)
+        evt = PassDogToDataLayerEvent(dog=dog, maxid=evt.maxid)
         wx.PostEvent(self.parent, evt)
 
     def CreateDog(self, e):

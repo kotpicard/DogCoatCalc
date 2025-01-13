@@ -781,7 +781,7 @@ class BreedingPanel(wx.Panel):
         # if pickmate, needs parent and at least one selected goal
         if self.CheckIfAllDataPresent():
             data = self.PrepareData()
-            wx.PostEvent(self.GetParent(), BeginBreedingCalculation(data=data))
+            wx.PostEvent(self.GetParent(), BeginBreedingCalculation(data=data, origin="add"))
         else:
             dialog = wx.MessageDialog(self, message=TEXT_MISSING_DATA + TEXT_MISSING_DATA_BREEDING,
                                       caption=TEXT_MISSING_DATA_TITLE, style=wx.OK | wx.ICON_WARNING)

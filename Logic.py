@@ -768,13 +768,16 @@ class Goal:
     def __init__(self, elements):
         self.elements = elements
 
-    def FromString(self, text):
-        ...
+
 
     def ToText(self):
         goaldata = self.ToList()
-        text = "|".join([x[0].upper() + ":" + x[1] for x in goaldata])
+        text = "*".join([x[0] for x in goaldata])
         return text
+
+    def __eq__(self, other):
+        if type(other) == Goal:
+            return other.ToText()==self.ToText()
 
     def ToList(self):
         return [(x.desc, x.type) for x in self.elements]
@@ -896,12 +899,12 @@ class Dog:
             child.CreateChildData()
 
     def Breed(self, partner, breedingtype, goals=None):
-        if breedingtype=="Conventional":
+        if breedingtype == "Conventional":
             if self.sex == partner.sex:
                 return "Error: can't breed same sex dogs"
             else:
                 return BreedingResult(self, partner, breedingtype, goals)
-        elif breedingtype=="PickMate":
+        elif breedingtype == "PickMate":
             return BreedingResult(self, partner, breedingtype, goals)
 
 
@@ -911,10 +914,12 @@ class BreedingResult:
         self.parent1 = parent1
         self.parent2 = parent2
         self.goals = goals
+        print("I RECEIVED THESE GOALS: ", goals)
         if self.goals:
             self.goalslist = [x.ToList() for x in self.goals]
         else:
             self.goalslist = []
+            self.goals = []
             self.goalscores = None
         if self.type == "Conventional":
             self.Preparations()
@@ -926,7 +931,7 @@ class BreedingResult:
             print(self.possiblePhensAsGoals)
             self.impossiblePhensAsGoals = [Goal([x]).ToList() for x in self.impossiblePhens]
             self.goalscores = self.GetGoalScores()
-        if self.type=="PickMate":
+        if self.type == "PickMate":
             self.mainparent = None
             self.bestmate = self.GetBestPartner()
 
