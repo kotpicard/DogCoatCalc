@@ -106,7 +106,7 @@ class AddDogPanel(wx.Panel):
         age = children[1].GetValue()
         other = [x.GetLabel() for x in children[2:] if x.GetValue()]
         sex = other.pop(0)
-        evt = PassDogDataEvent(name=name, age=age, sex=sex, coat=other, type="add")
+        evt = PassDogDataEvent(name=name, age=age, sex=sex, coat=other, type="add", maxid=None)
         wx.PostEvent(self.GetParent(), evt)
 
     def Cancel(self, e):

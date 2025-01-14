@@ -15,6 +15,26 @@ class LogicLayer(wx.EvtHandler):
         self.Bind(EVT_OPEN_EDIT_LOCUS, self.GetOptionsForEditLocus)
         self.Bind(EVT_ADD_GOAL, self.ProcessAddGoal)
         self.Bind(EVT_DO_BREEDCALC, self.DoBreedCalc)
+        self.Bind(EVT_ADD_RELATIVE_LOGIC, self.ProcessAddRelative)
+
+    def ProcessAddRelative(self, evt):
+        print(evt.relative.name, "is", evt.target.name, evt.type)
+        if evt.type == "Parent":
+            if evt.relative.sex == "f":
+                evt.target.dam = evt.relative
+                print(evt.relative.children)
+                print(evt.target.dam.name, "is mother")
+                print(evt.target.genotype)
+                evt.target.ImposeParentAndChildConditions()
+                print(evt.target.genotype)
+            else:
+                evt.target.sire = evt.relative
+                evt.relative.children.append(evt.target)
+                print(evt.target.sire.name, "is father")
+                evt.target.ImposeParentAndChildConditions()
+
+        else:
+            evt.target.relatives.append(evt.relative.id)
 
     def DoBreedCalc(self, evt):
         breedingtype, parents, goals = evt.data
@@ -116,14 +136,15 @@ class LogicLayer(wx.EvtHandler):
         age = int(data[2])
         sex = data[3]
         coat = data[4].split("|")
-        coat = [PHEN_DICT[x] for x in coat if x != "I don't know"]
+        print(coat)
+        coat = [PHEN_DICT[x] for x in coat if x != "I don't know" and x]
         mother = None if data[6] == "None" else int(data[6])
         father = None if data[7] == "None" else int(data[7])
         children = data[8].split("|")
         relatives = data[9].split("|")
         dog = Dog(genotype, coat, dogid, name, age, mother, father, sex)
-        dog.children = None if children == ["None"] else children
-        dog.relatives = None if relatives == ["None"] else relatives
+        dog.children = [] if children == ["None"] else children
+        dog.relatives = [] if relatives == ["None"] else relatives
         evt = PassDogToDataLayerEvent(dog=dog, maxid=evt.maxid)
         wx.PostEvent(self.parent, evt)
 
@@ -137,7 +158,7 @@ class LogicLayer(wx.EvtHandler):
         for p in coat_phens:
             p.ImposeConditions(dog.genotype)
         if dog.genotype.status:
-            evt = PassDogToDataLayerEvent(dog=dog)
+            evt = PassDogToDataLayerEvent(dog=dog, maxid=e.maxid)
             wx.PostEvent(self.parent, evt)
             wx.PostEvent(self.parent, NavigationEvent(destination="MyDogs"))
         else:

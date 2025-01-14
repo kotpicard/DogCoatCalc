@@ -24,7 +24,7 @@ class MainWindow(wx.Frame):
             "Goals": self.CreateGoalsPage
         }
         self.Bind(EVT_ADD_DOG, self.AddDogHandler)
-        self.Bind(EVT_PASS_DOG_DATA, self.PassDogData)
+        self.Bind(EVT_PASS_DOG_DATA, self.PassToTopLayer)
         self.Bind(EVT_NAV_DATA_PASS, self.NavigationDataHandler)
         self.Bind(EVT_OPEN_DOG_PAGE, self.GoToDogPage)
         self.Bind(EVT_PASS_DATA_DOG_PAGE, self.CreateDogPage)

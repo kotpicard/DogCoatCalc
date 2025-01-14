@@ -114,7 +114,7 @@ class Locus:
 
     def CreateFromString(self, string):
         allele1, allele2 = string.split("/")
-        allele2 = allele2[:-1]
+        allele2 = allele2.strip()
         self.alleles = []
         if "except" in allele1:
             self.alleles.append(NotAllele(allele1.split(" ")[-1].split(",")))
@@ -379,12 +379,15 @@ class MultipleCondition:
         self.argument = None
         self.type = connectiontype
 
-        self.locus1 = cond1.locus
-        self.locus2 = cond2.locus
         self.cond1 = cond1
+        print(type(self.cond1))
+        if type(cond1) != MultipleCondition:
+            self.locus1 = cond1.locus
         if type(cond1) == Condition:
             self.cond1 = ReverseCondition(cond1)
         self.cond2 = cond2
+        if type(cond2) != MultipleCondition:
+            self.locus2 = cond2.locus
         if type(cond2) == Condition:
             self.cond2 = ReverseCondition(cond2)
         self.resolved = False
@@ -412,8 +415,9 @@ class MultipleCondition:
     def TestCond1(self, target):
         if self.type == "AND":
             print("testing", self.cond1.name)
-            target = target[self.locus1]
+            print(type(self.cond1))
             if type(self.cond1) != MultipleCondition:
+                target = target[self.locus1]
                 print(target.CanReplace(self.cond1.cond(target)))
                 return target.CanReplace(self.cond1.cond(target))
             elif type(self.cond1) == MultipleCondition:
@@ -421,9 +425,9 @@ class MultipleCondition:
 
     def TestCond2(self, target):
         if self.type == "AND":
-            target = target[self.locus2]
             print("testing", self.cond2.name)
             if type(self.cond2) != MultipleCondition:
+                target = target[self.locus2]
                 print(target.CanReplace(self.cond2.cond(target)))
                 return target.CanReplace(self.cond2.cond(target))
             elif type(self.cond2) == MultipleCondition:
@@ -768,8 +772,6 @@ class Goal:
     def __init__(self, elements):
         self.elements = elements
 
-
-
     def ToText(self):
         goaldata = self.ToList()
         text = "*".join([x[0] for x in goaldata])
@@ -777,7 +779,7 @@ class Goal:
 
     def __eq__(self, other):
         if type(other) == Goal:
-            return other.ToText()==self.ToText()
+            return other.ToText() == self.ToText()
 
     def ToList(self):
         return [(x.desc, x.type) for x in self.elements]
@@ -823,6 +825,7 @@ class Goal:
 
 class Dog:
     def __init__(self, genotype, coat=None, dogid=None, name=None, age=None, dam=None, sire=None, sex=None):
+        print("creating dog")
         self.genotype = genotype
         self.coat = coat
         self.id = dogid
@@ -838,7 +841,6 @@ class Dog:
         self.coatdesc = "| ".join([str(x.desc) for x in self.coat])
 
     def ToList(self):
-        print(self.children)
         return [("id", int(self.id)),
                 ("name", self.name), ("age", str(self.age)), ("sex", self.sex),
                 ("coat", "|".join([str(x.desc) for x in self.coat])),
@@ -855,10 +857,11 @@ class Dog:
     def CreateParents(self):
         if type(self.dam) != Dog:
             self.dam = Dog(Genotype(), name="Mother of {}".format(self.name), sex="f", coat=[])
-            self.dam.children.append(self)
+        self.dam.children.append(self)
+        print(type(self.dam.children))
         if type(self.sire) != Dog:
             self.sire = Dog(Genotype(), name="Father of {}".format(self.name), sex="m", coat=[])
-            self.sire.children.append(self)
+        self.sire.children.append(self)
 
     def CreateAllParentConditions(self):
         self.CreateParents()
@@ -866,17 +869,24 @@ class Dog:
             own_locus = self.genotype[locus_number]
             own_locus.CreateParentConditions()
 
+    def ImposeParentAndChildConditions(self):
+        self.CreateAllParentConditions()
+        self.ImposeAllParentConditions()
+        self.dam.ImposeChildConditions()
+        self.sire.ImposeChildConditions()
+
     def ImposeAllParentConditions(self):
+        print("imposing conditions on parents {} and {}".format(self.dam.name, self.sire.name))
         for locus_number in range(len(self.genotype)):
             own_locus = self.genotype[locus_number]
             for condition in own_locus.dam_conditions:
-                print("DAM", condition.name, condition.argument)
+                # print("DAM", condition.name, condition.argument)
                 condition.Execute(self.dam.genotype)
             for condition in own_locus.sire_conditions:
-                print("SIRE", condition.name, condition.argument)
+                # print("SIRE", condition.name, condition.argument)
                 condition.Execute(self.sire.genotype)
             for condition in own_locus.general_conditions:
-                print("GEN", condition.name, condition.argument)
+                # print("GEN", condition.name, condition.argument)
                 condition.Execute(self.dam.genotype, self.sire.genotype)
 
     def CreateChildData(self):
@@ -889,10 +899,12 @@ class Dog:
 
     def ImposeChildConditions(self):
         self.CreateChildData()
+        print("impose child conditions")
         for child in self.children:
             for condition in self.childConditions:
                 if type(condition) == Condition:
                     reverse = ReverseCondition(condition)
+                    print(reverse)
                     reverse.Execute(child.genotype)
                 if type(condition) == MultipleCondition:
                     condition.Execute(child.genotype)

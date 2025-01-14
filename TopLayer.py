@@ -65,7 +65,10 @@ class DogApp(wx.App):
                      RequestDogs(filter=lambda x: x.id in [dogid, relativeid], data=relativetype, destination="top"))
 
     def ProcessAddRelative(self, evt):
-        print(evt.data, evt.dogs)
+        #first dog is target second is relative
+        e = AddRelativeLogicEvent(type=evt.data, target=evt.dogs[0], relative=evt.dogs[1])
+        self.PassToLogicLayer(e)
+        print(evt.data, [x.name for x in evt.dogs])
 
     def ProcessPassDogs(self, evt):
         if evt.destination != "top":
