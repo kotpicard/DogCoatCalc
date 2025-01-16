@@ -921,7 +921,7 @@ class AllBreedingResultsPanel(wx.Panel):
         buttonsizer.AddStretchSpacer(3)
         buttonsizer.Add(buttonback, 1, wx.EXPAND | wx.ALL, 10)
         sizer.Add(self.viewpanel, 3, wx.EXPAND | wx.ALL, 10)
-        sizer.Add(buttonsizer, 1, wx.EXPAND)
+        sizer.Add(buttonsizer, 0, wx.EXPAND|wx.ALL, 10)
         if data:
             for i, elem in enumerate(data):
                 self.viewpanel.AddBreedingElement(elem, i)

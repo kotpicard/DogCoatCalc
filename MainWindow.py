@@ -4,8 +4,6 @@ from AllPanels import *
 class MainWindow(wx.Frame):
     def __init__(self, parent, title, app):
         wx.Frame.__init__(self, parent, title=title, size=(1000, 800))
-        self.CreateStatusBar()
-        self.CreateMenu()
         self.app = app
         self.MainSizer = wx.BoxSizer()
         # self.CreateDefaultPanel()
@@ -123,15 +121,6 @@ class MainWindow(wx.Frame):
 
     def PassToTopLayer(self, e):
         wx.PostEvent(self.app, e)
-
-    def CreateMenu(self):
-        filemenu = wx.Menu()
-        filemenu.Append(wx.ID_ABOUT, TEXT_ABOUT, INFO_ABOUT)
-        filemenu.AppendSeparator()
-        filemenu.Append(wx.ID_EXIT, TEXT_EXIT, INFO_EXIT)
-        menuBar = wx.MenuBar()
-        menuBar.Append(filemenu, "File")
-        self.SetMenuBar(menuBar)
 
     def NavigationHandler(self, e):
         print(e, e.destination)

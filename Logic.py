@@ -785,7 +785,7 @@ ALLOW_AGOUTI.AddCondition(6, "IsHomozygousFor", "k")
 OTHER_PHENOTYPES = [SABLE, AGOUTI, TANPOINT, BRINDLE, SOLID_EUMELANIN, SOLID_PHEOMELANIN, MASK, MERLE, DOUBLE_MERLE,
                     NO_WHITE, MINOR_WHITE, PIEBALD, IRISH_WHITE, MINOR_TICKING, TICKING, ROANING, ROANING_AND_TICKING,
                     GREYING,
-                    NO_MERLE, NO_TICKING, NO_GREYING, NORMAL_EXTENSION, ALLOW_AGOUTI]
+                    NO_MERLE, NO_TICKING, NO_GREYING, ALLOW_AGOUTI, NORMAL_EXTENSION]
 
 ALL_PHENOTYPES = COLOR_PHENOTYPES + OTHER_PHENOTYPES
 
@@ -1039,8 +1039,8 @@ class BreedingResult:
         return filtered_results[0]
 
     def GetPossiblePhenotypes(self):
-        possible_phenotypes = [x for x in ALL_PHENOTYPES if x.TestConditions(self.possibleGenotype)[0]]
-        impossible_phenotypes = [x for x in ALL_PHENOTYPES if x not in possible_phenotypes]
+        possible_phenotypes = [x for x in ALL_PHENOTYPES[:-1] if x.TestConditions(self.possibleGenotype)[0]]
+        impossible_phenotypes = [x for x in ALL_PHENOTYPES[:-1] if x not in possible_phenotypes]
         return possible_phenotypes, impossible_phenotypes
 
     def CalculatePossibleLoci(self):
