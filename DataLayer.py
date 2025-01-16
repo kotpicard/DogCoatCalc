@@ -1,6 +1,6 @@
 from CustomEvents import *
 import wx
-
+from text_en import *
 
 class DataLayer(wx.EvtHandler):
     def __init__(self, parent, path="data.txt"):
@@ -169,14 +169,20 @@ class DataLayer(wx.EvtHandler):
 
     def PassDogByID(self, evt):
         if int(evt.dogid) in range(len(self.dogs)):
+            dogid = int(evt.dogid)
             if evt.type == "byid":
                 # print("BYID")
                 filtered_breedings = [(i, self.breedings[i]) for i in range(len(self.breedings)) if
-                                      self.breedings[i].parent1.id == int(evt.dogid) or self.breedings[
-                                          i].parent2.id == int(
-                                          evt.dogid)]
+                                      self.breedings[i].parent1.id == dogid or self.breedings[
+                                          i].parent2.id == dogid]
+
+                mother = False if self.dogs[dogid].dam is None or "Mother of" in self.dogs[dogid].dam.name else (TEXT_MOTHER+": "+self.dogs[dogid].dam.name, self.dogs[dogid].dam.id)
+                father = False if self.dogs[dogid].sire is None or "Father of" in self.dogs[dogid].sire.name else (TEXT_FATHER+": "+self.dogs[dogid].sire.name, self.dogs[dogid].sire.id)
+                children =[(TEXT_CHILD+": "+x.name, x.id) for x in self.dogs[dogid].children]
+                relatives = [mother, father]+children+[(TEXT_OTHER_RELATIVES+": "+x.name, x.id) for x in self.dogs[dogid].relatives]
+
                 wx.PostEvent(self.parent,
-                             PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type=evt.type, data=filtered_breedings))
+                             PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type=evt.type, data=filtered_breedings, relativedata=relatives))
             else:
                 wx.PostEvent(self.parent, PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type=evt.type))
 

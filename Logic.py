@@ -11,6 +11,7 @@ from text_en import *
 # 7 - Merle M, m
 # 8 - Spotting S, sp, si
 # 9 - Ticking T, Tr, t
+#TODO: add recessive black as separate phen
 LOCUS0 = ["Ay", "aw", "at"]
 LOCUS1 = ["B", "b"]
 LOCUS2 = ["D", "d"]
@@ -139,7 +140,7 @@ class Locus:
             return (self.alleles[0].value == other[0].value and self.alleles[1].value == other[1].value) or (
                     self.alleles[0].value == other[1].value and self.alleles[1].value == other[0].value)
 
-    def CanBeReplacedBy(self, original, replacement):
+    def CanBeReplacedBy(self, original, replacement, force_replace):
         # replacement is ALLELE
         print("TESTING REPLACEMENT", end=" ")
         print(original, replacement)
@@ -154,31 +155,31 @@ class Locus:
             return False
         elif type(original) == NotAllele and type(replacement) == NotAllele and all(
                 [x in original.notValue for x in replacement.notValue]):
-            return "test other"
+            return "test other" if force_replace else True
         else:
             print("CAN REPLACE")
             return True
 
-    def CanReplace(self, replacement):
+    def CanReplace(self, replacement, force_replacement=False):
         # replacement is locus
         result = []
         if type(replacement) == Locus:
             replacement = replacement.alleles
         print("replacing", self.alleles, replacement)
-        if self.CanBeReplacedBy(self.alleles[0], replacement[0]) and self.CanBeReplacedBy(self.alleles[1],
-                                                                                          replacement[1]):
-            if self.CanBeReplacedBy(self.alleles[0], replacement[0]) == "test other" or self.CanBeReplacedBy(
+        if self.CanBeReplacedBy(self.alleles[0], replacement[0], force_replacement) and self.CanBeReplacedBy(self.alleles[1],
+                                                                                          replacement[1], force_replacement):
+            if self.CanBeReplacedBy(self.alleles[0], replacement[0],force_replacement) == "test other" or self.CanBeReplacedBy(
                     self.alleles[1],
-                    replacement[1]) == "test other":
+                    replacement[1], force_replacement) == "test other":
                 result.append("test other 1")
             else:
                 result.append(1)
 
-        if self.CanBeReplacedBy(self.alleles[0], replacement[1]) and self.CanBeReplacedBy(self.alleles[1],
-                                                                                          replacement[0]):
-            if self.CanBeReplacedBy(self.alleles[0], replacement[1]) == "test other" or self.CanBeReplacedBy(
+        if self.CanBeReplacedBy(self.alleles[0], replacement[1], force_replacement) and self.CanBeReplacedBy(self.alleles[1],
+                                                                                          replacement[0], force_replacement):
+            if self.CanBeReplacedBy(self.alleles[0], replacement[1], force_replacement) == "test other" or self.CanBeReplacedBy(
                     self.alleles[0],
-                    replacement[1]) == "test other":
+                    replacement[1], force_replacement) == "test other":
                 result.append("test other -1")
             result.append(-1)
         elif all([type(x) == AnyAllele for x in replacement]):
@@ -208,12 +209,13 @@ class Locus:
         else:
             return result[0]
 
-    def replace(self, replacement):
+    def replace(self, replacement, force_replacement=False):
         # replacement is locus
         # print("EQUALITY TEST", self == replacement)
         if type(replacement) == Locus:
             replacement = replacement.alleles
-        order = self.CanReplace(replacement)
+        order = self.CanReplace(replacement, force_replacement)
+        print(force_replacement)
         if type(order) == int:
             self.alleles = self.alleles[::order]
             print(self.alleles)
@@ -368,7 +370,7 @@ class ReverseCondition(Condition):
 
     def Execute(self, target):
         print("EXECUTING", self)
-        print(target[self.locus].CanReplace(self.cond(target)))
+        print(target[self.locus].CanReplace(self.cond(target), False))
         print(target[self.locus], self.cond(target))
         return target[self.locus].replace(self.cond(target))
 
@@ -418,7 +420,7 @@ class MultipleCondition:
             print(type(self.cond1))
             if type(self.cond1) != MultipleCondition:
                 target = target[self.locus1]
-                print(target.CanReplace(self.cond1.cond(target)))
+                print(target.CanReplace(self.cond1.cond(target), False))
                 return target.CanReplace(self.cond1.cond(target))
             elif type(self.cond1) == MultipleCondition:
                 return self.cond1.CanResolve(target, target)

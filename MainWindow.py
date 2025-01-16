@@ -198,8 +198,9 @@ class MainWindow(wx.Frame):
     def CreateDogPage(self, evt):
         self.MainSizer.Clear(delete_windows=True)
         data = evt.dog.ToDesc()
-        breedingdata = evt.data
-        dogpanel = DogPanel(self, data, breedingdata)
+        breedingdata = evt.data[0]
+        relativedata = evt.data[1]
+        dogpanel = DogPanel(self, data, breedingdata, relativedata)
         self.MainSizer.Add(dogpanel, 1, wx.EXPAND)
         self.MainSizer.Layout()
         self.Center()

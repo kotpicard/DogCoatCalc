@@ -114,8 +114,9 @@ class MyDogsPanel(wx.Panel):
 
 
 class DogPanel(wx.Panel):
-    def __init__(self, parent, values, breedingdata=None):
+    def __init__(self, parent, values, breedingdata=None, relativedata=None):
         super().__init__(parent)
+        print(relativedata)
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
         dogdatasizer = wx.BoxSizer(wx.VERTICAL)
         namelabel = wx.StaticText(self, label=values[0])
@@ -154,7 +155,10 @@ class DogPanel(wx.Panel):
         linkeddatasizer = wx.BoxSizer(wx.VERTICAL)
         relativeslabel = wx.StaticText(self, label=TEXT_RELATIVES)
         relativeslabel.SetFont(FONT_BIG)
-        relativeslinkbox = LinkBoxCtrl(self)
+        relativeslinkbox = BrowseDogsPanel(self,Color(Hex_BACKGROUNDBOX).rgb, 3)
+        for elem in relativedata:
+            if elem:
+                relativeslinkbox.AddElement([elem[0]], elem[1])
         addrelativebutton = RoundedButton(self, size=(200, 50), corner_radius=10, label=TEXT_ADDRELATIVE,
                                           colors=BUTTONCOLORS)
         addrelativebutton.Bind(wx.EVT_LEFT_DOWN, self.AddRelative)

@@ -32,9 +32,19 @@ class LogicLayer(wx.EvtHandler):
                 evt.relative.children.append(evt.target)
                 print(evt.target.sire.name, "is father")
                 evt.target.ImposeParentAndChildConditions()
-
         else:
             evt.target.relatives.append(evt.relative.id)
+            evt.relative.relatives.append(evt.target.id)
+            evt.relative.ImposeParentAndChildConditions()
+            if evt.type == "Full sibling" or evt.type == TEXT_HALFSIBLING_MOTHER:
+                if type(evt.target.dam) != Dog or "Mother of " in evt.target.dam.name:
+                    evt.target.dam = evt.relative.dam
+            if evt.type == "Full sibling" or evt.type == TEXT_HALFSIBLING_FATHER:
+                if type(evt.target.sire) != Dog or "Father of " in evt.target.dam.name:
+                    evt.target.sire = evt.relative.sire
+
+
+
 
     def DoBreedCalc(self, evt):
         breedingtype, parents, goals = evt.data
@@ -88,10 +98,10 @@ class LogicLayer(wx.EvtHandler):
             print(type(replacementallele))
         replacementlocus = Locus(number, allele1=replacementallele, allele2=AnyAllele())
         print("REPLACEMENT", replacementlocus)
-        canreplace = genotype[number].CanReplace(replacementlocus)
+        canreplace = genotype[number].CanReplace(replacementlocus, force_replacement=True)
         print(canreplace, "CANREPLACE")
         if canreplace:
-            genotype[number].replace(replacementlocus)
+            genotype[number].replace(replacementlocus, force_replacement=True)
             wx.PostEvent(self.parent, DogGenotypeChangedEvent(dogid=dogid))
         else:
             wx.PostEvent(self.parent, DogIncorrectGenotypeEvent(dogid=dogid))

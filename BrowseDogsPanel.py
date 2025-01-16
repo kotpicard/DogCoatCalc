@@ -63,15 +63,14 @@ class BrowseDogsPanel(wx.ScrolledWindow):
         button = LinkButton(self, label=values[0])
         button.num = i
         button.Bind(wx.EVT_LEFT_DOWN, self.OpenDogPage)
-        sexlabel = wx.StaticText(self, label=TEXT_SEX + values[1])
-        agelabel = wx.StaticText(self, label=TEXT_AGE + values[2])
-        coatlabel = wx.StaticText(self, label=TEXT_COAT + values[3])
-
         elementsizer.Add(button, 0, wx.ALIGN_CENTER)
-        elementsizer.Add(sexlabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
-        elementsizer.Add(agelabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
-        # elementsizer.Add(breedlabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
-        elementsizer.Add(coatlabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
+        if len(values) > 1:
+            sexlabel = wx.StaticText(self, label=TEXT_SEX + values[1])
+            agelabel = wx.StaticText(self, label=TEXT_AGE + values[2])
+            coatlabel = wx.StaticText(self, label=TEXT_COAT + values[3])
+            elementsizer.Add(sexlabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
+            elementsizer.Add(agelabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
+            elementsizer.Add(coatlabel, 0, wx.ALIGN_CENTER | wx.LEFT, 15)
         self.sizer.Add(elementsizer)
         self.sizer.Layout()
 
@@ -79,7 +78,7 @@ class BrowseDogsPanel(wx.ScrolledWindow):
         elementsizer = wx.BoxSizer(wx.VERTICAL)
         topsizer = wx.BoxSizer(wx.HORIZONTAL)
         radio = wx.RadioButton(self)
-        radio.num=i
+        radio.num = i
         radio.Bind(wx.EVT_RADIOBUTTON, self.selectedstatusupdate)
         topsizer.Add(radio, wx.ALL, 5)
         button = LinkButton(self, label=values[0])
