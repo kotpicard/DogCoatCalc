@@ -60,6 +60,7 @@ class AddDogPanel(wx.Panel):
         tickingsizer.Add(wx.RadioButton(self, label=TEXT_MINOR_TICKING))
         tickingsizer.Add(wx.RadioButton(self, label=TEXT_TICKING))
         tickingsizer.Add(wx.RadioButton(self, label=TEXT_ROANING))
+        tickingsizer.Add(wx.RadioButton(self, label=TEXT_ROANING_AND_TICKING))
         tickingsizer.Add(wx.RadioButton(self, label=TEXT_IDONTKNOW))
 
         # Create individual checkboxes for the patterns

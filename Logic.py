@@ -11,7 +11,6 @@ from text_en import *
 # 7 - Merle M, m
 # 8 - Spotting S, sp, si
 # 9 - Ticking T, Tr, t
-# TODO: add recessive black as separate phen
 LOCUS0 = ["Ay", "aw", "at"]
 LOCUS1 = ["B", "b"]
 LOCUS2 = ["D", "d"]
@@ -148,7 +147,7 @@ class Locus:
             return True
         elif type(original) == Allele:
             if type(replacement) == Allele and original == replacement:
-                return True
+                return "test other" if force_replace else True
             else:
                 return False
         elif type(replacement) == Allele and type(original) == NotAllele and replacement.value in original.notValue:
@@ -171,8 +170,8 @@ class Locus:
                 replacement[1], force_replacement):
             if self.CanBeReplacedBy(self.alleles[0], replacement[0],
                                     force_replacement) == "test other" or self.CanBeReplacedBy(
-                    self.alleles[1],
-                    replacement[1], force_replacement) == "test other":
+                self.alleles[1],
+                replacement[1], force_replacement) == "test other":
                 result.append("test other 1")
             else:
                 result.append(1)
@@ -182,8 +181,8 @@ class Locus:
                 replacement[0], force_replacement):
             if self.CanBeReplacedBy(self.alleles[0], replacement[1],
                                     force_replacement) == "test other" or self.CanBeReplacedBy(
-                    self.alleles[0],
-                    replacement[1], force_replacement) == "test other":
+                self.alleles[0],
+                replacement[1], force_replacement) == "test other":
                 result.append("test other -1")
             result.append(-1)
         elif all([type(x) == AnyAllele for x in replacement]):
@@ -455,6 +454,7 @@ class MultipleCondition:
         if self.type == "AND":
             direction1 = self.TestCond1(target1) and self.TestCond2(target2)
             direction2 = self.TestCond1(target2) and self.TestCond2(target1)
+            print("direction1, direction2", direction1, direction2)
             if direction1 and direction2:
                 self.resolvable = 0
                 return False
@@ -492,7 +492,8 @@ class MultipleCondition:
             self.ResolveCond2(target1)
             self.resolved = True
         else:
-            return "Error: cannot resolve multiple condition on these targets"
+            print("Error: cannot resolve multiple condition on these targets")
+            return [0,0]
 
 
 class Genotype:
@@ -560,8 +561,13 @@ class Phenotype:
     def AddCondition(self, locus, cond, argument):
         self.conditions.append(Condition(locus, cond, argument))
 
+    def AddMultipleCondition(self, arguments):
+        cond1 = Condition(*arguments[0])
+        cond2 = Condition(*arguments[1])
+        self.conditions.append(MultipleCondition(cond1, cond2))
+
     def CreateReverseConditions(self):
-        self.reverseConditions = [ReverseCondition(x) for x in self.conditions]
+        self.reverseConditions = [ReverseCondition(x) if type(x)==Condition else x for x in self.conditions]
 
     def TestConditions(self, genotype):
         tests = [x.Execute(genotype) for x in self.conditions]
@@ -684,7 +690,11 @@ MINOR_TICKING = Phenotype("TICKING")
 NO_TICKING = Phenotype("TICKING")
 TICKING = Phenotype("TICKING")
 ROANING = Phenotype("TICKING")
+ROANING_AND_TICKING = Phenotype("TICKING")
 GREYING = Phenotype("GREYING")
+NO_GREYING = Phenotype("GREYING")
+ALLOW_AGOUTI = Phenotype("K_LOCUS")
+NORMAL_EXTENSION = Phenotype("E_LOCUS")
 
 ## DESCRIPTIONS
 SABLE.desc = TEXT_SABLE
@@ -705,6 +715,7 @@ NO_TICKING.desc = TEXT_NO_TICKING
 MINOR_TICKING.desc = TEXT_MINOR_TICKING
 TICKING.desc = TEXT_TICKING
 ROANING.desc = TEXT_ROANING
+ROANING_AND_TICKING.desc = TEXT_ROANING_AND_TICKING
 GREYING.desc = TEXT_GREYING
 
 ### CONDITIONS
@@ -751,9 +762,12 @@ IRISH_WHITE.AddCondition(8, "IsHomozygousFor", "si")
 MINOR_TICKING.AddCondition(9, "IsExactly", ["T", "t"])
 MINOR_TICKING.AddCondition(8, "IsNotHomozygousFor", "S")
 
-TICKING.AddCondition(9, "HasAtLeastOne", "T")
-TICKING.AddCondition(9, "DoesntHaveAllele", "t")
+TICKING.AddCondition(9, "IsHomozygousFor", "T")
 TICKING.AddCondition(8, "IsNotHomozygousFor", "S")
+
+ROANING_AND_TICKING.AddCondition(9, "IsExactly", ["T", "Tr"])
+ROANING_AND_TICKING.AddCondition(8, "IsNotHomozygousFor", "S")
+
 NO_TICKING.AddCondition(9, "IsHomozygousFor", "t")
 
 ROANING.AddCondition(8, "IsNotHomozygousFor", "S")
@@ -763,9 +777,15 @@ ROANING.AddCondition(9, "HasAtLeastOne", "Tr")
 GREYING.AddCondition(4, "HasAtLeastOne", "G")
 GREYING.AddCondition(3, "IsNotHomozygousFor", "e")
 
+NO_GREYING.AddCondition(4, "IsHomozygousFor", "g")
+NORMAL_EXTENSION.AddMultipleCondition([(3, "DoesntHaveAllele", "Em"),(3, "HasAtLeastOne", "E")])
+
+ALLOW_AGOUTI.AddCondition(6, "IsHomozygousFor", "k")
+
 OTHER_PHENOTYPES = [SABLE, AGOUTI, TANPOINT, BRINDLE, SOLID_EUMELANIN, SOLID_PHEOMELANIN, MASK, MERLE, DOUBLE_MERLE,
-                    NO_WHITE, MINOR_WHITE, PIEBALD, IRISH_WHITE, MINOR_TICKING, TICKING, ROANING, GREYING,
-                    NO_MERLE, NO_TICKING]
+                    NO_WHITE, MINOR_WHITE, PIEBALD, IRISH_WHITE, MINOR_TICKING, TICKING, ROANING, ROANING_AND_TICKING,
+                    GREYING,
+                    NO_MERLE, NO_TICKING, NO_GREYING, NORMAL_EXTENSION, ALLOW_AGOUTI]
 
 ALL_PHENOTYPES = COLOR_PHENOTYPES + OTHER_PHENOTYPES
 
@@ -831,7 +851,6 @@ class Goal:
 
 class Dog:
     def __init__(self, genotype, coat=None, dogid=None, name=None, age=None, dam=None, sire=None, sex=None):
-        print("creating dog")
         self.genotype = genotype
         self.coat = coat
         self.id = dogid
@@ -856,11 +875,31 @@ class Dog:
         print("CHIDLREN", parent.children)
         self.ImposeParentAndChildConditions()
 
+    def UpdateCoat(self):
+        possible_phenotypes = [x for x in ALL_PHENOTYPES if x.TestConditions(self.genotype)[0]]
+        print([x.desc+x.type for x in possible_phenotypes], "UPDATING")
+        append = False
+        for phen in possible_phenotypes:
+            if sum([x.type == phen.type for x in possible_phenotypes]) == 1:
+                if not phen in self.coat:
+                    print("APPENDING", phen.desc, phen.type)
+                    self.coat.append(phen)
+                # if phen.type == "GREYING":
+                #     if any([type(x) == Allele and x == Allele("G") for x in self.genotype[4].alleles]):
+                #         append = True  # fix for no non-greying
+                # if phen.type == "E_LOCUS":
+                #     if phen.desc == SOLID_EUMELANIN:
+                #         if all([type(x) == Allele and x == Allele("e") for x in self.genotype[3].alleles]):
+                #             append = True  # fix for no normal extension
+                # else:
+                #     append = True
+
+
     def HasMother(self):
-        return True if type(self.dam)==Dog and "Mother of" not in self.dam.name else False
+        return True if type(self.dam) == Dog and "Mother of" not in self.dam.name else False
 
     def HasFather(self):
-        return True if type(self.sire)==Dog and "Father of" not in self.sire.name else False
+        return True if type(self.sire) == Dog and "Father of" not in self.sire.name else False
 
     def ToList(self):
         return [("id", int(self.id)),

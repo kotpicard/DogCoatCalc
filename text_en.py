@@ -85,6 +85,7 @@ TEXT_NO_TICKING = "No ticking/roaning"
 TEXT_MINOR_TICKING = "Minor ticking"
 TEXT_TICKING = "Ticking"
 TEXT_ROANING = "Roaning"
+TEXT_ROANING_AND_TICKING = TEXT_ROANING+" AND "+TEXT_TICKING
 TEXT_GREYING = "Greying"
 TEXT_NO_GREYING = "No greying"
 TEXT_BLACK = "Black"

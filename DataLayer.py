@@ -169,7 +169,7 @@ class DataLayer(wx.EvtHandler):
             wx.PostEvent(self.parent, newevt)
         if evt.type == "passgenotype":
             genotype = self.dogs[evt.dogid].genotype
-            newevt = PassGenotypeDataEvent(genotype=genotype, type=evt.subtype, data=evt.data)
+            newevt = PassGenotypeDataEvent(genotype=genotype, type=evt.subtype, data=evt.data, dog=self.dogs[evt.dogid])
             # print("passing")
             wx.PostEvent(self.parent, newevt)
 

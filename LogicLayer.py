@@ -74,9 +74,9 @@ class LogicLayer(wx.EvtHandler):
 
     def ProcessGenotype(self, evt):
         if evt.type == "editlocus":
-            self.ProcessLocusEdit(genotype=evt.genotype, data=evt.data)
+            self.ProcessLocusEdit(genotype=evt.genotype, data=evt.data, dog=evt.dog)
 
-    def ProcessLocusEdit(self, genotype, data):
+    def ProcessLocusEdit(self, genotype, data, dog):
         # data is values, number, replacementtype, dogid
         values = data[0]
         number = data[1]
@@ -99,6 +99,7 @@ class LogicLayer(wx.EvtHandler):
         print(canreplace, "CANREPLACE")
         if canreplace:
             genotype[number].replace(replacementlocus, force_replacement=True)
+            dog.UpdateCoat()
             wx.PostEvent(self.parent, DogGenotypeChangedEvent(dogid=dogid))
         else:
             wx.PostEvent(self.parent, DogIncorrectGenotypeEvent(dogid=dogid))
