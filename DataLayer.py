@@ -2,6 +2,7 @@ from CustomEvents import *
 import wx
 from text_en import *
 
+
 class DataLayer(wx.EvtHandler):
     def __init__(self, parent, path="data.txt"):
         super().__init__()
@@ -28,7 +29,7 @@ class DataLayer(wx.EvtHandler):
         self.Bind(EVT_ADD_BREEDING_RES, self.AddBreedingResult)
         self.Bind(EVT_REQUEST_ALL_BREEDINGS, self.PassAllBreedings)
         self.Bind(EVT_OPEN_BREEDING_RESULT, self.PassBreedingByNumber)
-        self.Bind(EVT_LOAD_ALL_BREEDINGS, self.LoadBreedings)
+        self.Bind(EVT_LOAD_ALL_BREEDINGS, self.LoadAllRelatives)
 
     def FindGoalByDescs(self, goal):
         for i, g in enumerate(self.goals):
@@ -64,6 +65,23 @@ class DataLayer(wx.EvtHandler):
             else:
                 wx.PostEvent(self,
                              BeginBreedingCalculation(data=(breedingtype, (mainparent, None), goalids), origin="load"))
+
+    def LoadAllRelatives(self, e):
+        for dog in self.dogs:
+            if type(dog.dam) == int:
+                dog.dam = self.dogs[dog.dam]
+            if type(dog.sire) == int:
+                dog.sire = self.dogs[dog.sire]
+            print(dog.children)
+            dog.children = [self.dogs[int(x)] for x in dog.children]
+            print(dog.children, "CHILD")
+            dog.relatives = [self.dogs[int(x)] for x in dog.relatives]
+        for dog in self.dogs:
+            if dog.HasMother():
+                dog.SetParent(dog.dam)
+            if dog.HasFather():
+                dog.SetParent(dog.sire)
+        LoadAllBreedings()
 
     def PassBreedingByNumber(self, e):
         wx.PostEvent(self.parent, ViewBreedingResult(breedingresult=self.breedings[e.num]))
@@ -133,7 +151,7 @@ class DataLayer(wx.EvtHandler):
         result = [dog for dog in self.dogs if evt.filter(dog)]
         if evt.destination == "selectdog" or evt.destination == "addrelative":
             result = [self.FormatForSelection(dog) for dog in result]
-        if evt.destination=="top":
+        if evt.destination == "top":
             if not evt.order:
                 result = result[::-1]
         e = PassDogs(dogs=result, destination=evt.destination, data=evt.data)
@@ -165,7 +183,7 @@ class DataLayer(wx.EvtHandler):
         evt.dog.id = self.currentDogID
         self.currentDogID += 1
         self.dogs.append(evt.dog)
-        wx.PostEvent(self, SaveEvent())
+        # wx.PostEvent(self, SaveEvent())
         if len(self.dogs) == evt.maxid:
             print("all", evt.maxid, "dogs loaded")
             wx.PostEvent(self, LoadAllBreedings())
@@ -179,15 +197,19 @@ class DataLayer(wx.EvtHandler):
                                       self.breedings[i].parent1.id == dogid or self.breedings[
                                           i].parent2.id == dogid]
 
-                mother = False if self.dogs[dogid].dam is None or "Mother of" in self.dogs[dogid].dam.name else (TEXT_MOTHER+": "+self.dogs[dogid].dam.name, self.dogs[dogid].dam.id)
-                father = False if self.dogs[dogid].sire is None or "Father of" in self.dogs[dogid].sire.name else (TEXT_FATHER+": "+self.dogs[dogid].sire.name, self.dogs[dogid].sire.id)
-                children =[(TEXT_CHILD+": "+x.name, x.id) for x in self.dogs[dogid].children]
+                mother = False if self.dogs[dogid].dam is None or "Mother of" in self.dogs[dogid].dam.name else (
+                TEXT_MOTHER + ": " + self.dogs[dogid].dam.name, self.dogs[dogid].dam.id)
+                father = False if self.dogs[dogid].sire is None or "Father of" in self.dogs[dogid].sire.name else (
+                TEXT_FATHER + ": " + self.dogs[dogid].sire.name, self.dogs[dogid].sire.id)
+                children = [(TEXT_CHILD + ": " + x.name, x.id) for x in self.dogs[dogid].children]
                 print("CHILDREN DATA", self.dogs[dogid].children)
                 print(self.dogs[dogid].relatives)
-                relatives = [mother, father]+children+[(TEXT_OTHER_RELATIVES+": "+x.name, x.id) for x in self.dogs[dogid].relatives]
+                relatives = [mother, father] + children + [(TEXT_OTHER_RELATIVES + ": " + x.name, x.id) for x in
+                                                           self.dogs[dogid].relatives]
 
                 wx.PostEvent(self.parent,
-                             PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type=evt.type, data=filtered_breedings, relativedata=relatives))
+                             PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type=evt.type, data=filtered_breedings,
+                                              relativedata=relatives))
             else:
                 wx.PostEvent(self.parent, PassDogDataEvent(dog=self.dogs[int(evt.dogid)], type=evt.type))
 
@@ -210,7 +232,7 @@ class DataLayer(wx.EvtHandler):
             datafile.write("#")
             dogdata = dog.ToList()
             for elem in dogdata:
-                # print(elem)
+                print(elem)
                 datafile.write(elem[0].upper() + ":" + str(elem[1]) + "\n")
 
         datafile.write("##BREEDINGS")

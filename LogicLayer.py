@@ -148,9 +148,11 @@ class LogicLayer(wx.EvtHandler):
         mother = None if data[6] == "None" else int(data[6])
         father = None if data[7] == "None" else int(data[7])
         children = data[8].split("|")
+        print(children, "CHIIII")
         relatives = data[9].split("|")
         dog = Dog(genotype, coat, dogid, name, age, mother, father, sex)
         dog.children = [] if children == ["None"] else children
+        print(dog.children)
         dog.relatives = [] if relatives == ["None"] else relatives
         evt = PassDogToDataLayerEvent(dog=dog, maxid=evt.maxid)
         wx.PostEvent(self.parent, evt)

@@ -924,15 +924,16 @@ class Dog:
     def ImposeChildConditions(self):
         self.CreateChildData()
         print("impose child conditions")
-        for child in self.children:
-            for condition in self.childConditions:
-                if type(condition) == Condition:
-                    reverse = ReverseCondition(condition)
-                    print(reverse)
-                    reverse.Execute(child.genotype)
-                if type(condition) == MultipleCondition:
-                    condition.Execute(child.genotype)
-            child.CreateChildData()
+        if self.children:
+            for child in self.children:
+                for condition in self.childConditions:
+                    if type(condition) == Condition:
+                        reverse = ReverseCondition(condition)
+                        print(reverse)
+                        reverse.Execute(child.genotype)
+                    if type(condition) == MultipleCondition:
+                        condition.Execute(child.genotype)
+                child.CreateChildData()
 
     def Breed(self, partner, breedingtype, goals=None):
         if breedingtype == "Conventional":

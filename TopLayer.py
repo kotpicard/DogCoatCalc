@@ -50,11 +50,13 @@ class DogApp(wx.App):
         self.Bind(EVT_LOAD_ALL_BREEDINGS, self.PassToDataLayer)
         self.Bind(EVT_LOAD_ALL_DOGS, self.LoadAllDogs)
 
+
         wx.PostEvent(self.DataLayer, LoadEvent())
 
     def LoadAllDogs(self, evt):
         for dogslice in evt.data:
             e = LoadDogFromDataEvent(data=dogslice, maxid=len(evt.data) - 1)
+            print(dogslice)
             wx.PostEvent(self, e)
 
     def RequestRelativeData(self, evt):

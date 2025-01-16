@@ -52,6 +52,12 @@ class MainWindow(wx.Frame):
         self.Bind(EVT_OPEN_BREEDING_RESULT, self.PassToTopLayer)
 
         self.SetSizer(self.MainSizer)
+        self.Bind(wx.EVT_CLOSE, self.SaveOnClose)
+
+
+    def SaveOnClose(self, e):
+        wx.PostEvent(self.app, SaveEvent())
+        self.Destroy()
 
     def OpenBreedingResult(self, e):
         self.MainSizer.Clear(delete_windows=True)
