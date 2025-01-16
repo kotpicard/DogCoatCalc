@@ -11,7 +11,7 @@ from text_en import *
 # 7 - Merle M, m
 # 8 - Spotting S, sp, si
 # 9 - Ticking T, Tr, t
-#TODO: add recessive black as separate phen
+# TODO: add recessive black as separate phen
 LOCUS0 = ["Ay", "aw", "at"]
 LOCUS1 = ["B", "b"]
 LOCUS2 = ["D", "d"]
@@ -166,18 +166,22 @@ class Locus:
         if type(replacement) == Locus:
             replacement = replacement.alleles
         print("replacing", self.alleles, replacement)
-        if self.CanBeReplacedBy(self.alleles[0], replacement[0], force_replacement) and self.CanBeReplacedBy(self.alleles[1],
-                                                                                          replacement[1], force_replacement):
-            if self.CanBeReplacedBy(self.alleles[0], replacement[0],force_replacement) == "test other" or self.CanBeReplacedBy(
+        if self.CanBeReplacedBy(self.alleles[0], replacement[0], force_replacement) and self.CanBeReplacedBy(
+                self.alleles[1],
+                replacement[1], force_replacement):
+            if self.CanBeReplacedBy(self.alleles[0], replacement[0],
+                                    force_replacement) == "test other" or self.CanBeReplacedBy(
                     self.alleles[1],
                     replacement[1], force_replacement) == "test other":
                 result.append("test other 1")
             else:
                 result.append(1)
 
-        if self.CanBeReplacedBy(self.alleles[0], replacement[1], force_replacement) and self.CanBeReplacedBy(self.alleles[1],
-                                                                                          replacement[0], force_replacement):
-            if self.CanBeReplacedBy(self.alleles[0], replacement[1], force_replacement) == "test other" or self.CanBeReplacedBy(
+        if self.CanBeReplacedBy(self.alleles[0], replacement[1], force_replacement) and self.CanBeReplacedBy(
+                self.alleles[1],
+                replacement[0], force_replacement):
+            if self.CanBeReplacedBy(self.alleles[0], replacement[1],
+                                    force_replacement) == "test other" or self.CanBeReplacedBy(
                     self.alleles[0],
                     replacement[1], force_replacement) == "test other":
                 result.append("test other -1")
@@ -842,6 +846,22 @@ class Dog:
         self.childConditions = []
         self.coatdesc = "| ".join([str(x.desc) for x in self.coat])
 
+    def SetParent(self, parent):
+        if parent.sex == "f":
+            self.dam = parent
+        else:
+            self.sire = parent
+        if self not in parent.children:
+            parent.children.append(self)
+        print("CHIDLREN", parent.children)
+        self.ImposeParentAndChildConditions()
+
+    def HasMother(self):
+        return True if type(self.dam)==Dog and "Mother of" not in self.dam.name else False
+
+    def HasFather(self):
+        return True if type(self.sire)==Dog and "Father of" not in self.sire.name else False
+
     def ToList(self):
         return [("id", int(self.id)),
                 ("name", self.name), ("age", str(self.age)), ("sex", self.sex),
@@ -859,11 +879,13 @@ class Dog:
     def CreateParents(self):
         if type(self.dam) != Dog:
             self.dam = Dog(Genotype(), name="Mother of {}".format(self.name), sex="f", coat=[])
-        self.dam.children.append(self)
+        if not self in self.dam.children:
+            self.dam.children.append(self)
         print(type(self.dam.children))
         if type(self.sire) != Dog:
             self.sire = Dog(Genotype(), name="Father of {}".format(self.name), sex="m", coat=[])
-        self.sire.children.append(self)
+        if not self in self.sire.children:
+            self.sire.children.append(self)
 
     def CreateAllParentConditions(self):
         self.CreateParents()

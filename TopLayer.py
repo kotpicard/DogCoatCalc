@@ -54,18 +54,20 @@ class DogApp(wx.App):
 
     def LoadAllDogs(self, evt):
         for dogslice in evt.data:
-            e = LoadDogFromDataEvent(data=dogslice, maxid=len(evt.data)-1)
+            e = LoadDogFromDataEvent(data=dogslice, maxid=len(evt.data) - 1)
             wx.PostEvent(self, e)
 
     def RequestRelativeData(self, evt):
         dogid = evt.dogid
         relativeid = evt.relativeid
         relativetype = evt.type
+        print("{} is {} {}".format(relativeid, dogid, relativetype))
         wx.PostEvent(self.DataLayer,
-                     RequestDogs(filter=lambda x: x.id in [dogid, relativeid], data=relativetype, destination="top"))
+                     RequestDogs(filter=lambda x: x.id in [dogid, relativeid], data=relativetype,
+                                 order=relativeid > dogid, destination="top"))
 
     def ProcessAddRelative(self, evt):
-        #first dog is target second is relative
+        # first dog is target second is relative
         e = AddRelativeLogicEvent(type=evt.data, target=evt.dogs[0], relative=evt.dogs[1])
         self.PassToLogicLayer(e)
         print(evt.data, [x.name for x in evt.dogs])

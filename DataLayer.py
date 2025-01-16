@@ -133,6 +133,9 @@ class DataLayer(wx.EvtHandler):
         result = [dog for dog in self.dogs if evt.filter(dog)]
         if evt.destination == "selectdog" or evt.destination == "addrelative":
             result = [self.FormatForSelection(dog) for dog in result]
+        if evt.destination=="top":
+            if not evt.order:
+                result = result[::-1]
         e = PassDogs(dogs=result, destination=evt.destination, data=evt.data)
         wx.PostEvent(self.parent, e)
 
@@ -179,6 +182,8 @@ class DataLayer(wx.EvtHandler):
                 mother = False if self.dogs[dogid].dam is None or "Mother of" in self.dogs[dogid].dam.name else (TEXT_MOTHER+": "+self.dogs[dogid].dam.name, self.dogs[dogid].dam.id)
                 father = False if self.dogs[dogid].sire is None or "Father of" in self.dogs[dogid].sire.name else (TEXT_FATHER+": "+self.dogs[dogid].sire.name, self.dogs[dogid].sire.id)
                 children =[(TEXT_CHILD+": "+x.name, x.id) for x in self.dogs[dogid].children]
+                print("CHILDREN DATA", self.dogs[dogid].children)
+                print(self.dogs[dogid].relatives)
                 relatives = [mother, father]+children+[(TEXT_OTHER_RELATIVES+": "+x.name, x.id) for x in self.dogs[dogid].relatives]
 
                 wx.PostEvent(self.parent,

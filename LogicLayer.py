@@ -20,28 +20,25 @@ class LogicLayer(wx.EvtHandler):
     def ProcessAddRelative(self, evt):
         print(evt.relative.name, "is", evt.target.name, evt.type)
         if evt.type == "Parent":
-            if evt.relative.sex == "f":
-                evt.target.dam = evt.relative
-                print(evt.relative.children)
-                print(evt.target.dam.name, "is mother")
-                print(evt.target.genotype)
-                evt.target.ImposeParentAndChildConditions()
-                print(evt.target.genotype)
-            else:
-                evt.target.sire = evt.relative
-                evt.relative.children.append(evt.target)
-                print(evt.target.sire.name, "is father")
-                evt.target.ImposeParentAndChildConditions()
+            evt.target.SetParent(evt.relative)
+            evt.target.ImposeParentAndChildConditions()
         else:
-            evt.target.relatives.append(evt.relative.id)
-            evt.relative.relatives.append(evt.target.id)
+            evt.target.relatives.append(evt.relative)
+            evt.relative.relatives.append(evt.target)
             evt.relative.ImposeParentAndChildConditions()
             if evt.type == "Full sibling" or evt.type == TEXT_HALFSIBLING_MOTHER:
-                if type(evt.target.dam) != Dog or "Mother of " in evt.target.dam.name:
-                    evt.target.dam = evt.relative.dam
+                if not evt.target.HasMother() and evt.relative.HasMother():
+                    print("replacing target dam with relative dam", evt.relative.dam.name)
+                    evt.target.SetParent(evt.relative.dam)
+                elif evt.target.HasMother() and not evt.relative.HasMother():
+                    print("replacing relative dam with target dam", evt.target.dam.name)
+                    evt.relative.SetParent(evt.target.dam)
             if evt.type == "Full sibling" or evt.type == TEXT_HALFSIBLING_FATHER:
-                if type(evt.target.sire) != Dog or "Father of " in evt.target.dam.name:
-                    evt.target.sire = evt.relative.sire
+                if not evt.target.HasFather() and evt.relative.HasFather():
+                    print("replacing target sire with relative sire", evt.relative.sire.name)
+                    evt.target.SetParent(evt.relative.sire)
+                elif evt.target.HasFather() and not evt.relative.HasFather():
+                    evt.relative.SetParent(evt.target.sire)
 
 
 

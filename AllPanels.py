@@ -210,6 +210,7 @@ class DogPanel(wx.Panel):
         self.Bind(EVT_PASS_DATA, self.ProcessAddRelative)
 
     def ProcessAddRelative(self, e):
+        print("{} is {}'s {}".format(e.relativedogid, e.dogid, e.relativetype))
         wx.PostEvent(self.GetParent(), AddRelativeEvent(type=e.relativetype, relativeid=e.relativedogid, dogid=e.dogid))
 
     def GetTypeOfRelative(self, e):
@@ -280,6 +281,7 @@ class PopupAddRelative(wx.Frame):
 
     def Selected(self, e):
         values = [x.GetLabel() if x.GetValue() else "" for x in self.GetChildren() if type(x) == wx.RadioButton]
+        print(values, "SELECTED PARENT", self.dogid)
         value = "".join(values)
         wx.PostEvent(self.GetParent(),
                      PassDataEvent(origin="addrelativepopup", target="dogpanel", relativetype=value,
