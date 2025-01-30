@@ -77,6 +77,8 @@ BUTTONCOLORS = (Color(Hex_BUTTONCOLOR).rgb, Color(Hex_BUTTONCOLORHOVER).rgb)
 
 BREEDINGTYPES = ("CONVENTIONAL", "PICKMATE", "PICKPAIR", "CREATE")
 
-FONT_DEFAULT = wx.Font()
 FONT_BIG = wx.Font()
-FONT_BIG.SetPointSize(20)
+FONT_DEFAULT = wx.Font()
+
+def FontSetup():
+    FONT_BIG.SetPointSize(20)

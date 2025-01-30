@@ -75,7 +75,11 @@ class NotAllele(Allele):
             "]", "")
 
     def __eq__(self, other):
+        print([x for x in self.notValue], other, "THIS")
         return all([x != other for x in self.notValue])
+
+    def __ne__(self, other):
+        return True
 
     def __add__(self, other):
         if type(other) == NotAllele:
@@ -328,8 +332,6 @@ class Condition:
         return False
 
     def Execute(self, target):
-        # print(self.name, self.argument, target[self.locus].alleles)
-        # print(self.cond(target))
         if type(target) == Genotype:
             return self.cond(target), 1
         if type(target) == PossibleGenotype:
@@ -553,7 +555,7 @@ class PossibleGenotype(Genotype):
 
 class Phenotype:
     def __init__(self, type):
-        self.desc = "description of phenotype"
+        self.desc = type+"description of phenotype"
         self.conditions = []  # list of conditions for this phenotype to show
         self.reverseConditions = []
         self.type = type
@@ -717,6 +719,7 @@ TICKING.desc = TEXT_TICKING
 ROANING.desc = TEXT_ROANING
 ROANING_AND_TICKING.desc = TEXT_ROANING_AND_TICKING
 GREYING.desc = TEXT_GREYING
+NO_GREYING.desc = "no grey"
 
 ### CONDITIONS
 SABLE.AddCondition(6, "IsNotHomozygousFor", "K")
@@ -778,14 +781,12 @@ GREYING.AddCondition(4, "HasAtLeastOne", "G")
 GREYING.AddCondition(3, "IsNotHomozygousFor", "e")
 
 NO_GREYING.AddCondition(4, "IsHomozygousFor", "g")
-NORMAL_EXTENSION.AddMultipleCondition([(3, "DoesntHaveAllele", "Em"),(3, "HasAtLeastOne", "E")])
-
 ALLOW_AGOUTI.AddCondition(6, "IsHomozygousFor", "k")
 
 OTHER_PHENOTYPES = [SABLE, AGOUTI, TANPOINT, BRINDLE, SOLID_EUMELANIN, SOLID_PHEOMELANIN, MASK, MERLE, DOUBLE_MERLE,
                     NO_WHITE, MINOR_WHITE, PIEBALD, IRISH_WHITE, MINOR_TICKING, TICKING, ROANING, ROANING_AND_TICKING,
                     GREYING,
-                    NO_MERLE, NO_TICKING, NO_GREYING, ALLOW_AGOUTI, NORMAL_EXTENSION]
+                    NO_MERLE, NO_TICKING, NO_GREYING, ALLOW_AGOUTI]
 
 ALL_PHENOTYPES = COLOR_PHENOTYPES + OTHER_PHENOTYPES
 

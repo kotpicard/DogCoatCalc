@@ -3,13 +3,14 @@ import wx
 from MainWindow import MainWindow
 from DataLayer import DataLayer
 from LogicLayer import LogicLayer
-
+from GuiConstants import FontSetup
 from CustomEvents import *
 
 
 class DogApp(wx.App):
     def __init__(self):
         super().__init__()
+        FontSetup()
         self.MainWindow = MainWindow(None, "Dog Coat Calculator", self)
         self.DataLayer = DataLayer(self)
         self.LogicLayer = LogicLayer(self)
