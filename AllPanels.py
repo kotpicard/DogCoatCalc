@@ -1,6 +1,5 @@
 from CustomEvents import *
 from GoalCtrl import GoalCtrl
-from LinkBoxCtrl import LinkBoxCtrl
 from GuiConstants import *
 from RoundedButton import RoundedButton
 from BrowseDogsPanel import BrowseDogsPanel
@@ -8,7 +7,6 @@ from LinkButton import LinkButton
 from DogSelectDialog import DogSelectDialog
 from text_en import *
 from AddDogPanel import AddDogPanel
-
 
 class DefaultPanel(wx.Panel):
     def __init__(self, parent):
@@ -59,7 +57,7 @@ class DefaultPanel(wx.Panel):
 
     def ClickedBreedingCalcButton(self, e):
         evt = NavigationEvent(destination="BreedingCalc")
-        print("breeding calc")
+
         wx.PostEvent(self.GetParent(), evt)
 
     def ClickedBreedingGoalsButton(self, e):
@@ -101,7 +99,7 @@ class MyDogsPanel(wx.Panel):
         wx.PostEvent(self.GetParent(), OpenMainMenu())
 
     def Fill(self, elems):
-        print("FILLING")
+
         for i in range(len(elems)):
             self.dogspanel.AddElement(elems[i], i)
 
@@ -116,7 +114,7 @@ class MyDogsPanel(wx.Panel):
 class DogPanel(wx.Panel):
     def __init__(self, parent, values, breedingdata=None, relativedata=None):
         super().__init__(parent)
-        print(relativedata)
+
         self.SetBackgroundColour(Color(Hex_BACKGROUND).rgb)
         dogdatasizer = wx.BoxSizer(wx.VERTICAL)
         namelabel = wx.StaticText(self, label=values[0])
@@ -210,7 +208,7 @@ class DogPanel(wx.Panel):
         self.Bind(EVT_PASS_DATA, self.ProcessAddRelative)
 
     def ProcessAddRelative(self, e):
-        print("{} is {}'s {}".format(e.relativedogid, e.dogid, e.relativetype))
+
         wx.PostEvent(self.GetParent(), AddRelativeEvent(type=e.relativetype, relativeid=e.relativedogid, dogid=e.dogid))
 
     def GetTypeOfRelative(self, e):
@@ -281,7 +279,7 @@ class PopupAddRelative(wx.Frame):
 
     def Selected(self, e):
         values = [x.GetLabel() if x.GetValue() else "" for x in self.GetChildren() if type(x) == wx.RadioButton]
-        print(values, "SELECTED PARENT", self.dogid)
+
         value = "".join(values)
         wx.PostEvent(self.GetParent(),
                      PassDataEvent(origin="addrelativepopup", target="dogpanel", relativetype=value,
@@ -397,15 +395,14 @@ class AllelePanel(wx.Panel):
         wx.PostEvent(self.GetParent(), OpenGenotypeViewEvent(dogid=self.dogid))
 
     def ProcessEdit(self, e):
-        print("processing edit")
+
         if self.type != "anyallele":
             children = [x.GetWindow() for x in self.bottomsizer.GetChildren()]
             values = [x.GetLabel() for x in children if type(x) in [wx.RadioButton, wx.CheckBox] and x.GetValue()]
-            for x in self.bottomsizer.GetChildren():
-                print(type(x))
+
         else:
             values = []
-        print(self.type, self.dogid, values)
+
         wx.PostEvent(self.GetParent(),
                      EditLocusEvent(replacementtype=self.type, dogid=self.dogid, number=self.number, values=values))
 
@@ -469,13 +466,13 @@ class GoalsPanel(wx.Panel):
         wx.PostEvent(self.GetParent(), OpenMainMenu())
 
     def Fill(self, data):
-        print("FILLING GOALS")
+
         self.goalctrl.Fill(data)
         self.Layout()
 
     def AddGoal(self, e):
         wx.PostEvent(self.GetParent(), OpenAddGoalPanel(origin="goals"))
-        print("ADDING")
+
 
     def DeleteGoal(self, e):
         dialog = wx.MessageDialog(self, TEXT_DELETE_WARNING, style=wx.OK | wx.CANCEL)
@@ -703,9 +700,9 @@ class BreedingPanel(wx.Panel):
         self.Layout()
 
     def FillGoalCtrl(self, e):
-        print("FILLING GOAL CTRL")
+
         data = e.data
-        print("RECEIVED DATA", e.data)
+
         self.goalctrl.Fill(data)
         self.goalctrl.Layout()
 
@@ -771,7 +768,7 @@ class BreedingPanel(wx.Panel):
 
     def CheckIfAllDataPresent(self):
         if self.breedingtype == "Conventional":
-            print(self.sire, self.dam)
+
             return True if self.sire is not None and self.dam is not None else False
         if self.breedingtype == "PickMate":
             return True if (self.sire is not None or self.dam is not None) and self.goalctrl.selected else False
@@ -883,16 +880,16 @@ class BreedingResultPanel(wx.Panel):
         if self.breedingtype == "Conventional":
             self.leftwidget.Fill(self.breedingresult.possiblePhensAsGoals, False)
             self.rightwidget.Fill(self.breedingresult.impossiblePhensAsGoals, False)
-            print(self.breedingresult.goalslist, "GOALSLIST")
+
             self.goalwidget.Fill(self.breedingresult.goalslist, False, self.breedingresult.goalscores)
 
         else:
-            print(self.breedingresult.bestmate)
+
             self.leftwidget.Fill(self.breedingresult.goalslist, False, self.breedingresult.bestmate[1])
             self.rightwidget.AddElement(self.breedingresult.bestmate[2].ToDesc(), self.breedingresult.bestmate[2].id)
 
     def GoBackToBreedings(self, e):
-        print("BACK")
+
         wx.PostEvent(self.GetParent(), NavigationEvent(destination="AllBreedingResults"))
 
     def GoBackToBreedCalc(self, e):
@@ -934,7 +931,7 @@ class AllBreedingResultsPanel(wx.Panel):
         wx.PostEvent(self.GetParent(), OpenMainMenu())
 
     def GoToDogPage(self, e):
-        print("GOOOO TOOOO DOG PAGE")
+
         dialog = wx.MessageDialog(self, TEXT_GOTODOGPAGEWARNING, style=wx.OK | wx.CANCEL)
         test = dialog.ShowModal()
         evt = OpenDogPageEvent(num=e.num, status="confirmed")

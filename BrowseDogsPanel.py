@@ -105,15 +105,15 @@ class BrowseDogsPanel(wx.ScrolledWindow):
             self.selected.append(num)
 
     def OpenBreedingPage(self, e):
-        print("open breeding page", e.GetEventObject().num)
+
         num = e.GetEventObject().num
-        print(num)
+
         if num is not None:
-            print(self.GetParent())
+
             wx.PostEvent(self.GetParent(), OpenBreedingPageEvent(num=num))
 
     def OpenDogPage(self, e):
-        print("open dog page", e.GetEventObject().num)
+
         num = e.GetEventObject().num
         if num is not None:
             wx.PostEvent(self.GetParent(), OpenDogPageEvent(num=num))

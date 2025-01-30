@@ -6,10 +6,6 @@ class MainWindow(wx.Frame):
         wx.Frame.__init__(self, parent, title=title, size=(1000, 800))
         self.app = app
         self.MainSizer = wx.BoxSizer()
-        # self.CreateDefaultPanel()
-        # self.CreateBreedingTestPanel()
-        # self.CreateDogPage()
-        # self.CreateMyDogsPanel()
         self.CreateDefaultPanel()
         self.Center()
         self.Show()
@@ -74,11 +70,11 @@ class MainWindow(wx.Frame):
             self.Layout()
 
     def DisplayGoals(self, e):
-        print("display dest", e.destination)
-        print(e.data)
+
+
         if e.destination == "breeding":
             if type(self.temp) == BreedingPanel:
-                print(type(self.temp), ": temp type")
+
                 self.ReturnToBreeding(e)
             else:
                 self.PassToBreedingPanel(e)
@@ -87,10 +83,9 @@ class MainWindow(wx.Frame):
         if e.origin != "breeding":
             self.MainSizer.Clear(delete_windows=True)
         else:
-            print("origin breeding")
+
             for child in self.MainSizer.GetChildren():
-                print(type(child.GetWindow()))
-                # self.MainSizer.Clear(delete_windows=True)
+
                 if type(child.GetWindow()) == BreedingPanel:
                     self.temp = child.GetWindow()
                     self.MainSizer.Detach(child.GetWindow())
@@ -123,14 +118,14 @@ class MainWindow(wx.Frame):
         wx.PostEvent(self.app, e)
 
     def NavigationHandler(self, e):
-        print(e, e.destination)
+
         wx.PostEvent(self.app, e)
 
     def NavigationDataHandler(self, e):
         self.MainSizer.Clear(delete_windows=True)
-        print(e.destination, e.data)
+
         self.NAVDICT[e.destination](e.data)
-        print("layout")
+
         self.Layout()
         self.Center()
 
@@ -179,14 +174,14 @@ class MainWindow(wx.Frame):
         wx.PostEvent(self.app, e)
 
     def CreateGoalsPage(self, data):
-        print("HERE", data)
+
         goalspanel = GoalsPanel(self)
         goalspanel.Fill(data)
         self.MainSizer.Add(goalspanel, 1, wx.EXPAND)
         self.MainSizer.Layout()
 
     def GoToDogPage(self, evt):
-        print("GO TO DOG PAGE", evt.num)
+
         dogid = evt.num
         wx.PostEvent(self.app, RequestDogByID(dogid=dogid, type="byid"))
 

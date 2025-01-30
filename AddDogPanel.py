@@ -1,11 +1,6 @@
 from CustomEvents import *
-from GoalCtrl import GoalCtrl
-from LinkBoxCtrl import LinkBoxCtrl
 from GuiConstants import *
 from RoundedButton import RoundedButton
-from BrowseDogsPanel import BrowseDogsPanel
-from LinkButton import LinkButton
-from DogSelectDialog import DogSelectDialog
 from text_en import *
 
 
@@ -62,8 +57,6 @@ class AddDogPanel(wx.Panel):
         tickingsizer.Add(wx.RadioButton(self, label=TEXT_ROANING))
         tickingsizer.Add(wx.RadioButton(self, label=TEXT_ROANING_AND_TICKING))
         tickingsizer.Add(wx.RadioButton(self, label=TEXT_IDONTKNOW))
-
-        # Create individual checkboxes for the patterns
         patternchoices = [
             TEXT_SOLID_EUMELANIN, TEXT_SABLE, TEXT_AGOUTI, TEXT_TANPOINT,
             TEXT_BRINDLE, TEXT_MASK, TEXT_GREYING, TEXT_IDONTKNOW
@@ -72,10 +65,6 @@ class AddDogPanel(wx.Panel):
         for pattern in patternchoices:
             checkbox = wx.CheckBox(self, label=pattern)
             patternsizer.Add(checkbox, 0, wx.ALL, 0)
-
-        # Add the sizer to the main sizer
-
-        # Add the radio boxes to a parent sizer
         coatsizer.AddMany([blackcolorsizer, redcolorsizer, spottingsizer, merlesizer, tickingsizer, patternsizer])
         rightsizer.Add(coatlabel, 0, wx.ALL, 10)
         rightsizer.Add(coatsizer, 5, wx.EXPAND)

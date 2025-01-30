@@ -14,8 +14,6 @@ class DogApp(wx.App):
         self.MainWindow = MainWindow(None, "Dog Coat Calculator", self)
         self.DataLayer = DataLayer(self)
         self.LogicLayer = LogicLayer(self)
-        # evt = LoadEvent()
-        # wx.PostEvent(self.DataLayer, evt)
         self.Bind(EVT_LOAD_DOG_FROM_DATA, self.PassToLogicLayer)
         self.Bind(EVT_PASS_DOG, self.PassToDataLayer)
         self.Bind(EVT_PASS_DOG_DATA, self.PassDogData)
@@ -57,14 +55,14 @@ class DogApp(wx.App):
     def LoadAllDogs(self, evt):
         for dogslice in evt.data:
             e = LoadDogFromDataEvent(data=dogslice, maxid=len(evt.data) - 1)
-            print(dogslice)
+
             wx.PostEvent(self, e)
 
     def RequestRelativeData(self, evt):
         dogid = evt.dogid
         relativeid = evt.relativeid
         relativetype = evt.type
-        print("{} is {} {}".format(relativeid, dogid, relativetype))
+
         wx.PostEvent(self.DataLayer,
                      RequestDogs(filter=lambda x: x.id in [dogid, relativeid], data=relativetype,
                                  order=relativeid > dogid, destination="top"))
@@ -73,7 +71,7 @@ class DogApp(wx.App):
         # first dog is target second is relative
         e = AddRelativeLogicEvent(type=evt.data, target=evt.dogs[0], relative=evt.dogs[1])
         self.PassToLogicLayer(e)
-        print(evt.data, [x.name for x in evt.dogs])
+
 
     def ProcessPassDogs(self, evt):
         if evt.destination != "top":
@@ -96,7 +94,7 @@ class DogApp(wx.App):
 
     def PassDogData(self, evt):
         if evt.type == "byid":
-            print("BYID2", evt.dog.name)
+
             wx.PostEvent(self.MainWindow, PassDataForDogPageEvent(dog=evt.dog, data=(evt.data, evt.relativedata)))
         if evt.type == "add":
             wx.PostEvent(self.LogicLayer, evt)

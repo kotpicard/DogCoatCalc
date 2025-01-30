@@ -70,33 +70,3 @@ class DogSelectDialog(wx.Frame):
 
     def Cancel(self, e):
         self.Destroy()
-#
-# class MainWindow(wx.Frame):
-#     def __init__(self):
-#         super().__init__(None, title="Main Window", size=(400, 300))
-#
-#         # Main panel
-#         panel = wx.Panel(self)
-#
-#         # Add a button
-#         button = wx.Button(panel, label="Open New Window", pos=(100, 100))
-#         button.Bind(wx.EVT_BUTTON, self.on_open_new_window)
-#
-#         # Frame settings
-#         self.Center()
-#
-#     def on_open_new_window(self, event):
-#         new_window = DogSelectDialog(self, "sire")  # Create a new instance of the NewWindow class
-#         new_window.Show()  # Show the new window
-#
-#
-# class MyApp(wx.App):
-#     def OnInit(self):
-#         frame = MainWindow()
-#         frame.Show()
-#         return True
-#
-#
-# if __name__ == "__main__":
-#     app = MyApp()
-#     app.MainLoop()

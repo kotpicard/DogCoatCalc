@@ -75,7 +75,7 @@ class NotAllele(Allele):
             "]", "")
 
     def __eq__(self, other):
-        print([x for x in self.notValue], other, "THIS")
+        
         return all([x != other for x in self.notValue])
 
     def __ne__(self, other):
@@ -83,12 +83,12 @@ class NotAllele(Allele):
 
     def __add__(self, other):
         if type(other) == NotAllele:
-            print("BEFORENOTVALUE", self.notValue)
+            
             self.notValue += other.notValue
             self.notValue = unique(self.notValue)
             self.value = "Any allele except {}".format(str(self.notValue)).replace('"', "").replace("'", "").replace(
                 "[", "").replace("]", "")
-            print("AFTER NOTVALUE", self.notValue, self.value)
+            
         return self
 
     def ReturnCondition(self, number):
@@ -145,8 +145,8 @@ class Locus:
 
     def CanBeReplacedBy(self, original, replacement, force_replace):
         # replacement is ALLELE
-        print("TESTING REPLACEMENT", end=" ")
-        print(original, replacement)
+        
+        
         if type(replacement) == AnyAllele:
             return True
         elif type(original) == Allele:
@@ -160,7 +160,7 @@ class Locus:
                 [x in original.notValue for x in replacement.notValue]):
             return "test other" if force_replace else True
         else:
-            print("CAN REPLACE")
+            
             return True
 
     def CanReplace(self, replacement, force_replacement=False):
@@ -168,7 +168,7 @@ class Locus:
         result = []
         if type(replacement) == Locus:
             replacement = replacement.alleles
-        print("replacing", self.alleles, replacement)
+        
         if self.CanBeReplacedBy(self.alleles[0], replacement[0], force_replacement) and self.CanBeReplacedBy(
                 self.alleles[1],
                 replacement[1], force_replacement):
@@ -195,21 +195,21 @@ class Locus:
             result.append(False)
 
         if "test other 1" in result:
-            print("test other 1")
+            
             if -1 in result:
-                print("-1")
+                
                 return -1
 
             else:
-                print("1")
+                
                 return 1
         elif "test other -1" in result:
-            print("test other -1")
+            
             if 1 in result:
-                print("1")
+                
                 return 1
             else:
-                print("-1")
+                
                 return -1
         elif False in result:
             return False
@@ -218,29 +218,26 @@ class Locus:
 
     def replace(self, replacement, force_replacement=False):
         # replacement is locus
-        # print("EQUALITY TEST", self == replacement)
         if type(replacement) == Locus:
             replacement = replacement.alleles
         order = self.CanReplace(replacement, force_replacement)
-        print(force_replacement)
+        
         if type(order) == int:
             self.alleles = self.alleles[::order]
-            print(self.alleles)
+            
             temp = []
             for i in range(2):
-                # print("original", self.alleles[i], "replacement", replacement[i])
                 if type(replacement[i]) != AnyAllele:
                     if type(self.alleles[i]) == type(replacement[i]) == NotAllele:
                         temp.append(self.alleles[i] + replacement[i])
-                        print("ADDED TO NOTVALUE")
-                        print(temp)
+                        
+                        
                     else:
-                        # print(replacement[i])
                         temp.append(replacement[i])
                 else:
                     temp.append(self.alleles[i])
             self.alleles = temp
-            print("AFTER REPLACEMENT", self.alleles)
+            
             return True
         elif not order:
             return False
@@ -248,7 +245,7 @@ class Locus:
     def CreateParentConditions(self):
         condition1 = self.alleles[0].ReturnCondition(self.number)
         condition2 = self.alleles[1].ReturnCondition(self.number)
-        print(condition1, condition2)
+        
         if condition1.name != "ZeroCondition" or condition2.name != "ZeroCondition":
             if condition1.name == condition2.name:
                 if condition1.argument == condition2.argument:
@@ -318,8 +315,6 @@ class Condition:
         return all([x == self.argument for x in target[self.locus].alleles])
 
     def IsNotHomozygousFor(self, target):
-        # print("TEST")
-        # print(any([x != self.argument for x in target[self.locus].alleles]))
         return any([x != self.argument for x in target[self.locus].alleles])
 
     def IsExactly(self, target):
@@ -374,9 +369,9 @@ class ReverseCondition(Condition):
         return "Error: wrong condition type"
 
     def Execute(self, target):
-        print("EXECUTING", self)
-        print(target[self.locus].CanReplace(self.cond(target), False))
-        print(target[self.locus], self.cond(target))
+        
+        
+        
         return target[self.locus].replace(self.cond(target))
 
 
@@ -387,7 +382,7 @@ class MultipleCondition:
         self.type = connectiontype
 
         self.cond1 = cond1
-        print(type(self.cond1))
+        
         if type(cond1) != MultipleCondition:
             self.locus1 = cond1.locus
         if type(cond1) == Condition:
@@ -421,21 +416,21 @@ class MultipleCondition:
 
     def TestCond1(self, target):
         if self.type == "AND":
-            print("testing", self.cond1.name)
-            print(type(self.cond1))
+            
+            
             if type(self.cond1) != MultipleCondition:
                 target = target[self.locus1]
-                print(target.CanReplace(self.cond1.cond(target), False))
+                
                 return target.CanReplace(self.cond1.cond(target))
             elif type(self.cond1) == MultipleCondition:
                 return self.cond1.CanResolve(target, target)
 
     def TestCond2(self, target):
         if self.type == "AND":
-            print("testing", self.cond2.name)
+            
             if type(self.cond2) != MultipleCondition:
                 target = target[self.locus2]
-                print(target.CanReplace(self.cond2.cond(target)))
+                
                 return target.CanReplace(self.cond2.cond(target))
             elif type(self.cond2) == MultipleCondition:
                 return self.cond2.CanResolve(target, target)
@@ -456,7 +451,7 @@ class MultipleCondition:
         if self.type == "AND":
             direction1 = self.TestCond1(target1) and self.TestCond2(target2)
             direction2 = self.TestCond1(target2) and self.TestCond2(target1)
-            print("direction1, direction2", direction1, direction2)
+            
             if direction1 and direction2:
                 self.resolvable = 0
                 return False
@@ -472,11 +467,11 @@ class MultipleCondition:
 
     def Execute(self, target1, target2=None):
         # needs to resolve in ONE direction only unless performed on same target
-        print("EXECUTING MULTIPLE", self.name)
+        
         if not target2:
             target2 = target1
         self.CanResolve(target1, target2)
-        print(self.resolvable)
+        
         if self.resolvable == 0:
             if target1 != target2:
                 self.resolvable = True
@@ -494,7 +489,7 @@ class MultipleCondition:
             self.ResolveCond2(target1)
             self.resolved = True
         else:
-            print("Error: cannot resolve multiple condition on these targets")
+            
             return [0,0]
 
 
@@ -509,7 +504,7 @@ class Genotype:
     def CreateFromString(self, string):
         loci_text = string.split("|")
         for i in range(10):
-            print(i, loci_text[i] if "K" in loci_text[i] else "")
+            
             self.loci[i].CreateFromString(loci_text[i])
 
     def __getitem__(self, item):
@@ -582,7 +577,6 @@ class Phenotype:
     def ImposeConditions(self, genotype):
         self.CreateReverseConditions()
         for cond in self.reverseConditions:
-            # print(cond.locus, cond.name)
             result = cond.Execute(genotype)
             if not result:
                 genotype.status = False
@@ -824,7 +818,7 @@ class Goal:
         # 2: is possible (known alleles)
         # 3: is certain
         for i in range(len(results)):
-            print(i, len(results))
+            
             if not results[i]:
                 elementresults.append(0)
             else:
@@ -847,7 +841,7 @@ class Goal:
                         else:
                             # result is both specific and certain
                             temp.append(3)
-                print(temp)
+                
                 elementresults.append(sum(temp) / len(temp))
         return elementresults
 
@@ -875,17 +869,17 @@ class Dog:
             self.sire = parent
         if self not in parent.children:
             parent.children.append(self)
-        print("CHIDLREN", parent.children)
+        
         self.ImposeParentAndChildConditions()
 
     def UpdateCoat(self):
         possible_phenotypes = [x for x in ALL_PHENOTYPES if x.TestConditions(self.genotype)[0]]
-        print([x.desc+x.type for x in possible_phenotypes], "UPDATING")
+        
         append = False
         for phen in possible_phenotypes:
             if sum([x.type == phen.type for x in possible_phenotypes]) == 1:
                 if not phen in self.coat:
-                    print("APPENDING", phen.desc, phen.type)
+                    
                     self.coat.append(phen)
                 # if phen.type == "GREYING":
                 #     if any([type(x) == Allele and x == Allele("G") for x in self.genotype[4].alleles]):
@@ -923,7 +917,7 @@ class Dog:
             self.dam = Dog(Genotype(), name="Mother of {}".format(self.name), sex="f", coat=[])
         if not self in self.dam.children:
             self.dam.children.append(self)
-        print(type(self.dam.children))
+        
         if type(self.sire) != Dog:
             self.sire = Dog(Genotype(), name="Father of {}".format(self.name), sex="m", coat=[])
         if not self in self.sire.children:
@@ -942,17 +936,17 @@ class Dog:
         self.sire.ImposeChildConditions()
 
     def ImposeAllParentConditions(self):
-        print("imposing conditions on parents {} and {}".format(self.dam.name, self.sire.name))
+        
         for locus_number in range(len(self.genotype)):
             own_locus = self.genotype[locus_number]
             for condition in own_locus.dam_conditions:
-                # print("DAM", condition.name, condition.argument)
+                
                 condition.Execute(self.dam.genotype)
             for condition in own_locus.sire_conditions:
-                # print("SIRE", condition.name, condition.argument)
+                
                 condition.Execute(self.sire.genotype)
             for condition in own_locus.general_conditions:
-                # print("GEN", condition.name, condition.argument)
+                
                 condition.Execute(self.dam.genotype, self.sire.genotype)
 
     def CreateChildData(self):
@@ -965,13 +959,13 @@ class Dog:
 
     def ImposeChildConditions(self):
         self.CreateChildData()
-        print("impose child conditions")
+        
         if self.children:
             for child in self.children:
                 for condition in self.childConditions:
                     if type(condition) == Condition:
                         reverse = ReverseCondition(condition)
-                        print(reverse)
+                        
                         reverse.Execute(child.genotype)
                     if type(condition) == MultipleCondition:
                         condition.Execute(child.genotype)
@@ -993,7 +987,7 @@ class BreedingResult:
         self.parent1 = parent1
         self.parent2 = parent2
         self.goals = goals
-        print("I RECEIVED THESE GOALS: ", goals)
+        
         if self.goals:
             self.goalslist = [x.ToList() for x in self.goals]
         else:
@@ -1007,7 +1001,7 @@ class BreedingResult:
             self.possibleGenotype = PossibleGenotype(self.possible_loci)
             self.possiblePhens, self.impossiblePhens = self.GetPossiblePhenotypes()
             self.possiblePhensAsGoals = [Goal([x]).ToList() for x in self.possiblePhens]
-            print(self.possiblePhensAsGoals)
+            
             self.impossiblePhensAsGoals = [Goal([x]).ToList() for x in self.impossiblePhens]
             self.goalscores = self.GetGoalScores()
         if self.type == "PickMate":
@@ -1058,47 +1052,3 @@ class BreedingResult:
             for goal in self.goals:
                 results.append(goal.CheckConditions(self.possibleGenotype))
         return results
-
-#### TESTS
-
-#
-# test_genotype = Genotype()
-# ISABELLA.ImposeConditions(test_genotype)
-# BLACK.ImposeConditions(test_genotype)
-# possible_phenotypes = [x.desc for x in OTHER_PHENOTYPES + COLOR_PHENOTYPES if x.TestConditions(test_genotype)[0]]
-# print(possible_phenotypes)
-# test_dog = Dog(test_genotype, name="Test Dog", coat=[BLACK])
-# test_dog.CreateParents()
-# ISABELLA.ImposeConditions(test_dog.dam.genotype)
-# ISABELLA.ImposeConditions(test_dog.sire.genotype)
-# print(test_dog.dam.genotype)
-# print(test_dog.sire.genotype)
-# test_dog.CreateAllParentConditions()
-# test_dog.ImposeAllParentConditions()
-# print(test_dog.genotype)
-# print(test_dog.dam.genotype)
-# print(test_dog.sire.genotype)
-#
-# test_dog.CreateChildData()
-# print(test_dog.genotype)
-# test_dog.dam.ImposeChildConditions()
-# print(test_dog.dam.childConditions)
-# print(test_dog.genotype)
-# test_dog.CreateAllParentConditions()
-# test_dog.ImposeAllParentConditions()
-
-# print(test_dog.genotype)
-# print(test_dog.dam.genotype)
-# print(test_dog.sire.genotype)
-# print("\n\n\n")
-#
-# test_dog.dam.Breed(test_dog.sire)
-# breeding = test_dog.dam.Breed(test_dog.sire)
-# print(breeding.possibleGenotype)
-# print(breeding.possibleGenotype.TestMultiplePhenotypes([ISABELLA, BLACK, BLUE, NO_WHITE]), "THIS HERE")
-# goal = Goal([ISABELLA, BLACK, BLUE, NO_WHITE])
-# print(goal.CheckConditions(breeding.possibleGenotype))
-# a = Locus(0)
-# a1 = [a]
-# c = Condition(0, "IsNotHomozygousFor", "a")
-# print(goal.ToList())
