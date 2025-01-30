@@ -554,11 +554,12 @@ class PossibleGenotype(Genotype):
 
 
 class Phenotype:
-    def __init__(self, type):
+    def __init__(self, type, display=True):
         self.desc = type+"description of phenotype"
         self.conditions = []  # list of conditions for this phenotype to show
         self.reverseConditions = []
         self.type = type
+        self.display = display
 
     def AddCondition(self, locus, cond, argument):
         self.conditions.append(Condition(locus, cond, argument))
@@ -681,7 +682,7 @@ BRINDLE = Phenotype("K_LOCUS")
 SOLID_EUMELANIN = Phenotype("K_LOCUS")
 SOLID_PHEOMELANIN = Phenotype("E_LOCUS")
 MASK = Phenotype("E_LOCUS")
-NO_MERLE = Phenotype("MERLE")
+NO_MERLE = Phenotype("MERLE", False)
 MERLE = Phenotype("MERLE")
 DOUBLE_MERLE = Phenotype("MERLE")
 NO_WHITE = Phenotype("WHITE")
@@ -689,14 +690,14 @@ MINOR_WHITE = Phenotype("WHITE")
 PIEBALD = Phenotype("WHITE")
 IRISH_WHITE = Phenotype("WHITE")
 MINOR_TICKING = Phenotype("TICKING")
-NO_TICKING = Phenotype("TICKING")
+NO_TICKING = Phenotype("TICKING", False)
 TICKING = Phenotype("TICKING")
 ROANING = Phenotype("TICKING")
 ROANING_AND_TICKING = Phenotype("TICKING")
 GREYING = Phenotype("GREYING")
-NO_GREYING = Phenotype("GREYING")
-ALLOW_AGOUTI = Phenotype("K_LOCUS")
-NORMAL_EXTENSION = Phenotype("E_LOCUS")
+NO_GREYING = Phenotype("GREYING", False)
+ALLOW_AGOUTI = Phenotype("K_LOCUS", False)
+NORMAL_EXTENSION = Phenotype("E_LOCUS", False)
 
 ## DESCRIPTIONS
 SABLE.desc = TEXT_SABLE
@@ -719,7 +720,6 @@ TICKING.desc = TEXT_TICKING
 ROANING.desc = TEXT_ROANING
 ROANING_AND_TICKING.desc = TEXT_ROANING_AND_TICKING
 GREYING.desc = TEXT_GREYING
-NO_GREYING.desc = "no grey"
 
 ### CONDITIONS
 SABLE.AddCondition(6, "IsNotHomozygousFor", "K")
@@ -782,11 +782,13 @@ GREYING.AddCondition(3, "IsNotHomozygousFor", "e")
 
 NO_GREYING.AddCondition(4, "IsHomozygousFor", "g")
 ALLOW_AGOUTI.AddCondition(6, "IsHomozygousFor", "k")
+NORMAL_EXTENSION.AddCondition(3, "DoesntHaveAllele", "Em")
+NORMAL_EXTENSION.AddCondition(3, "IsNotHomozygousFor", "e")
 
 OTHER_PHENOTYPES = [SABLE, AGOUTI, TANPOINT, BRINDLE, SOLID_EUMELANIN, SOLID_PHEOMELANIN, MASK, MERLE, DOUBLE_MERLE,
                     NO_WHITE, MINOR_WHITE, PIEBALD, IRISH_WHITE, MINOR_TICKING, TICKING, ROANING, ROANING_AND_TICKING,
                     GREYING,
-                    NO_MERLE, NO_TICKING, NO_GREYING, ALLOW_AGOUTI]
+                    NO_MERLE, NO_TICKING, NO_GREYING, ALLOW_AGOUTI, NORMAL_EXTENSION]
 
 ALL_PHENOTYPES = COLOR_PHENOTYPES + OTHER_PHENOTYPES
 
@@ -914,7 +916,7 @@ class Dog:
 
     def ToDesc(self):
         return [str(self.id) + ". " + self.name, "Male" if self.sex == "m" else "Female", str(self.age),
-                "\n".join([str(x.desc) for x in self.coat])]
+                "\n".join([str(x.desc) for x in self.coat if x.display])]
 
     def CreateParents(self):
         if type(self.dam) != Dog:
